@@ -27,9 +27,9 @@ export default function AppNavigator() {
                     options={{
                     headerShown: false
                 }}/>
-                <Stack.Screen name="Login" component={LoginScreen}/>
-                <Stack.Screen name="Register" component={RegisterScreen}/>
-                <Stack.Screen name="Home" component={HomeScreen}/>
+                <Stack.Screen name="Home" component={HomeScreen}options={{
+                    headerShown: false
+                }}/>
             </Stack.Navigator>
         </NavigationContainer>
     );

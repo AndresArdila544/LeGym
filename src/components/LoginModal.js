@@ -12,7 +12,7 @@ import {
     Platform
 } from 'react-native';
 
-export default function LoginModal({onClose}) {
+export default function LoginModal({onClose,onContinue}) {
     const [email,
         setEmail] = useState('');
     const [password,
@@ -78,7 +78,7 @@ export default function LoginModal({onClose}) {
                                 <Text style={styles.forgot}>Forgot Password?</Text>
                             </TouchableOpacity>
 
-                            <TouchableOpacity style={styles.loginButton}>
+                            <TouchableOpacity style={styles.loginButton} onPress={onContinue}>
                                 <Text style={styles.loginButtonText}>LOG IN</Text>
                             </TouchableOpacity>
 

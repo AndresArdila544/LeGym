@@ -56,8 +56,17 @@ export default function WelcomeScreen({navigation}) {
                     animationType="slide"
                     transparent={true}
                     visible={loginVisible}
-                    onRequestClose={() => setLoginVisible(false)}>
-                    <LoginModal onClose={() => setLoginVisible(false)}/>
+                    onRequestClose={() => {
+                    setLoginVisible(false)
+                }}>
+                    <LoginModal
+                        onClose={() => {
+                        setLoginVisible(false)
+                    }}
+                        onContinue={() => {
+                            setLoginVisible(false)
+                        navigation.navigate('Home')
+                    }}/>
                 </Modal>
 
                 {/* Create Account Modal */}

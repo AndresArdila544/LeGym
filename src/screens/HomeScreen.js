@@ -1,299 +1,273 @@
+// src/screens/HomeScreen.js
 import React from 'react';
 import {
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    ScrollView,
-    Image,
-    ImageBackground
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Image,
+  ImageBackground
 } from 'react-native';
-import {Ionicons, MaterialCommunityIcons} from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import WeeklyWorkout from '../components/WeeklyWorkout';
 import CrowdMeterCard from '../components/CrowdMeterCard';
 import crowded from '../../assets/images/crowded.png';
 import BottomNavigationBar from '../components/BottomNavigationBar';
 import LockerPromoCard from '../components/LockerPromoCard';
 
-export default function HomeScreen() {
-    const bookedClasses = [
-        {
-            id: 1,
-            type: 'STRENGTH TRAINING CLASS',
-            time: '5:30 PM',
-            coach: 'Coach Raymond',
-            image: 'https://via.placeholder.com/150'
-        }, {
-            id: 2,
-            type: 'YOGA CLASS',
-            time: '3:35 PM',
-            coach: 'Coach Ashley',
-            image: 'https://via.placeholder.com/150'
-        }
-    ];
-    
-
-    return (
-        <View style={styles.container}>
-            {/* HEADER */}
-            <View style={styles.header}>
-                <Image
-                    source={require('../../assets/le_gym.png')}
-                    style={styles.logoImage}
-                    resizeMode="contain"/>
-                <View style={styles.headerIcons}>
-                    <Ionicons name="notifications-outline" size={24} color="#333"/>
-                    <TouchableOpacity style={styles.profileCircle}/>
-                </View>
-            </View>
-
-            <ScrollView
-                showsVerticalScrollIndicator={false}
-                style={{
-                flex: 1
-            }}>
-                {/* GREETING CARD */}
-
-                <ImageBackground source={require('../../assets/images/HomeHead.png')} // update path if needed
-                    style={styles.hero} imageStyle={{
-
-                }} resizeMode="cover">
-                    <Image source={require('../../assets/images/Overlay.png')} // your gradient image
-                        style={styles.gradientOverlay} resizeMode="cover"/>
-                    <View style={styles.heroTextWrapper}>
-                        <Text style={styles.heroTitle}>Hi John! 👋</Text>
-                        <Text style={styles.heroSub}>Ready for your next workout?</Text>
-                        <Text style={styles.streak}>🔥 Streak: 5 Days</Text>
-                    </View>
-                </ImageBackground>
-
-
-                <View style={styles.cards}>
-                {/* WEEKLY WORKOUTS */}
-                <WeeklyWorkout />
-
-                {/* CROWD METER */}
-                <CrowdMeterCard current={15} max={250} backgroundImage={crowded} style={styles.cardSpacing} />
-                </View>
-                {/* BOOKED CLASSES */}
-                <View style={styles.sectionHeader}>
-                    <Text style={styles.sectionTitle}>Booked Classes</Text>
-                </View>
-                {bookedClasses.map((item) => (
-                    <View key={item.id} style={styles.classCard}>
-                        <Image
-                            source={{
-                            uri: item.image
-                        }}
-                            style={styles.classImage}/>
-                        <View style={styles.classDetails}>
-                            <Text style={styles.classTitle}>{item.type}</Text>
-                            <Text style={styles.classInfo}>{item.time}
-                                • {item.coach}</Text>
-                            <TouchableOpacity style={styles.cancelButton}>
-                                <Text style={styles.cancelButtonText}>Cancel Booking</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                ))}
-
-                {/* LOCKER PROMO */}
-                <LockerPromoCard />
-            </ScrollView>
-
-            {/* BOTTOM NAVIGATION */}
-            <BottomNavigationBar active="home" onChatPress={() => console.log('Chat tapped!')}/>
-        </View>
-    );
-}
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff'
-    },
-    
-    cardSpacing: {
-      marginTop: 16, // space between workout card and occupancy
-    },
-    header: {
-        padding: 20,
-        paddingTop: 50,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-    },
-    logoText: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        color: '#000'
-    },
-    headerIcons: {
-        flexDirection: 'row',
-        gap: 16,
-        alignItems: 'center'
-    },
-    profileCircle: {
-        width: 30,
-        height: 30,
-        borderRadius: 15,
-        backgroundColor: '#ccc'
-    },
-    hero: {
-        width: 393,
-        height: 135,
-        overflow: 'hidden',
-        justifyContent: 'center',
-        paddingHorizontal: 20,
-        marginBottom: 20,
-        alignSelf: 'stretch'
-    },
-    gradientOverlay: {
-        ...StyleSheet.absoluteFillObject,
-        width: 393,
-        height: 135,
-        zIndex: 1
-    },
-    heroTextWrapper: {
-      zIndex: 2,
-    },
-    heroTitle: {
-      color: '#fff',
-      fontSize: 18,
-      fontWeight: 'bold',
-    },
-    heroSub: {
-      color: '#eee',
-      fontSize: 12,
-      marginTop: 2,
-    },
-    streak: {
-      color: '#fff',
-      fontSize: 12,
-      marginTop: 4,
-      fontWeight: '600',
-    },
-    welcomeText: {
-        color: '#fff',
-        fontSize: 20,
-        fontWeight: '700'
-    },
-    subtitle: {
-        color: '#fff',
-        fontSize: 14
-    },
-    streak: {
-        color: '#fff',
-        fontSize: 13,
-        marginTop: 8,
-        fontWeight: '600'
-    },
-    greetingCard: {
-        marginHorizontal: 20,
-        marginBottom: 20
-    },
-    greetingText: {
-        fontSize: 22,
-        fontWeight: '600'
-    },
-    
-    weeklyTracker: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginBottom: 20
-    },
-    dayCircle: {
-        backgroundColor: '#eee',
-        borderRadius: 20,
-        paddingVertical: 10,
-        paddingHorizontal: 12
-    },
-    dayText: {
-        fontSize: 14
-    },
-    crowdMeter: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        backgroundColor: '#f9f9f9',
-        marginHorizontal: 20,
-        padding: 15,
-        borderRadius: 10,
-        alignItems: 'center',
-        marginBottom: 20
-    },
-    crowdText: {
-        fontSize: 16
-    },
-    capacityBadge: {
-        backgroundColor: '#8B1C3B',
-        padding: 8,
-        borderRadius: 20
-    },
-    capacityText: {
-        color: '#fff',
-        fontWeight: 'bold'
-    },
-    sectionHeader: {
-        marginHorizontal: 20,
-        marginBottom: 10
-    },
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: '600'
-    },
-    classCard: {
-        flexDirection: 'row',
-        backgroundColor: '#f3f3f3',
-        marginHorizontal: 20,
-        marginBottom: 15,
-        borderRadius: 10,
-        overflow: 'hidden'
-    },
-    classImage: {
-        width: 90,
-        height: 90
-    },
-    classDetails: {
-        flex: 1,
-        padding: 10,
-        justifyContent: 'center'
-    },
-    classTitle: {
-        fontWeight: 'bold',
-        fontSize: 14
-    },
-    classInfo: {
-        fontSize: 12,
-        color: '#555',
-        marginBottom: 5
-    },
-    cancelButton: {
-        backgroundColor: '#8B1C3B',
-        paddingVertical: 6,
-        borderRadius: 20,
-        alignItems: 'center'
-    },
-    cancelButtonText: {
-        color: '#fff',
-        fontWeight: 'bold',
-        fontSize: 12
-    },
-    promoBanner: {
-        backgroundColor: '#ddd',
-        padding: 20,
-        margin: 20,
-        borderRadius: 10
-    },
-    promoText: {
-        fontSize: 14
-    },
-    boldText: {
-        fontWeight: 'bold'
-    },
-    bottomNav: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        paddingVertical: 12,
-        borderTopWidth: 1,
-        borderColor: '#eee'
+export default function HomeScreen({ navigation }) {
+  const bookedClasses = [
+    {
+      id: '1',
+      title: 'STRENGTH TRAINING CLASS',
+      time: '5:30 PM',
+      instructor: 'Coach Raymond',
+      location: 'SGW – Le Gym – Gymnasium',
+      rating: '4.8'
+    }, {
+      id: '2',
+      title: 'YOGA CLASS',
+      time: '5:30 PM',
+      instructor: 'Coach Ashley',
+      location: 'SGW – Le Gym – Studio',
+      rating: '4.8'
     }
+  ];
+
+  return (
+    <View style={styles.container}>
+      {/* HEADER */}
+      <View style={styles.header}>
+        <Image
+          source={require('../../assets/le_gym.png')}
+          style={styles.logoImage}
+          resizeMode="contain"
+        />
+        <View style={styles.headerIcons}>
+          <Ionicons name="notifications-outline" size={24} color="#333"/>
+          <TouchableOpacity 
+            style={styles.profileCircle}
+            onPress={() => navigation.navigate('Profile')}
+          >
+            <Text style={styles.profileInitials}>JS</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <ScrollView showsVerticalScrollIndicator={false} style={{flex: 1}}>
+        {/* GREETING CARD */}
+        <ImageBackground 
+          source={require('../../assets/images/HomeHead.png')}
+          style={styles.hero} 
+          resizeMode="cover"
+        >
+          <Image 
+            source={require('../../assets/images/Overlay.png')}
+            style={styles.gradientOverlay} 
+            resizeMode="cover"
+          />
+          <View style={styles.heroTextWrapper}>
+            <Text style={styles.heroTitle}>Hi John! 👋</Text>
+            <Text style={styles.heroSub}>Ready for your next workout?</Text>
+            <Text style={styles.streak}>🔥 Streak: 5 Days</Text>
+          </View>
+        </ImageBackground>
+
+        <View style={styles.cards}>
+          {/* WEEKLY WORKOUTS */}
+          <WeeklyWorkout />
+
+          {/* CROWD METER */}
+          <CrowdMeterCard 
+            current={15} 
+            max={250} 
+            image={crowded}
+            crowdLevel="Not Crowded"
+            location="SGW – Le Gym"
+            waitTime="No wait time"
+            style={styles.cardSpacing} 
+          />
+        </View>
+
+        <View style={styles.classesContainer}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Booked Classes</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Calendar')}>
+              <Text style={styles.seeAllText}>See all</Text>
+            </TouchableOpacity>
+          </View>
+
+          {bookedClasses.map((classItem, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.classCard}
+              onPress={() => navigation.navigate('ClassDetail', { classInfo: classItem })}
+            >
+              <View style={styles.classInfo}>
+                <View style={styles.classRatingContainer}>
+                  <Text style={styles.classRating}>{classItem.rating}</Text>
+                </View>
+                <Text style={styles.classTitle}>{classItem.title}</Text>
+                <Text style={styles.classTime}>{classItem.time}</Text>
+                <Text style={styles.classInstructor}>{classItem.instructor}</Text>
+                <TouchableOpacity style={styles.cancelButton}>
+                  <Text style={styles.cancelButtonText}>Cancel Booking</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <LockerPromoCard 
+          title="Need a Locker while you workout? It's free!"
+          subtitle="Padlock for $10"
+          onPress={() => navigation.navigate('LockerRental')}
+        />
+      </ScrollView>
+
+      <BottomNavigationBar active="home" navigation={navigation} />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 50,
+    paddingBottom: 10,
+    backgroundColor: '#fff',
+  },
+  logoImage: {
+    height: 30,
+    width: 120,
+  },
+  headerIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  profileCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#800000',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileInitials: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  hero: {
+    height: 180,
+    width: '100%',
+    position: 'relative',
+  },
+  gradientOverlay: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+  },
+  heroTextWrapper: {
+    padding: 20,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  heroTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 4,
+  },
+  heroSub: {
+    fontSize: 16,
+    color: '#fff',
+    marginBottom: 8,
+  },
+  streak: {
+    fontSize: 16,
+    color: '#fff',
+    fontWeight: '500',
+  },
+  cards: {
+    padding: 16,
+  },
+  cardSpacing: {
+    marginTop: 16,
+  },
+  classesContainer: {
+    padding: 16,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  seeAllText: {
+    color: '#800000',
+    fontWeight: '500',
+  },
+  classCard: {
+    backgroundColor: '#f5f5f5',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+  },
+  classInfo: {
+    flex: 1,
+  },
+  classRatingContainer: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    backgroundColor: '#800000',
+    borderRadius: 4,
+    padding: 4,
+  },
+  classRating: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  classTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  classTime: {
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  classInstructor: {
+    fontSize: 14,
+    marginBottom: 12,
+  },
+  cancelButton: {
+    alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderColor: '#800000',
+    borderRadius: 20,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+  },
+  cancelButtonText: {
+    color: '#800000',
+    fontSize: 12,
+    fontWeight: '500',
+  },
 });

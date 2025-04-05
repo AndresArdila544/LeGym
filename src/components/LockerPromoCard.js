@@ -2,9 +2,9 @@ import React from 'react';
 import { View, Text, StyleSheet, ImageBackground, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function LockerPromoCard() {
+export default function LockerPromoCard({onPress}) {
     return (
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={onPress}>
             <ImageBackground
                 source={require('../../assets/images/locker.png')}
                 style={styles.image}

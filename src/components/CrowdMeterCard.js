@@ -7,7 +7,7 @@ export default function CrowdMeterCard({ current = 15, max = 250, backgroundImag
 
     return (
         <View style={styles.container}>
-            <ImageBackground source={backgroundImage} style={styles.image} imageStyle={styles.imageStyle}>
+            <ImageBackground source={require('../../assets/images/crowded.png')} style={styles.image} imageStyle={styles.imageStyle}>
                 <View style={styles.overlay}>
                     <Text style={styles.occupancyLabel}>Live Occupancy</Text>
                     <Text style={styles.status}>Not Crowded</Text>
@@ -40,6 +40,9 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         marginHorizontal: 20,
         marginBottom: 20,
+        marginHorizontal: 0, // Remove horizontal margins
+        marginBottom: 20,
+        width: '100%',
     },
     image: {
         flex: 1,

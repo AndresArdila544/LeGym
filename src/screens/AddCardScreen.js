@@ -74,7 +74,7 @@ export default function AddCardScreen({ navigation }) {
       await AsyncStorage.setItem('paymentMethods', JSON.stringify(finalMethods));
       
       Alert.alert('Success', 'Payment method added successfully', [
-        { text: 'OK', onPress: () => navigation.goBack() }
+        { text: 'OK', onPress: () => navigation.navigate('Profile') }
       ]);
     } catch (error) {
       console.error('Error saving payment method:', error);

@@ -24,14 +24,16 @@ export default function HomeScreen({ navigation }) {
       time: '5:30 PM',
       instructor: 'Coach Raymond',
       location: 'SGW – Le Gym – Gymnasium',
-      rating: '4.8'
+      image: require('../../assets/images/Strengthtrainingclass.png')
+      /*rating: '4.8'*/
     }, {
       id: '2',
       title: 'YOGA CLASS',
       time: '5:30 PM',
       instructor: 'Coach Ashley',
       location: 'SGW – Le Gym – Studio',
-      rating: '4.8'
+      image: require('../../assets/images/Yogaclass.png')
+      /*rating: '4.8'*/
     }
   ];
 
@@ -104,13 +106,27 @@ export default function HomeScreen({ navigation }) {
               style={styles.classCard}
               onPress={() => navigation.navigate('ClassDetail', { classInfo: classItem })}
             >
+              <Image
+                source={classItem.image}
+                style={styles.classImage}
+                resizeMode="cover"
+              />
               <View style={styles.classInfo}>
+                {/*
                 <View style={styles.classRatingContainer}>
                   <Text style={styles.classRating}>{classItem.rating}</Text>
-                </View>
+                </View>*/}
                 <Text style={styles.classTitle}>{classItem.title}</Text>
-                <Text style={styles.classTime}>{classItem.time}</Text>
-                <Text style={styles.classInstructor}>{classItem.instructor}</Text>
+                <View style={styles.classMetaContainer}>
+                  <View style={styles.classTimeBadge}>
+                    <Ionicons name="time-outline" size={16} color="white" />
+                    <Text style={styles.classTimeBadgeText}>{classItem.time}</Text>
+                  </View>
+                  <View style={styles.classInstructorBadge}>
+                    <Ionicons name="person-outline" size={16} color="white" />
+                    <Text style={styles.classInstructorBadgeText}>{classItem.instructor}</Text>
+                  </View>
+                </View>
                 <TouchableOpacity style={styles.cancelButton}>
                   <Text style={styles.cancelButtonText}>Cancel Booking</Text>
                 </TouchableOpacity>
@@ -223,14 +239,88 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   classCard: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'white',
     borderRadius: 12,
-    padding: 16,
     marginBottom: 12,
-  },
+    borderWidth: 1,
+    borderColor: '#EAF0F6',
+    overflow: 'hidden',
+    },
   classInfo: {
     flex: 1,
+    padding: 16,
+    paddingLeft: 8,
   },
+  classImage: {
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+  },
+  classTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 4,
+    paddingLeft: 4,
+  },
+  classTime: {
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  classInstructor: {
+    fontSize: 14,
+    marginBottom: 12,
+  },
+  cancelButton: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#800000',
+    borderRadius: 25,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginTop: 10,
+    alignItems: 'center',
+    marginLeft: 4,
+    width: '100%',
+  },
+  cancelButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  classMetaContainer: {
+    flexDirection: 'row',
+    marginBottom: 12,
+    gap: 20, // Increased spacing between badges
+  },
+  classTimeBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#222222',
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    gap: 6,
+    height: 36,
+  },
+  classTimeBadgeText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  classInstructorBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#222222',
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    gap: 6,
+    height: 36,
+  },
+  classInstructorBadgeText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+   /*
   classRatingContainer: {
     position: 'absolute',
     right: 0,
@@ -243,31 +333,5 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 12,
-  },
-  classTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  classTime: {
-    fontSize: 14,
-    marginBottom: 4,
-  },
-  classInstructor: {
-    fontSize: 14,
-    marginBottom: 12,
-  },
-  cancelButton: {
-    alignSelf: 'flex-start',
-    borderWidth: 1,
-    borderColor: '#800000',
-    borderRadius: 20,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-  },
-  cancelButtonText: {
-    color: '#800000',
-    fontSize: 12,
-    fontWeight: '500',
-  },
+  },*/
 });

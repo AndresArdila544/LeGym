@@ -79,8 +79,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 16,
         padding: 16,
-        marginHorizontal: 16,
+        marginHorizontal: 0,
         marginTop: 16,
+        width: '100%',
         // iOS shadow
         shadowColor: '#000',
         shadowOffset: {
@@ -110,10 +111,11 @@ const styles = StyleSheet.create({
     },
     dayRow: {
         flexDirection: 'row',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        marginHorizontal: -4,
     },
     dayPill: {
-        width: 44, // Longer pill
+        width: (SCREEN_WIDTH - 80) / 7,
         height: 64, // Slightly taller
         borderRadius: 22,
         alignItems: 'center',

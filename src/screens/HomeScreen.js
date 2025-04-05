@@ -24,16 +24,16 @@ export default function HomeScreen({ navigation }) {
       time: '5:30 PM',
       instructor: 'Coach Raymond',
       location: 'SGW – Le Gym – Gymnasium',
-      image: require('../../assets/images/Strengthtrainingclass.png')
-      /*rating: '4.8'*/
+      image: require('../../assets/images/Strengthtrainingclass.png'),
+      rating: '4.8'
     }, {
       id: '2',
       title: 'YOGA CLASS',
       time: '5:30 PM',
       instructor: 'Coach Ashley',
       location: 'SGW – Le Gym – Studio',
-      image: require('../../assets/images/Yogaclass.png')
-      /*rating: '4.8'*/
+      image: require('../../assets/images/Yogaclass.png'),
+      rating: '4.8'
     }
   ];
 
@@ -112,10 +112,10 @@ export default function HomeScreen({ navigation }) {
                 resizeMode="cover"
               />
               <View style={styles.classInfo}>
-                {/*
+                
                 <View style={styles.classRatingContainer}>
                   <Text style={styles.classRating}>{classItem.rating}</Text>
-                </View>*/}
+                </View>
                 <Text style={styles.classTitle}>{classItem.title}</Text>
                 <View style={styles.classMetaContainer}>
                   <View style={styles.classTimeBadge}>
@@ -254,6 +254,7 @@ const styles = StyleSheet.create({
   classImage: {
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
+    width:'100%'
   },
   classTitle: {
     fontSize: 16,
@@ -320,7 +321,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
   },
-   /*
+   
   classRatingContainer: {
     position: 'absolute',
     right: 0,
@@ -333,5 +334,5 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 12,
-  },*/
+  },
 });

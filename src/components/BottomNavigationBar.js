@@ -1,52 +1,80 @@
+// src/components/BottomNavigationBar.js
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function BottomNavigationBar({ active = 'home', onChatPress }) {
-    return (
-        <>
-            {/* Floating Chat Button */}
-            <TouchableOpacity style={styles.chatButton} onPress={onChatPress}>
-                <Ionicons name="chatbubble-ellipses" size={24} color="#8B1C3B" />
-            </TouchableOpacity>
+export default function BottomNavigationBar({ active, navigation }) {
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.tabButton}
+        onPress={() => navigation.navigate('Home')}
+      >
+        <Ionicons
+          name={active === 'home' ? 'home' : 'home-outline'}
+          size={24}
+          color={active === 'home' ? '#800000' : '#666'}
+        />
+      </TouchableOpacity>
 
-            {/* Bottom Nav Bar */}
-            <View style={styles.navBar}>
-                <Ionicons name="home" size={24} color={active === 'home' ? '#8B1C3B' : '#ccc'} />
-                <Ionicons name="calendar" size={24} color={active === 'calendar' ? '#8B1C3B' : '#ccc'} />
-                <Ionicons name="stats-chart" size={24} color={active === 'stats' ? '#8B1C3B' : '#ccc'} />
-                <Ionicons name="person" size={24} color={active === 'profile' ? '#8B1C3B' : '#ccc'} />
-            </View>
-        </>
-    );
+      <TouchableOpacity
+        style={styles.tabButton}
+        onPress={() => navigation.navigate('Calendar')}
+      >
+        <Ionicons
+          name={active === 'calendar' ? 'calendar' : 'calendar-outline'}
+          size={24}
+          color={active === 'calendar' ? '#800000' : '#666'}
+        />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.tabButton}
+        onPress={() => navigation.navigate('FitnessTracker')}
+      >
+        <Ionicons
+          name={active === 'fitness' ? 'fitness' : 'fitness-outline'}
+          size={24}
+          color={active === 'fitness' ? '#800000' : '#666'}
+        />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.tabButton}
+        onPress={() => navigation.navigate('Chat')}
+      >
+        <Ionicons
+          name={active === 'chat' ? 'chatbubble' : 'chatbubble-outline'}
+          size={24}
+          color={active === 'chat' ? '#800000' : '#666'}
+        />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.tabButton}
+        onPress={() => navigation.navigate('Profile')}
+      >
+        <Ionicons
+          name={active === 'profile' ? 'person' : 'person-outline'}
+          size={24}
+          color={active === 'profile' ? '#800000' : '#666'}
+        />
+      </TouchableOpacity>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    navBar: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        backgroundColor: '#111',
-        paddingVertical: 14,
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
-        paddingBottom: 35
-        
-    },
-    chatButton: {
-        position: 'absolute',
-        right: 20,
-        bottom: 80,
-        backgroundColor: '#000',
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 10,
-        shadowColor: '#000',
-        shadowOpacity: 0.3,
-        shadowRadius: 6,
-        elevation: 5
-    }
+  container: {
+    flexDirection: 'row',
+    height: 60,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+  },
+  tabButton: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });

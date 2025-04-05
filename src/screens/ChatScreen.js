@@ -10,6 +10,7 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -31,7 +32,7 @@ export default function ChatScreen({ navigation }) {
           // If no messages, add welcome message
           const welcomeMessage = {
             id: Date.now().toString(),
-            text: "Hello, I'm StingerBot! I'm your personal Le Gym assistant. How can I help you?",
+            text: `Hello, I'm StingerBot! 👋 I'm your personal Le Gym assistant. How can I help you?`,
             sender: 'bot',
             timestamp: new Date().toISOString(),
           };
@@ -114,8 +115,16 @@ export default function ChatScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Stinger Bot</Text>
-        <Text style={styles.headerSubtitle}>Always active</Text>
+        <View style={styles.headerContent}>
+          <Image source={require('../../assets/images/Stingericon.png')} style={styles.headerIcon}/>
+          <View style={styles.headerTextContainer}>
+            <Text style={styles.headerTitle}>Stinger Bot</Text>
+            <View style={styles.statusContainer}>
+              <View style={styles.activeIndicator} />
+              <Text style={styles.headerSubtitle}>Always active</Text>
+            </View>
+          </View>
+        </View>
       </View>
       
       <ScrollView 
@@ -180,17 +189,45 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   header: {
-    backgroundColor: '#800000',
-    padding: 16,
+    backgroundColor: 'white',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerIcon: {
+    width: 30,
+    height: 30,
+    marginRight: 12,
+    borderRadius: 20,
+  },
+  headerTextContainer: {
+    flex: 1,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: 'white',
+    color: '#000',
+    marginBottom: 2,
+  },
+  statusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  activeIndicator: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#4CAF50',
+    marginRight: 4,
   },
   headerSubtitle: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: 'Black',
   },
   messagesContainer: {
     flex: 1,

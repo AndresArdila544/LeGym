@@ -1,7 +1,13 @@
 // src/components/BottomNavigationBar.js
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
+const homeiconPath = '../../assets/images/Homebaricon.png';
+const calendariconPath = '../../assets/images/Calendarbaricon.png';
+const ChartbariconPath = '../../assets/images/Chartbaricon.png';
+const ProfilebariconPath = '../../assets/images/Profilebaricon.png';
+
 
 export default function BottomNavigationBar({ active, navigation }) {
   return (
@@ -10,10 +16,12 @@ export default function BottomNavigationBar({ active, navigation }) {
         style={styles.tabButton}
         onPress={() => navigation.navigate('Home')}
       >
-        <Ionicons
-          name={active === 'home' ? 'home' : 'home-outline'}
-          size={24}
-          color={active === 'home' ? '#800000' : '#666'}
+        <Image
+          source={require(homeiconPath)}
+          style={[
+            styles.icon,
+            { tintColor: active === 'home' ? '#FFFFFF' : '#666' }
+          ]}
         />
       </TouchableOpacity>
 
@@ -21,10 +29,12 @@ export default function BottomNavigationBar({ active, navigation }) {
         style={styles.tabButton}
         onPress={() => navigation.navigate('Calendar')}
       >
-        <Ionicons
-          name={active === 'calendar' ? 'calendar' : 'calendar-outline'}
-          size={24}
-          color={active === 'calendar' ? '#800000' : '#666'}
+        <Image
+          source={require(calendariconPath)}
+          style={[
+            styles.icon,
+            { tintColor: active === 'calendar' ? '#FFFFFF' : '#666' }
+          ]}
         />
       </TouchableOpacity>
 
@@ -32,10 +42,12 @@ export default function BottomNavigationBar({ active, navigation }) {
         style={styles.tabButton}
         onPress={() => navigation.navigate('FitnessTracker')}
       >
-        <Ionicons
-          name={active === 'fitness' ? 'fitness' : 'fitness-outline'}
-          size={24}
-          color={active === 'fitness' ? '#800000' : '#666'}
+        <Image
+          source={require(ChartbariconPath)}
+          style={[
+            styles.icon,
+            { tintColor: active === 'fitness' ? '#FFFFFF' : '#666' }
+          ]}
         />
       </TouchableOpacity>
 
@@ -46,7 +58,7 @@ export default function BottomNavigationBar({ active, navigation }) {
         <Ionicons
           name={active === 'chat' ? 'chatbubble' : 'chatbubble-outline'}
           size={24}
-          color={active === 'chat' ? '#800000' : '#666'}
+          color={active === 'chat' ? '#FFFFFF' : '#666'}
         />
       </TouchableOpacity>
 
@@ -54,10 +66,12 @@ export default function BottomNavigationBar({ active, navigation }) {
         style={styles.tabButton}
         onPress={() => navigation.navigate('Profile')}
       >
-        <Ionicons
-          name={active === 'profile' ? 'person' : 'person-outline'}
-          size={24}
-          color={active === 'profile' ? '#800000' : '#666'}
+        <Image
+          source={require(ProfilebariconPath)}
+          style={[
+            styles.icon,
+            { tintColor: active === 'profile' ? '#FFFFFF' : '#666' }
+          ]}
         />
       </TouchableOpacity>
     </View>
@@ -68,13 +82,21 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     height: 60,
-    backgroundColor: '#fff',
+    backgroundColor: '#141414',
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: '#333',
   },
   tabButton: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: 10,
+    backgroundColor: '#141414' 
   },
+  icon: {
+    width: 28,
+    height: 28,
+    resizeMode: 'contain',
+    opacity: 1,
+  }
 });

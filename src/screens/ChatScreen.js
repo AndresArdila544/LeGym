@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
       color: '#e1e1e1',
     },
     messagesContainer: {
-        flex: 1,
+        flexGrow: 1,
         padding: 16
     },
     messageWrapper: {

@@ -146,22 +146,18 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
         paddingTop: 50,
-        paddingHorizontal: 12
+        
     },
     header: {
         fontSize: 20,
         fontWeight: 'bold',
         color: '#8B1C3B',
-        marginVertical: 12
-    },
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#8B1C3B',
-        marginVertical: 12
+        marginVertical: 12,
+        paddingHorizontal: 12
     },
     content: {
-        flex: 1
+        flex: 1,
+        paddingHorizontal: 12
     },
     profileSection: {
         alignItems: 'center',

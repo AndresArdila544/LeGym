@@ -7,75 +7,74 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
+  Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BottomNavigationBar from '../components/BottomNavigationBar';
+import DatePicker from '../components/DatePicker';
 
 export default function CalendarScreen({ navigation }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [events, setEvents] = useState([]);
-  
-  // Current month days
-  const daysInMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0).getDate();
-  const firstDay = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1).getDay();
-  
-  // Get calendar days
-  const getDays = () => {
-    const days = [];
-    // Previous month days
-    for (let i = 0; i < firstDay; i++) {
-      days.push({ day: null, isCurrentMonth: false });
-    }
-    // Current month days
-    for (let i = 1; i <= daysInMonth; i++) {
-      days.push({ day: i, isCurrentMonth: true });
-    }
-    return days;
-  };
-  
-  const days = getDays();
-  
-  // Get month name
-  const monthNames = ["January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"];
-  
+
+  const eventsData = [
+    {
+      eventName: 'Rumba Class',
+      location: 'SGW – Le Gym – Gymnasium',
+      instructor: 'Coach Raymond',
+      instructorImage: 'https://images.unsplash.com/photo-1724984430472-2b79b1c0dd13',
+      dateTime: '2025-04-05T20:00:00.000Z',
+      duration: '1hr',
+      id: 'hstd7hebgfhsgfdjudg'
+    }, {
+      eventName: 'Yoga Class',
+      location: 'SGW – Le Gym – Gymnasium',
+      instructor: 'Julie Watson',
+      instructorImage: 'https://images.unsplash.com/photo-1724984430472-2b79b1c0dd13',
+      dateTime: '2025-04-05T18:00:00.000Z',
+      duration: '45m',
+      id: 'hstd7hebdfegfdjudg'
+    }, {
+      eventName: 'Rumba Class',
+      location: 'SGW – Le Gym – Gymnasium',
+      instructor: 'Coach Raymond',
+      instructorImage: 'https://images.unsplash.com/photo-1724984430472-2b79b1c0dd13',
+      dateTime: '2025-04-06T09:00:00.000Z',
+      duration: '1hr',
+      id: '746hssfhsgfdjudg'
+    }]
+
   // Load events from AsyncStorage
   useEffect(() => {
     const loadEvents = async () => {
       try {
-        const storedEvents = await AsyncStorage.getItem('calendarEvents');
-        if (storedEvents) {
-          setEvents(JSON.parse(storedEvents));
-        }
+        // const storedEvents = await AsyncStorage.getItem('calendarEvents');
+        // console.log(await AsyncStorage.getItem('calendarEvents'))
+        // if (storedEvents) {
+        //   setEvents(JSON.parse(storedEvents));
+        // } else {
+        await AsyncStorage.clear();
+        await AsyncStorage.setItem('calendarEvents', JSON.stringify(eventsData));
+        setEvents(eventsData);
+        // }
       } catch (error) {
         console.error('Failed to load events:', error);
       }
     };
-    
+
     loadEvents();
   }, []);
-  
+
   // Filter events for selected date
   const todayEvents = events.filter(event => {
-    const eventDate = new Date(event.date);
+
+    const eventDate = new Date(event.dateTime);
     return eventDate.getDate() === selectedDate.getDate() &&
-           eventDate.getMonth() === selectedDate.getMonth() &&
-           eventDate.getFullYear() === selectedDate.getFullYear();
+      eventDate.getMonth() === selectedDate.getMonth() &&
+      eventDate.getFullYear() === selectedDate.getFullYear();
   });
-  
-  // Get tomorrow's date
-  const tomorrow = new Date(selectedDate);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  
-  // Filter events for tomorrow
-  const tomorrowEvents = events.filter(event => {
-    const eventDate = new Date(event.date);
-    return eventDate.getDate() === tomorrow.getDate() &&
-           eventDate.getMonth() === tomorrow.getMonth() &&
-           eventDate.getFullYear() === tomorrow.getFullYear();
-  });
-  
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -85,80 +84,55 @@ export default function CalendarScreen({ navigation }) {
         <Text style={styles.headerTitle}>My Calendar</Text>
         <View style={{ width: 24 }} />
       </View>
-      
-      <View style={styles.calendarHeader}>
-        <Text style={styles.monthYear}>{monthNames[selectedDate.getMonth()]} {selectedDate.getFullYear()}</Text>
-      </View>
-      
-      <View style={styles.weekdaysRow}>
-        {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
-          <Text key={index} style={styles.weekday}>{day}</Text>
-        ))}
-      </View>
-      
-      <View style={styles.daysContainer}>
-        {days.map((item, index) => (
-          <TouchableOpacity
-            key={index}
-            style={[
-              styles.dayCell,
-              !item.isCurrentMonth && styles.inactiveDay,
-              item.day === selectedDate.getDate() && styles.selectedDay
-            ]}
-            onPress={() => {
-              if (item.day && item.isCurrentMonth) {
-                const newDate = new Date(selectedDate);
-                newDate.setDate(item.day);
-                setSelectedDate(newDate);
-              }
-            }}
-          >
-            <Text style={[
-              styles.dayText,
-              item.day === selectedDate.getDate() && styles.selectedDayText
-            ]}>
-              {item.day}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-      
+
       <ScrollView style={styles.eventsContainer}>
+        <View style={{ marginTop: 20 }}>
+          <DatePicker onDateChange={(date) => setSelectedDate(date)} />
+        </View>
+
+        <View style={{ marginTop: 20, paddingHorizontal: 16, backgroundColor: "#F2F4F5", height: "fit-content", paddingVertical: 5 }}>
+          <Text style={styles.dayTitle}>{selectedDate.toDateString()}</Text>
+        </View>
+
         <View style={styles.dayEventsContainer}>
-          <Text style={styles.dayTitle}>Today - {selectedDate.toDateString()}</Text>
           {todayEvents.length > 0 ? (
             todayEvents.map((event, index) => (
               <View key={index} style={styles.eventCard}>
-                <Text style={styles.eventTime}>{event.time}</Text>
-                <Text style={styles.eventDuration}>{event.duration}</Text>
-                <Text style={styles.eventTitle}>{event.title}</Text>
-                <Text style={styles.eventInstructor}>{event.instructor}</Text>
-                <Text style={styles.eventLocation}>{event.location}</Text>
+                <View>
+                  <Text style={styles.eventTime}>{new Date(event.dateTime).getHours() + ":" + new Date(event.dateTime).getMinutes().toString().padStart(2, '0')}</Text>
+                  <Text style={styles.eventDuration}>{event.duration}</Text>
+                </View>
+
+                <View style={styles.eventDetailsCard}>
+                  <TouchableOpacity onPress={() => navigation.navigate('ClassDetail', { classInfo: event })}>
+                    <Text style={styles.eventTitle}>{event.eventName}</Text>
+
+                  <View style={{ display: 'flex', flexDirection: 'row', gap: 10, alignItems: 'center', marginTop: 15 }}>
+                    <Ionicons name="location-outline" size={24} color="#fff" /> 
+                    <Text style={styles.eventLocation}>{event.location}</Text>
+                  </View>
+
+                  <View style={{ display: 'flex', flexDirection: 'row', gap: 10, alignItems: 'center', marginTop: 10 }}>
+                    <Image
+                      source={{ uri: event.instructorImage }}
+                      style={{ width: 25, height: 25, borderRadius: 20 }}
+                    />
+
+                    <Text style={styles.eventInstructor}>{event.instructor}</Text>
+                  </View>
+                  </TouchableOpacity>
+                  
+                </View>
+
               </View>
             ))
           ) : (
             <Text style={styles.noEvents}>No events scheduled</Text>
           )}
         </View>
-        
-        <View style={styles.dayEventsContainer}>
-          <Text style={styles.dayTitle}>{tomorrow.toDateString()}</Text>
-          {tomorrowEvents.length > 0 ? (
-            tomorrowEvents.map((event, index) => (
-              <View key={index} style={styles.eventCard}>
-                <Text style={styles.eventTime}>{event.time}</Text>
-                <Text style={styles.eventDuration}>{event.duration}</Text>
-                <Text style={styles.eventTitle}>{event.title}</Text>
-                <Text style={styles.eventInstructor}>{event.instructor}</Text>
-                <Text style={styles.eventLocation}>{event.location}</Text>
-              </View>
-            ))
-          ) : (
-            <Text style={styles.noEvents}>No events scheduled</Text>
-          )}
-        </View>
+
       </ScrollView>
-      
+
       <BottomNavigationBar active="calendar" navigation={navigation} />
     </SafeAreaView>
   );
@@ -228,41 +202,61 @@ const styles = StyleSheet.create({
   },
   eventsContainer: {
     flex: 1,
-    paddingHorizontal: 16,
+    // paddingHorizontal: 16,
   },
   dayEventsContainer: {
-    marginBottom: 16,
+    marginVertical: 16,
+    paddingHorizontal: 16,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 30
   },
   dayTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: 'bold',
     marginVertical: 8,
   },
   eventCard: {
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 8,
+    // backgroundColor: 'red',
+    display: 'flex',
+    flexDirection: 'row',
+    // justifyContent: 'space-between',
+    // alignItems: 'center',
+    // borderRadius: 8,
+    // padding: 12,
+    // marginBottom: 8,
+  },
+  eventDetailsCard: {
+    backgroundColor: '#93243A',
+    borderRadius: 16,
+    minHeight: 'fit-content',
+    // width: '60%',
+    padding: 16,
+    marginLeft: 30,
+    flex: 1,
   },
   eventTime: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: '#000',
   },
   eventDuration: {
     fontSize: 14,
     color: '#666',
   },
   eventTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginTop: 4,
+    color: '#FFFFFF'
+    // marginTop: 4,
   },
   eventInstructor: {
-    fontSize: 14,
+    fontSize: 15,
+    color: '#FFFFFF',
   },
   eventLocation: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 15,
+    color: '#FFFFFF',
   },
   noEvents: {
     fontStyle: 'italic',

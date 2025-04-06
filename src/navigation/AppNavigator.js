@@ -17,6 +17,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import MembershipScreen from '../screens/MembershipScreen';
 import PaymentMethodScreen from '../screens/PaymentMethodScreen';
 import AddCardScreen from '../screens/AddCardScreen';
+import ClassesScreen from '../screens/ClassesScreen';
 
 const Stack = createStackNavigator();
 
@@ -32,9 +33,15 @@ export default function AppNavigator({onLayout}) {
                 <Stack.Screen name="Welcome" component={WelcomeScreen}/>
                 <Stack.Screen name="Login" component={LoginScreen}/>
                 <Stack.Screen name="Register" component={RegisterScreen}/>
-                <Stack.Screen name="Home" component={HomeScreen}/>
-                <Stack.Screen name="Calendar" component={CalendarScreen}/>
-                <Stack.Screen name="FitnessTracker" component={FitnessTrackerScreen}/>
+                <Stack.Screen name="Home" component={HomeScreen} options={{ gestureEnabled: false,animation: 'none' }}/>
+                <Stack.Screen name="Calendar" component={CalendarScreen} options={{ gestureEnabled: false }}/>
+                <Stack.Screen
+                    name="FitnessTracker"
+                    component={FitnessTrackerScreen}
+                    options={{ gestureEnabled: false }}
+                    screenOptions={{
+                    headerShown: false
+                }}/>
                 <Stack.Screen name="AddWorkout" component={AddWorkoutScreen}/>
                 <Stack.Screen name="ClassDetail" component={ClassDetailScreen}/>
                 <Stack.Screen name="LockerRental" component={LockerRentalScreen}/>
@@ -46,10 +53,15 @@ export default function AppNavigator({onLayout}) {
                     animation: 'slide_from_bottom',
                     headerShown: false
                 }}/>
-                <Stack.Screen name="Profile" component={ProfileScreen}/>
+                <Stack.Screen
+                    name="Profile"
+                    component={ProfileScreen}
+                    options={{ headerShown: false,gestureEnabled: false, animation: 'none' }}
+                    />
                 <Stack.Screen name="Membership" component={MembershipScreen}/>
                 <Stack.Screen name="PaymentMethod" component={PaymentMethodScreen}/>
                 <Stack.Screen name="AddCard" component={AddCardScreen}/>
+                <Stack.Screen name="ClassesScreen" component={ClassesScreen}/>
             </Stack.Navigator>
         </NavigationContainer>
     );

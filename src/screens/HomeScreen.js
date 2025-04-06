@@ -95,8 +95,8 @@ export default function HomeScreen({ navigation }) {
         <View style={styles.classesContainer}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Booked Classes</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Calendar')}>
-              <Text style={styles.seeAllText}>See all</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('ClassesScreen')}>
+              <Text style={styles.seeAllText}>See all available classes</Text>
             </TouchableOpacity>
           </View>
 

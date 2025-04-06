@@ -35,8 +35,8 @@ export default function MembershipScreen({ navigation }) {
             case 'Annual':
               newRenewalDate.setFullYear(newRenewalDate.getFullYear() + 1);
               break;
-            case 'Student':
-              newRenewalDate.setMonth(newRenewalDate.getMonth() + 4); // Semester
+            case 'Weekly':
+              newRenewalDate.setMonth(newRenewalDate.getDay() + 7);
               break;
             default:
               newRenewalDate.setMonth(newRenewalDate.getMonth() + 1);
@@ -79,8 +79,8 @@ export default function MembershipScreen({ navigation }) {
           case 'Annual':
             newRenewalDate.setFullYear(newRenewalDate.getFullYear() + 1);
             break;
-          case 'Student':
-            newRenewalDate.setMonth(newRenewalDate.getMonth() + 4); // Semester
+          case 'Weekly':
+            newRenewalDate.setMonth(newRenewalDate.getDay() + 7); // Semester
             break;
           default:
             newRenewalDate.setMonth(newRenewalDate.getMonth() + 1);
@@ -96,24 +96,24 @@ export default function MembershipScreen({ navigation }) {
   const getMembershipPrice = (type) => {
     switch (type) {
       case 'Monthly':
-        return '$49.99/month';
+        return '$50/month';
       case 'Annual':
-        return '$499.99/year';
-      case 'Student':
-        return '$29.99/month';
+        return '$275/year';
+      case 'Weekly':
+        return '$35/month';
       default:
-        return '$49.99/month';
+        return '$50/month';
     }
   };
   
   const getMembershipDescription = (type) => {
     switch (type) {
       case 'Monthly':
-        return 'Full access to all gym facilities and classes. Cancel anytime.';
+        return 'Full access to all gym facilities and classes. Pay Monthly, cancel anytime.';
       case 'Annual':
-        return 'Full access to all gym facilities and classes. Save 15% compared to monthly.';
-      case 'Student':
-        return 'Full access to all gym facilities and classes. Valid student ID required.';
+        return 'Full access to all gym facilities and classes. Pay for a full year.';
+      case 'Weekly':
+        return 'Full access to all gym facilities and classes. Pay Weekly, cancel anytime. ';
       default:
         return 'Full access to all gym facilities and classes.';
     }
@@ -194,9 +194,9 @@ export default function MembershipScreen({ navigation }) {
           <TouchableOpacity 
             style={[
               styles.membershipOption,
-              currentMembership === 'Student' && styles.selectedOption
+              currentMembership === 'Weekly' && styles.selectedOption
             ]}
-            onPress={() => handleChangeMembership('Student')}
+            onPress={() => handleChangeMembership('Weekly')}
           >
             <View style={styles.optionHeader}>
               <Text style={styles.optionType}>Student</Text>

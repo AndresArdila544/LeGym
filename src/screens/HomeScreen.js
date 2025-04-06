@@ -1,5 +1,5 @@
 // src/screens/HomeScreen.js
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -8,8 +8,11 @@ import {
   ScrollView,
   Image,
   ImageBackground
+  
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useIsFocused } from '@react-navigation/native';
 import WeeklyWorkout from '../components/WeeklyWorkout';
 import CrowdMeterCard from '../components/CrowdMeterCard';
 import crowded from '../../assets/images/crowded.png';
@@ -17,25 +20,25 @@ import BottomNavigationBar from '../components/BottomNavigationBar';
 import LockerPromoCard from '../components/LockerPromoCard';
 
 export default function HomeScreen({ navigation }) {
-  const bookedClasses = [
-    {
-      id: '1',
-      title: 'STRENGTH TRAINING CLASS',
-      time: '5:30 PM',
-      instructor: 'Coach Raymond',
-      location: 'SGW – Le Gym – Gymnasium',
-      image: require('../../assets/images/Strengthtrainingclass.png'),
-      rating: '4.8'
-    }, {
-      id: '2',
-      title: 'YOGA CLASS',
-      time: '5:30 PM',
-      instructor: 'Coach Ashley',
-      location: 'SGW – Le Gym – Studio',
-      image: require('../../assets/images/Yogaclass.png'),
-      rating: '4.8'
+  const isFocused = useIsFocused();
+const [bookedClasses, setBookedClasses] = useState([]);
+
+useEffect(() => {
+  const loadBookedClasses = async () => {
+    try {
+      const stored = await AsyncStorage.getItem('classBookings');
+      const parsed = stored ? JSON.parse(stored) : [];
+      setBookedClasses(parsed);
+    } catch (e) {
+      console.error('Failed to load booked classes', e);
     }
-  ];
+  };
+
+  if (isFocused) {
+    loadBookedClasses();
+  }
+}, [isFocused]);
+
 
   return (
     <View style={styles.container}>
@@ -100,14 +103,24 @@ export default function HomeScreen({ navigation }) {
             </TouchableOpacity>
           </View>
 
-          {bookedClasses.map((classItem, index) => (
+          {bookedClasses.length === 0 ? (
+  <View style={{ alignItems: 'center', paddingVertical: 40 }}>
+    <Text style={{ fontSize: 16, color: '#666' }}>
+      You don't have any classes booked this week.
+    </Text>
+  </View>
+) :(bookedClasses.map((classItem, index) => (
             <TouchableOpacity
               key={index}
               style={styles.classCard}
               onPress={() => navigation.navigate('ClassDetail', { classInfo: classItem })}
             >
               <Image
-                source={classItem.image}
+                source={
+                  typeof classItem.image === 'number'
+                    ? classItem.image
+                    : require('../../assets/images/Strengthtrainingclass.png')
+                }
                 style={styles.classImage}
                 resizeMode="cover"
               />
@@ -127,12 +140,16 @@ export default function HomeScreen({ navigation }) {
                     <Text style={styles.classInstructorBadgeText}>{classItem.instructor}</Text>
                   </View>
                 </View>
-                <TouchableOpacity style={styles.cancelButton}>
+                <TouchableOpacity style={styles.cancelButton} 
+                onPress={() => navigation.navigate('ClassDetail', { 
+                classInfo: classItem, 
+                openCancelModal: true 
+                })}>
                   <Text style={styles.cancelButtonText}>Cancel Booking</Text>
                 </TouchableOpacity>
               </View>
             </TouchableOpacity>
-          ))}
+          )))}
         </View>
 
         <LockerPromoCard 

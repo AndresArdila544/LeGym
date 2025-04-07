@@ -22,7 +22,7 @@ export default function ProfileScreen({ navigation }) {
     memberSince: '2023-09-01',
     membership: 'Monthly',
   });
-  
+
   useEffect(() => {
     const loadUserData = async () => {
       try {
@@ -34,10 +34,10 @@ export default function ProfileScreen({ navigation }) {
         console.error('Failed to load user data:', error);
       }
     };
-    
+
     loadUserData();
   }, []);
-  
+
   const handleLogout = async () => {
     Alert.alert(
       'Logout',
@@ -67,13 +67,17 @@ export default function ProfileScreen({ navigation }) {
       { cancelable: true }
     );
   };
-  
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color="#000" />
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>Profile</Text>
+        <View style={{ width: 24 }} />
       </View>
-      
+
       <ScrollView style={styles.content}>
         <View style={styles.profileSection}>
           <View style={styles.profileImageContainer}>
@@ -83,10 +87,10 @@ export default function ProfileScreen({ navigation }) {
               </Text>
             </View>
           </View>
-          
+
           <Text style={styles.profileName}>{userData.firstName} {userData.lastName}</Text>
           <Text style={styles.profileEmail}>{userData.email}</Text>
-          
+
           <View style={styles.membershipInfo}>
             <Text style={styles.memberSince}>Member since: {new Date(userData.memberSince).toLocaleDateString()}</Text>
             <View style={styles.membershipBadge}>
@@ -94,9 +98,9 @@ export default function ProfileScreen({ navigation }) {
             </View>
           </View>
         </View>
-        
+
         <View style={styles.menuSection}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.menuItem}
             onPress={() => navigation.navigate('Membership')}
           >
@@ -104,8 +108,8 @@ export default function ProfileScreen({ navigation }) {
             <Text style={styles.menuItemText}>Membership</Text>
             <Ionicons name="chevron-forward" size={20} color="#999" />
           </TouchableOpacity>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={styles.menuItem}
             onPress={() => navigation.navigate('PaymentMethod')}
           >
@@ -113,26 +117,26 @@ export default function ProfileScreen({ navigation }) {
             <Text style={styles.menuItemText}>Payment Methods</Text>
             <Ionicons name="chevron-forward" size={20} color="#999" />
           </TouchableOpacity>
-          
+
           <TouchableOpacity style={styles.menuItem}>
             <Ionicons name="notifications-outline" size={24} color="#800000" />
             <Text style={styles.menuItemText}>Notifications</Text>
             <Ionicons name="chevron-forward" size={20} color="#999" />
           </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.menuItem}>
+
+          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('ProfileSetting')}>
             <Ionicons name="settings-outline" size={24} color="#800000" />
-            <Text style={styles.menuItemText}>Settings</Text>
+            <Text style={styles.menuItemText}>Update Profile</Text>
             <Ionicons name="chevron-forward" size={20} color="#999" />
           </TouchableOpacity>
-          
+
           <TouchableOpacity style={styles.menuItem}>
             <Ionicons name="help-circle-outline" size={24} color="#800000" />
             <Text style={styles.menuItemText}>Help & Support</Text>
             <Ionicons name="chevron-forward" size={20} color="#999" />
           </TouchableOpacity>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={[styles.menuItem, styles.logoutItem]}
             onPress={handleLogout}
           >
@@ -141,7 +145,7 @@ export default function ProfileScreen({ navigation }) {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      
+
       <BottomNavigationBar active="profile" navigation={navigation} />
     </SafeAreaView>
   );
@@ -156,7 +160,9 @@ const styles = StyleSheet.create({
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
   headerTitle: {
     fontSize: 20,

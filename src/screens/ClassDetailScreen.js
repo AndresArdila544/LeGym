@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import BottomNavigationBar from '../components/BottomNavigationBar';
 
 export default function ClassDetailScreen({ route, navigation }) {
   const { classInfo } = route.params || {

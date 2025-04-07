@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  SafeAreaView,
   ImageBackground
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -38,7 +39,7 @@ export default function HomeScreen({ navigation }) {
   ];
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {/* HEADER */}
       <View style={styles.header}>
         <Image
@@ -143,7 +144,7 @@ export default function HomeScreen({ navigation }) {
       </ScrollView>
 
       <BottomNavigationBar active="home" navigation={navigation} />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -157,7 +158,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: 50,
+    // paddingTop: 50,
     paddingBottom: 10,
     backgroundColor: '#fff',
   },

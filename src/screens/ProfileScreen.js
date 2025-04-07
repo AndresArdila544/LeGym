@@ -82,7 +82,8 @@ export default function ProfileScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+       <View style={{ flex: 1 }}>
       {/* <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="#000" />
@@ -95,7 +96,10 @@ export default function ProfileScreen({ navigation }) {
               <View style={{ width: 24 }} />
             </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView 
+      contentInsetAdjustmentBehavior="automatic"
+      showsVerticalScrollIndicator={false}
+      style={styles.content}>
         <View style={styles.profileSection}>
           <View style={styles.profileImageContainer}>
             <View style={styles.profileImage}>
@@ -164,6 +168,7 @@ export default function ProfileScreen({ navigation }) {
       </ScrollView>
 
       <BottomNavigationBar active="profile" navigation={navigation} />
+      </View>
     </SafeAreaView>
   );
 }
@@ -174,6 +179,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   header: {
+    
     padding: 16,
     //borderBottomWidth: 1,
     borderBottomColor: '#eee',

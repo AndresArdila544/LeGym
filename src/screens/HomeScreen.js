@@ -57,7 +57,7 @@ useEffect(() => {
 
   return (
     <SafeAreaView style={styles.container}>
-
+      <View style={{ flex: 1 }}>
       {/* HEADER */}
       <View style={styles.header}>
 
@@ -189,6 +189,7 @@ useEffect(() => {
       </ScrollView>
 
       <BottomNavigationBar active="home" navigation={navigation} />
+      </View>
     </SafeAreaView>
   );
 }

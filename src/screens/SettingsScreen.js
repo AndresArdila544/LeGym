@@ -1,5 +1,5 @@
 // src/screens/ProfileScreen.js
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import {
     View,
     Text,
@@ -10,17 +10,19 @@ import {
     Modal,
     Image,
     Alert,
-    TextInput,
+    TextInput
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import {Ionicons} from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import BottomNavigationBar from "../components/BottomNavigationBar";
 import CustomInlineDatePicker from "../components/InlineDatePicker";
 import SelectionInput from "../components/InlineSelectionPicker";
 import Picker from "react-native-picker-select";
 
-export default function SettingsScreen({ navigation }) {
-    const user = {
+export default function SettingsScreen({navigation}) {
+
+    const [userData,
+        setUserData] = useState({
         firstName: "John",
         lastName: "Smith",
         email: "john.smith@example.com",
@@ -29,47 +31,54 @@ export default function SettingsScreen({ navigation }) {
         dateOfBirth: "",
         gender: "",
         weight: "97",
-        height: "182.89",
-    }
-    
-    const [userData, setUserData] = useState({
-        firstName: "John",
-        lastName: "Smith",
-        email: "john.smith@example.com",
-        memberSince: "2023-09-01",
-        membership: "Monthly",
-        dateOfBirth: "",
-        gender: "",
-        weight: "97",
-        height: "182.89",
+        height: "182.89"
     });
-    const [updatedFirstName, setUpdatedFirstName] = useState(
-        userData.firstName || ""
-    );
-    const [updatedLastName, setUpdatedLastName] = useState(
-        userData.lastName || ""
-    );
-    const [updatedEmail, setUpdatedEmail] = useState(userData.email || "");
-    const [updatedWeight, setUpdatedWeight] = useState(userData.weight || "");
-    const [updatedHeight, setUpdatedHeight] = useState(userData.height || "");
-    const [updatedDob, setUpdatedDob] = useState(userData.dateOfBirth || "");
-    const [updatedGender, setUpdatedGender] = useState(userData.gender || "");
-    const [cancelConfirmVisible, showConfirmationModal] = useState(false);
+    const [updatedFirstName,
+        setUpdatedFirstName] = useState(userData.firstName || "");
+    const [updatedLastName,
+        setUpdatedLastName] = useState(userData.lastName || "");
+    const [updatedEmail,
+        setUpdatedEmail] = useState(userData.email || "");
+    const [updatedWeight,
+        setUpdatedWeight] = useState(userData.weight || "");
+    const [updatedHeight,
+        setUpdatedHeight] = useState(userData.height || "");
+    const [updatedDob,
+        setUpdatedDob] = useState(userData.dateOfBirth || "");
+    const [updatedGender,
+        setUpdatedGender] = useState(userData.gender || "");
+    const [cancelConfirmVisible,
+        showConfirmationModal] = useState(false);
 
     const options = [
-        { label: "Male", value: "Male" },
-        { label: "Female", value: "Female" },
-        { label: "Other", value: "Other" },
+        {
+            label: "Male",
+            value: "Male"
+        }, {
+            label: "Female",
+            value: "Female"
+        }, {
+            label: "Other",
+            value: "Other"
+        }
     ];
 
     useEffect(() => {
-        const loadUserData = async () => {
+        const loadUserData = async() => {
             try {
                 const storedUserData = await AsyncStorage.getItem("userData");
                 console.log(storedUserData);
-                
+
                 if (storedUserData) {
-                    setUserData(JSON.parse(storedUserData));
+                    const parsed = JSON.parse(storedUserData);
+                    setUserData(parsed);
+                    setUpdatedFirstName(parsed.firstName || '');
+                    setUpdatedLastName(parsed.lastName || '');
+                    setUpdatedEmail(parsed.email || '');
+                    setUpdatedDob(parsed.dateOfBirth || '');
+                    setUpdatedGender(parsed.gender || '');
+                    setUpdatedWeight(parsed.weight || '');
+                    setUpdatedHeight(parsed.height || '');
                 } else {
                     await AsyncStorage.setItem('userData', JSON.stringify(userData))
                 }
@@ -81,24 +90,22 @@ export default function SettingsScreen({ navigation }) {
         loadUserData();
     }, []);
 
-    const handleProfileUpdate = async () => {
+    const handleProfileUpdate = async() => {
         try {
-            setUserData({
+            const updatedUser = {
+                ...userData,
                 firstName: updatedFirstName,
                 lastName: updatedLastName,
                 email: updatedEmail,
-                memberSince: "2023-09-01",
-                membership: "Monthly",
                 dateOfBirth: updatedDob,
                 gender: updatedGender,
                 weight: updatedWeight,
                 height: updatedHeight,
-            })
-            // Save to AsyncStorage
-            await AsyncStorage.setItem('userData', JSON.stringify(userData));
-
-            // Update state
-            showConfirmationModal(false);
+              };
+              
+              await AsyncStorage.setItem('userData', JSON.stringify(updatedUser));
+              setUserData(updatedUser);
+              showConfirmationModal(false);
 
         } catch (error) {
             console.error('Error canceling booking:', error);
@@ -109,10 +116,12 @@ export default function SettingsScreen({ navigation }) {
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Ionicons name="arrow-back" size={24} color="#000" />
+                    <Ionicons name="arrow-back" size={24} color="#800000"/>
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Update Profile</Text>
-                <View style={{ width: 24 }} />
+                <View style={{
+                    width: 24
+                }}/>
             </View>
 
             <ScrollView style={styles.content}>
@@ -120,14 +129,19 @@ export default function SettingsScreen({ navigation }) {
                     <View style={styles.profileImageContainer}>
                         <View style={styles.profileImage}>
                             <Text style={styles.profileInitials}>
-                                {userData.firstName.charAt(0)}
-                                {userData.lastName.charAt(0)}
+                                {userData
+                                    .firstName
+                                    .charAt(0)}
+                                {userData
+                                    .lastName
+                                    .charAt(0)}
                             </Text>
                         </View>
                     </View>
 
                     <Text style={styles.profileName}>
-                        {userData.firstName} {userData.lastName}
+                        {userData.firstName } 
+                        {userData.lastName}
                     </Text>
                     <Text style={styles.profileEmail}>{userData.email}</Text>
                 </View>
@@ -139,8 +153,7 @@ export default function SettingsScreen({ navigation }) {
                             keyboardType="name-phone-pad"
                             value={updatedFirstName}
                             style={styles.inputBox}
-                            onChangeText={setUpdatedFirstName}
-                        />
+                            onChangeText={setUpdatedFirstName}/>
                     </View>
 
                     <View style={styles.inputSect}>
@@ -149,8 +162,7 @@ export default function SettingsScreen({ navigation }) {
                             keyboardType="name-phone-pad"
                             style={styles.inputBox}
                             value={updatedLastName}
-                            onChangeText={setUpdatedLastName}
-                        />
+                            onChangeText={setUpdatedLastName}/>
                     </View>
 
                     <View style={styles.inputSect}>
@@ -159,25 +171,21 @@ export default function SettingsScreen({ navigation }) {
                             keyboardType="email-address"
                             style={styles.inputBox}
                             value={updatedEmail}
-                            onChangeText={setUpdatedEmail}
-                        />
+                            onChangeText={setUpdatedEmail}/>
                     </View>
 
                     <View style={styles.inputSect}>
                         <Text style={styles.inputLabel}>Date of Birth</Text>
                         <CustomInlineDatePicker
+                            value={updatedDob}
                             onDateChange={(date) => {
-                                setUpdatedDob;
-                            }}
-                        />
+                                setUpdatedDob(date);
+                        }}/>
                     </View>
 
                     <View style={styles.inputSect}>
                         <Text style={styles.inputLabel}>Gender (Optional)</Text>
-                        <SelectionInput
-                            options={options}
-                            onValueChange={setUpdatedGender}
-                        />
+                        <SelectionInput options={options} value={updatedGender} onValueChange={setUpdatedGender}/>
                     </View>
 
                     <View style={styles.inputSect}>
@@ -186,8 +194,7 @@ export default function SettingsScreen({ navigation }) {
                             keyboardType="numeric"
                             style={styles.inputBox}
                             value={updatedWeight}
-                            onChangeText={setUpdatedWeight}
-                        />
+                            onChangeText={setUpdatedWeight}/>
                     </View>
 
                     <View style={styles.inputSect}>
@@ -196,37 +203,39 @@ export default function SettingsScreen({ navigation }) {
                             keyboardType="numeric"
                             style={styles.inputBox}
                             value={updatedHeight}
-                            onChangeText={setUpdatedHeight}
-                        />
+                            onChangeText={setUpdatedHeight}/>
                     </View>
 
-                    <TouchableOpacity style={styles.button} onPress={() => { showConfirmationModal(true)}}>
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => {
+                        showConfirmationModal(true)
+                    }}>
                         <Text style={styles.buttonText}>Confirm Changes</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
 
             {/* Cancel Confirmation Modal */}
-            <Modal
-                visible={cancelConfirmVisible}
-                transparent={true}
-                animationType="fade"
-            >
+            <Modal visible={cancelConfirmVisible} transparent={true} animationType="fade">
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
                         <Text style={styles.modalTitle}>Are you sure?</Text>
-                        <Text style={{textAlign: 'center', marginBottom: 15}} >You are about to update your profile details? </Text>
+                        <Text
+                            style={{
+                            textAlign: 'center',
+                            marginBottom: 15
+                        }}>You are about to update your profile details?
+                        </Text>
                         <View style={styles.modalButtons}>
                             <TouchableOpacity
                                 style={[styles.modalButton, styles.cancelModalButton]}
-                                onPress={() => showConfirmationModal(false)}
-                            >
+                                onPress={() => showConfirmationModal(false)}>
                                 <Text style={styles.cancelModalButtonText}>No, Cancel</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={[styles.modalButton, styles.confirmModalButton]}
-                                onPress={handleProfileUpdate}
-                            >
+                                onPress={handleProfileUpdate}>
                                 <Text style={styles.confirmModalButtonText}>Yes, Update</Text>
                             </TouchableOpacity>
                         </View>
@@ -234,7 +243,7 @@ export default function SettingsScreen({ navigation }) {
                 </View>
             </Modal>
 
-            <BottomNavigationBar active="profile" navigation={navigation} />
+            {/* <BottomNavigationBar active="profile" navigation={navigation}/> */}
         </SafeAreaView>
     );
 }
@@ -242,7 +251,7 @@ export default function SettingsScreen({ navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: "#fff"
     },
     header: {
         padding: 16,
@@ -251,20 +260,20 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         paddingHorizontal: 16,
         borderBottomWidth: 1,
-        borderBottomColor: "#eee",
+        borderBottomColor: "#eee"
     },
     headerTitle: {
         fontSize: 20,
         fontWeight: "bold",
+        color:"#800000"
     },
     profileSection: {
         alignItems: "center",
         padding: 10,
-        // borderBottomWidth: 1,
-        // borderBottomColor: '#eee',
+        // borderBottomWidth: 1, borderBottomColor: '#eee',
     },
     profileImageContainer: {
-        marginBottom: 10,
+        marginBottom: 10
     },
     profileImage: {
         width: 85,
@@ -272,40 +281,40 @@ const styles = StyleSheet.create({
         borderRadius: 85,
         backgroundColor: "#800000",
         justifyContent: "center",
-        alignItems: "center",
+        alignItems: "center"
     },
     profileInitials: {
         fontSize: 26,
         fontWeight: "bold",
-        color: "white",
+        color: "white"
     },
     profileName: {
         fontSize: 24,
         fontWeight: "bold",
-        marginBottom: 4,
+        marginBottom: 4
     },
     profileEmail: {
         fontSize: 16,
         color: "#666",
-        marginBottom: 16,
+        marginBottom: 16
     },
     content: {
-        flex: 1,
+        flex: 1
     },
     formSection: {
         // backgroundColor: 'red',
         width: "92%",
         margin: "auto",
-        marginTop: 20,
+        marginTop: 20
     },
     inputSect: {
-        marginBottom: 20,
+        marginBottom: 20
     },
     inputLabel: {
         marginBottom: 8,
         fontSize: 14,
         color: "#414141",
-        fontWeight: "bold",
+        fontWeight: "bold"
     },
     inputBox: {
         width: "100%",
@@ -313,7 +322,7 @@ const styles = StyleSheet.create({
         borderColor: "#BDBDBD",
         borderWidth: 1,
         borderRadius: 8,
-        paddingLeft: 15,
+        paddingLeft: 15
     },
     button: {
         backgroundColor: "#800000",
@@ -321,70 +330,69 @@ const styles = StyleSheet.create({
         padding: 16,
         alignItems: "center",
         marginTop: 16,
-        marginBottom: 160,
+        marginBottom: 160
     },
     buttonText: {
         color: "white",
         fontSize: 16,
-        fontWeight: "bold",
+        fontWeight: "bold"
     },
     modalContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      },
-      modalContent: {
+        backgroundColor: 'rgba(0, 0, 0, 0.5)'
+    },
+    modalContent: {
         backgroundColor: 'white',
         borderRadius: 16,
         padding: 24,
         width: '80%',
-        alignItems: 'center',
-      },
-      modalTitle: {
+        alignItems: 'center'
+    },
+    modalTitle: {
         fontSize: 18,
         fontWeight: 'bold',
         textAlign: 'center',
-        marginBottom: 24,
-      },
-      closeButton: {
+        marginBottom: 24
+    },
+    closeButton: {
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 8,
-        backgroundColor: '#800000',
-      },
-      closeButtonText: {
+        backgroundColor: '#800000'
+    },
+    closeButtonText: {
         color: 'white',
         fontSize: 16,
-        fontWeight: 'bold',
-      },
-      modalButtons: {
+        fontWeight: 'bold'
+    },
+    modalButtons: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '100%',
         marginTop: 15
-      },
-      modalButton: {
+    },
+    modalButton: {
         flex: 1,
         padding: 12,
         borderRadius: 8,
         alignItems: 'center',
-        marginHorizontal: 8,
-      },
-      cancelModalButton: {
+        marginHorizontal: 8
+    },
+    cancelModalButton: {
         borderColor: "black",
         borderWidth: 1
-      },
-      confirmModalButton: {
-        backgroundColor: '#912338',
-      },
-      cancelModalButtonText: {
+    },
+    confirmModalButton: {
+        backgroundColor: '#912338'
+    },
+    cancelModalButtonText: {
         color: '#333',
-        fontWeight: 'bold',
-      },
-      confirmModalButtonText: {
+        fontWeight: 'bold'
+    },
+    confirmModalButtonText: {
         color: 'white',
-        fontWeight: 'bold',
-
-      },
+        fontWeight: 'bold'
+    }
 });

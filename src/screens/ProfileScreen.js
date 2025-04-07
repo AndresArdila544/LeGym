@@ -13,6 +13,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BottomNavigationBar from '../components/BottomNavigationBar';
+import { useIsFocused } from '@react-navigation/native';
+
 
 export default function ProfileScreen({ navigation }) {
   const [userData, setUserData] = useState({
@@ -22,11 +24,14 @@ export default function ProfileScreen({ navigation }) {
     memberSince: '2023-09-01',
     membership: 'Monthly',
   });
+  const isFocused = useIsFocused();
 
   useEffect(() => {
+    
     const loadUserData = async () => {
       try {
         const storedUserData = await AsyncStorage.getItem('userData');
+        
         if (storedUserData) {
           const parsed = JSON.parse(storedUserData);
           setUserData({
@@ -41,9 +46,10 @@ export default function ProfileScreen({ navigation }) {
         console.error('Failed to load user data:', error);
       }
     };
-
-    loadUserData();
-  }, []);
+    if (isFocused) {
+      loadUserData(); 
+    }
+  }, [isFocused]);
 
   const handleLogout = async () => {
     Alert.alert(
@@ -77,13 +83,17 @@ export default function ProfileScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Profile</Text>
         <View style={{ width: 24 }} />
-      </View>
+      </View> */}
+      <View style={styles.header}>
+              <Text style={styles.headerTitle}>My Profile</Text>
+              <View style={{ width: 24 }} />
+            </View>
 
       <ScrollView style={styles.content}>
         <View style={styles.profileSection}>
@@ -147,7 +157,7 @@ export default function ProfileScreen({ navigation }) {
             style={[styles.menuItem, styles.logoutItem]}
             onPress={handleLogout}
           >
-            <Ionicons name="log-out-outline" size={24} color="#ff3b30" />
+            <Ionicons name="log-out-outline" size={24} color="#800000" />
             <Text style={[styles.menuItemText, styles.logoutText]}>Logout</Text>
           </TouchableOpacity>
         </View>
@@ -165,7 +175,7 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 16,
-    borderBottomWidth: 1,
+    //borderBottomWidth: 1,
     borderBottomColor: '#eee',
     flexDirection: 'row',
     alignItems: 'center',
@@ -174,6 +184,8 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
+    color: "#800000",
+    //paddingLeft:16
   },
   content: {
     flex: 1,
@@ -249,6 +261,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   logoutText: {
-    color: '#ff3b30',
+    color: '#800000',
   },
 });

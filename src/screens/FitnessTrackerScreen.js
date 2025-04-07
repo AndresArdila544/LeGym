@@ -63,9 +63,6 @@ export default function FitnessTrackerScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
         <Text style={styles.headerTitle}>My Fitness Tracker</Text>
         <View style={{ width: 24 }} />
       </View>
@@ -159,6 +156,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
+    color:"#800000"
   },
   content: {
     flex: 1,

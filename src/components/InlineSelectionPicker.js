@@ -3,22 +3,22 @@ import { View, StyleSheet } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { Ionicons } from "@expo/vector-icons";
 
-const SelectionInput = ({ options = [], borderColor, height, onValueChange }) => {
+const SelectionInput = ({ value,options = [], borderColor, height, onValueChange }) => {
   const [selectedValue, setSelectedValue] = useState("");
 
-  const handleChange = (value) => {
-    setSelectedValue(value);
-    if (onValueChange) onValueChange(value);
+  const handleChange = (val) => {
+    setSelectedValue(val);
+    if (onValueChange) onValueChange(val);
   };
 
   return (
     <View style={styles.container}>
       <RNPickerSelect
         onValueChange={handleChange}
+        value={value}
         placeholder={{ label: "Select an option", value: null }}
         items={options}
         style={pickerSelectStyles}
-        value={selectedValue}
         darkTheme={true}
         Icon={() => (
           <Ionicons

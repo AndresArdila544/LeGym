@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
     View,
     Text,
@@ -12,10 +12,12 @@ import {
     KeyboardAvoidingView
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Picker } from '@react-native-picker/picker';
+import {Picker} from '@react-native-picker/picker';
 import DropDownPicker from 'react-native-dropdown-picker';
+import CustomInlineDatePicker from './InlineDatePicker';
+import SelectionInput from './InlineSelectionPicker';
 
-export default function CreateAccountModal({ onClose, onContinue,onGoToLogIn }) {
+export default function CreateAccountModal({onClose, onContinue, onGoToLogIn}) {
     const slideAnim = useRef(new Animated.Value(300)).current;
 
     const [firstName,
@@ -36,56 +38,56 @@ export default function CreateAccountModal({ onClose, onContinue,onGoToLogIn }) 
         setValue] = useState(null);
     const [items,
         setItems] = useState([
-            {
-                label: 'Female',
-                value: 'female'
-            }, {
-                label: 'Male',
-                value: 'male'
-            }, {
-                label: 'Other',
-                value: 'other'
-            }
-        ]);
+        {
+            label: 'Female',
+            value: 'female'
+        }, {
+            label: 'Male',
+            value: 'male'
+        }, {
+            label: 'Other',
+            value: 'other'
+        }
+    ]);
 
-        const isValidEmail = (email) => {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return emailRegex.test(email);
-          };
-          
+    const isValidEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
     useEffect(() => {
         Animated
             .timing(slideAnim, {
-                toValue: 0,
-                duration: 300,
-                useNativeDriver: true
-            })
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true
+        })
             .start();
     }, []);
 
     return (
         <View style={[StyleSheet.absoluteFill]}>
             <TouchableWithoutFeedback onPress={onClose}>
-                <View style={StyleSheet.absoluteFillObject} />
+                <View style={StyleSheet.absoluteFillObject}/>
             </TouchableWithoutFeedback>
 
             <KeyboardAvoidingView
                 style={styles.keyboardAvoiding}
                 behavior={Platform.OS === 'ios'
-                    ? 'padding'
-                    : 'height'}
+                ? 'padding'
+                : 'height'}
                 keyboardVerticalOffset={0}>
-                    
+
                 <Animated.View
                     style={[
-                        styles.modalWrapper, {
-                            transform: [
-                                {
-                                    translateY: slideAnim
-                                }
-                            ]
-                        }
-                    ]}>
+                    styles.modalWrapper, {
+                        transform: [
+                            {
+                                translateY: slideAnim
+                            }
+                        ]
+                    }
+                ]}>
                     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                         <View style={styles.modalContent}>
                             <Text style={styles.label}>First Name</Text>
@@ -94,7 +96,7 @@ export default function CreateAccountModal({ onClose, onContinue,onGoToLogIn }) 
                                 placeholder="Enter first name"
                                 placeholderTextColor="#888"
                                 value={firstName}
-                                onChangeText={setFirstName} />
+                                onChangeText={setFirstName}/>
 
                             <Text style={styles.label}>Last Name</Text>
                             <TextInput
@@ -102,7 +104,7 @@ export default function CreateAccountModal({ onClose, onContinue,onGoToLogIn }) 
                                 placeholder="Enter last name"
                                 placeholderTextColor="#888"
                                 value={lastName}
-                                onChangeText={setLastName} />
+                                onChangeText={setLastName}/>
 
                             <Text style={styles.label}>Email Address</Text>
                             <TextInput
@@ -111,63 +113,62 @@ export default function CreateAccountModal({ onClose, onContinue,onGoToLogIn }) 
                                 placeholderTextColor="#888"
                                 keyboardType="email-address"
                                 value={email}
-                                onChangeText={setEmail} />
+                                onChangeText={setEmail}/>
 
                             <Text style={styles.label}>Date of Birth</Text>
 
-                            {(<DateTimePicker
-                                style={styles.dateinput}
-                                value={date}
-                                mode="date"
-                                display="default"
-                                onChange={(event, selectedDate) => {
-                                    const currentDate = selectedDate || date;
-                                    //setShowDatePicker(Platform.OS === 'ios');
-                                    setDate(currentDate);
-                                }} />)}
+                            <CustomInlineDatePicker
+                            style={styles.input}
+                                value={date
+                                .toISOString()
+                                .split('T')[0]}
+                                onDateChange={(formatted) => setDate(new Date(formatted))}/>
 
                             <Text style={styles.label}>Gender (Optional)</Text>
-                            <DropDownPicker
-                                open={open}
+                            <SelectionInput
+                            style={styles.input}
                                 value={value}
-                                items={items}
-                                setOpen={setOpen}
-                                setValue={setValue}
-                                setItems={setItems}
-                                placeholder="Select option"
-                                style={styles.input} />
+                                options={[
+                                {
+                                    label: 'Female',
+                                    value: 'female'
+                                }, {
+                                    label: 'Male',
+                                    value: 'male'
+                                }, {
+                                    label: 'Other',
+                                    value: 'other'
+                                }
+                            ]}
+                                onValueChange={setValue}/>
 
-                            <TouchableOpacity style={styles.continueButton} 
-                            onPress={() => {
+                            <TouchableOpacity
+                                style={styles.continueButton}
+                                onPress={() => {
                                 if (!firstName || !lastName || !email) {
-                                  alert('Please fill in all required fields.');
-                                  return;
+                                    alert('Please fill in all required fields.');
+                                    return;
                                 }
-                              
                                 if (!isValidEmail(email)) {
-                                  alert('Please enter a valid email address.');
-                                  return;
+                                    alert('Please enter a valid email address.');
+                                    return;
                                 }
-                              
                                 onContinue({
-                                  firstName,
-                                  lastName,
-                                  email,
-                                  dateOfBirth: date.toISOString(),
-                                  gender: value || '',
+                                    firstName,
+                                    lastName,
+                                    email,
+                                    dateOfBirth: date.toISOString(),
+                                    gender: value || ''
                                 });
-                              }}
-                              
-                            >
+                            }}>
                                 <Text style={styles.buttonText}>CONTINUE</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity
-                            onPress={() => {
+                                onPress={() => {
                                 onClose();
                                 onGoToLogIn();
-                            }}
-                            >
+                            }}>
                                 <Text style={styles.footerText}>
                                     Already a member?
                                     <Text style={styles.linkText}>Log in</Text>
@@ -199,29 +200,21 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         padding: 24,
-        marginBottom: 20,
+        marginBottom: 20
     },
     label: {
         fontSize: 14,
         fontWeight: '600',
         color: '#333',
-        marginBottom: 5
-    },
-    dateinput: {
-        //borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 10,
-        padding: 0,
-        marginBottom: 15,
-        //fontSize: 14,
-        color: '#000'
+        marginBottom: 5,
+        marginTop:15
     },
     input: {
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 10,
         padding: 12,
-        marginBottom: 15,
+        //marginBottom: 15,
         fontSize: 14,
         color: '#000'
     },
@@ -236,6 +229,7 @@ const styles = StyleSheet.create({
         color: '#000'
     },
     continueButton: {
+        marginTop: 15,
         backgroundColor: '#8B1C3B',
         padding: 14,
         borderRadius: 30,

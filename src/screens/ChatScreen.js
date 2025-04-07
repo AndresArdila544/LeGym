@@ -182,7 +182,11 @@ export default function ChatScreen({navigation}) {
                                     ? styles.userMessage
                                     : styles.botMessage
                             ]}>
-                                <Text style={styles.messageText}>{message.text}</Text>
+                                <Text style={[
+                                styles.messageBubble, message.sender === 'user'
+                                    ? styles.userText
+                                    : styles.botText
+                            ]}>{message.text}</Text>
                             </View>
                             <Text style={styles.timestamp}>{formatTime(message.timestamp)}</Text>
                         </View>
@@ -295,18 +299,23 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-start'
     },
     messageBubble: {
-        padding: 12,
+        padding: 5,
         borderRadius: 16
     },
     userMessage: {
         backgroundColor: '#800000',
-        borderTopRightRadius: 4
+        borderTopRightRadius: 4,
+        
     },
     botMessage: {
         backgroundColor: '#eee',
         borderTopLeftRadius: 4
     },
-    messageText: {
+    userText: {
+        fontSize: 16,
+        color: '#eee'
+    },
+    botText:{
         fontSize: 16,
         color: '#333'
     },

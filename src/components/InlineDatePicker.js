@@ -3,7 +3,7 @@ import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { Ionicons } from '@expo/vector-icons';
 
-const CustomInlineDatePicker = ({onDateChange}) => {
+const CustomInlineDatePicker = ({value,onDateChange}) => {
   const [date, setDate] = useState('');
   const [isPickerVisible, setPickerVisible] = useState(false);
 
@@ -22,7 +22,7 @@ const CustomInlineDatePicker = ({onDateChange}) => {
       <View style={styles.inputWrapper}>
         <TextInput
           style={styles.input}
-          value={date}
+          value={value}
           placeholder="Select Date"
           editable={false}
           placeholderTextColor="#444444"

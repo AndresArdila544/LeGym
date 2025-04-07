@@ -23,8 +23,21 @@ import LockerPromoCard from '../components/LockerPromoCard';
 export default function HomeScreen({ navigation }) {
   const isFocused = useIsFocused();
 const [bookedClasses, setBookedClasses] = useState([]);
+const [user, setUser] = useState(null);
+
 
 useEffect(() => {
+  const loadUserData = async () => {
+    try {
+      const stored = await AsyncStorage.getItem('userData');
+      const parsed = stored ? JSON.parse(stored) : null;
+      setUser(parsed);
+    } catch (e) {
+      console.error('Failed to load user data', e);
+    }
+  };
+
+
   const loadBookedClasses = async () => {
     try {
       const stored = await AsyncStorage.getItem('classBookings');
@@ -36,6 +49,7 @@ useEffect(() => {
   };
 
   if (isFocused) {
+    loadUserData();
     loadBookedClasses();
   }
 }, [isFocused]);
@@ -43,26 +57,36 @@ useEffect(() => {
 
   return (
     <SafeAreaView style={styles.container}>
+
       {/* HEADER */}
       <View style={styles.header}>
+
         <Image
           source={require('../../assets/le_gym.png')}
           style={styles.logoImage}
           resizeMode="contain"
         />
+
         <View style={styles.headerIcons}>
+
           <Ionicons name="notifications-outline" size={24} color="#333"/>
+
           <TouchableOpacity 
             style={styles.profileCircle}
             onPress={() => navigation.navigate('Profile')}
           >
-            <Text style={styles.profileInitials}>JS</Text>
+            <Text style={styles.profileInitials}>
+            {user?.firstName?.charAt(0).toUpperCase() || ''}
+            {user?.lastName?.charAt(0).toUpperCase() || ''}
+            </Text>
+
           </TouchableOpacity>
         </View>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} style={{flex: 1}}>
         {/* GREETING CARD */}
+
         <ImageBackground 
           source={require('../../assets/images/HomeHead.png')}
           style={styles.hero} 
@@ -73,11 +97,15 @@ useEffect(() => {
             style={styles.gradientOverlay} 
             resizeMode="cover"
           />
+
           <View style={styles.heroTextWrapper}>
-            <Text style={styles.heroTitle}>Hi John! 👋</Text>
+            <Text style={styles.heroTitle}>
+                Hi {user?.firstName || 'there'}! 👋
+            </Text>
             <Text style={styles.heroSub}>Ready for your next workout?</Text>
             <Text style={styles.streak}>🔥 Streak: 5 Days</Text>
           </View>
+
         </ImageBackground>
 
         <View style={styles.cards}>
@@ -86,7 +114,7 @@ useEffect(() => {
 
           {/* CROWD METER */}
           <CrowdMeterCard 
-            current={15} 
+            current={25} 
             max={250} 
             image={crowded}
             crowdLevel="Not Crowded"

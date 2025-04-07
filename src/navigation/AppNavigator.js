@@ -6,7 +6,7 @@ import SplashScreen from '../screens/SplashScreen';
 import WelcomeScreen from '../screens/WelcomeScreen';
 import HomeScreen from '../screens/HomeScreen';
 import LoginScreen from '../screens/LoginScreen';
-import RegisterScreen from '../screens/RegisterScreen';
+import RegisterScreen from '../screens/ForgotPassword';
 import CalendarScreen from '../screens/CalendarScreen';
 import FitnessTrackerScreen from '../screens/FitnessTrackerScreen';
 import AddWorkoutScreen from '../screens/AddWorkoutScreen';
@@ -17,6 +17,8 @@ import ProfileScreen from '../screens/ProfileScreen';
 import MembershipScreen from '../screens/MembershipScreen';
 import PaymentMethodScreen from '../screens/PaymentMethodScreen';
 import AddCardScreen from '../screens/AddCardScreen';
+import SettingsScreen from '../screens/SettingsScreen';
+import ForgotPassword from '../screens/ResetPassword';
 import ClassesScreen from '../screens/ClassesScreen';
 
 const Stack = createStackNavigator();
@@ -81,11 +83,15 @@ export default function AppNavigator({onLayout}) {
                 <Stack.Screen name="Membership" component={MembershipScreen}/>
                 <Stack.Screen name="PaymentMethod" component={PaymentMethodScreen}/>
                 <Stack.Screen name="AddCard" component={AddCardScreen}/>
+
                 <Stack.Screen name="ClassesScreen" component={ClassesScreen} options={{
                     headerShown: false,
                     gestureEnabled: false,
                     animationEnabled: false
                 }}/>
+                <Stack.Screen name="ProfileSetting" component={SettingsScreen}/>
+                <Stack.Screen name="ForgotPassword" component={ForgotPassword}/>
+
             </Stack.Navigator>
         </NavigationContainer>
     );

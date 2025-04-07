@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     View,
     Text,
@@ -12,10 +12,10 @@ import {
     KeyboardAvoidingView
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {Picker} from '@react-native-picker/picker';
+import { Picker } from '@react-native-picker/picker';
 import DropDownPicker from 'react-native-dropdown-picker';
 
-export default function CreateAccountModal({onClose, onContinue}) {
+export default function CreateAccountModal({ onClose, onContinue }) {
     const slideAnim = useRef(new Animated.Value(300)).current;
 
     const [firstName,
@@ -36,54 +36,51 @@ export default function CreateAccountModal({onClose, onContinue}) {
         setValue] = useState(null);
     const [items,
         setItems] = useState([
-        {
-            label: 'Female',
-            value: 'female'
-        }, {
-            label: 'Male',
-            value: 'male'
-        }, {
-            label: 'Other',
-            value: 'other'
-        }
-    ]);
+            {
+                label: 'Female',
+                value: 'female'
+            }, {
+                label: 'Male',
+                value: 'male'
+            }, {
+                label: 'Other',
+                value: 'other'
+            }
+        ]);
 
     useEffect(() => {
         Animated
             .timing(slideAnim, {
-            toValue: 0,
-            duration: 300,
-            useNativeDriver: true
-        })
+                toValue: 0,
+                duration: 300,
+                useNativeDriver: true
+            })
             .start();
     }, []);
 
     return (
         <View style={[StyleSheet.absoluteFill]}>
             <TouchableWithoutFeedback onPress={onClose}>
-                <View style={StyleSheet.absoluteFillObject}/>
+                <View style={StyleSheet.absoluteFillObject} />
             </TouchableWithoutFeedback>
 
-            <Animated.View
-                style={[
-                styles.modalWrapper, {
-                    transform: [
-                        {
-                            translateY: slideAnim
-                        }
-                    ]
-                }
-            ]}>
-                <KeyboardAvoidingView
-                    behavior={Platform.OS === 'ios'
+            <KeyboardAvoidingView
+                style={styles.keyboardAvoiding}
+                behavior={Platform.OS === 'ios'
                     ? 'padding'
                     : 'height'}
-                    keyboardVerticalOffset={Platform.OS === 'ios'
-                    ? 0
-                    : 0}
-                    style={{
-                    flex: 1
-                }}>
+                keyboardVerticalOffset={0}>
+                    
+                <Animated.View
+                    style={[
+                        styles.modalWrapper, {
+                            transform: [
+                                {
+                                    translateY: slideAnim
+                                }
+                            ]
+                        }
+                    ]}>
                     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                         <View style={styles.modalContent}>
                             <Text style={styles.label}>First Name</Text>
@@ -92,7 +89,7 @@ export default function CreateAccountModal({onClose, onContinue}) {
                                 placeholder="Enter first name"
                                 placeholderTextColor="#888"
                                 value={firstName}
-                                onChangeText={setFirstName}/>
+                                onChangeText={setFirstName} />
 
                             <Text style={styles.label}>Last Name</Text>
                             <TextInput
@@ -100,7 +97,7 @@ export default function CreateAccountModal({onClose, onContinue}) {
                                 placeholder="Enter last name"
                                 placeholderTextColor="#888"
                                 value={lastName}
-                                onChangeText={setLastName}/>
+                                onChangeText={setLastName} />
 
                             <Text style={styles.label}>Email Address</Text>
                             <TextInput
@@ -109,7 +106,7 @@ export default function CreateAccountModal({onClose, onContinue}) {
                                 placeholderTextColor="#888"
                                 keyboardType="email-address"
                                 value={email}
-                                onChangeText={setEmail}/>
+                                onChangeText={setEmail} />
 
                             <Text style={styles.label}>Date of Birth</Text>
 
@@ -119,10 +116,10 @@ export default function CreateAccountModal({onClose, onContinue}) {
                                 mode="date"
                                 display="default"
                                 onChange={(event, selectedDate) => {
-                                const currentDate = selectedDate || date;
-                                //setShowDatePicker(Platform.OS === 'ios');
-                                setDate(currentDate);
-                            }}/>)}
+                                    const currentDate = selectedDate || date;
+                                    //setShowDatePicker(Platform.OS === 'ios');
+                                    setDate(currentDate);
+                                }} />)}
 
                             <Text style={styles.label}>Gender (Optional)</Text>
                             <DropDownPicker
@@ -133,7 +130,7 @@ export default function CreateAccountModal({onClose, onContinue}) {
                                 setValue={setValue}
                                 setItems={setItems}
                                 placeholder="Select option"
-                                style={styles.input}/>
+                                style={styles.input} />
 
                             <TouchableOpacity style={styles.continueButton} onPress={onContinue}>
                                 <Text style={styles.buttonText}>CONTINUE</Text>
@@ -147,16 +144,15 @@ export default function CreateAccountModal({onClose, onContinue}) {
                             </TouchableOpacity>
                         </View>
                     </TouchableWithoutFeedback>
-                </KeyboardAvoidingView>
-            </Animated.View>
+                    {/* </KeyboardAvoidingView> */}
+                </Animated.View>
+            </KeyboardAvoidingView>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
     modalWrapper: {
-        position: 'absolute',
-        bottom: 0,
         width: '100%',
         maxHeight: '90%', // or a fixed height like 500
         backgroundColor: 'white',
@@ -171,7 +167,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        padding: 24
+        padding: 24,
+        marginBottom: 20,
     },
     label: {
         fontSize: 14,

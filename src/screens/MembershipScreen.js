@@ -20,6 +20,8 @@ export default function MembershipScreen({ navigation }) {
     const loadMembershipData = async () => {
       try {
         const userData = await AsyncStorage.getItem('userData');
+        console.log(userData);
+        
         if (userData) {
           const parsedData = JSON.parse(userData);
           setCurrentMembership(parsedData.membership || 'Monthly');

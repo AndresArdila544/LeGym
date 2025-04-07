@@ -81,7 +81,11 @@ export default function AppNavigator({onLayout}) {
                 <Stack.Screen name="Membership" component={MembershipScreen}/>
                 <Stack.Screen name="PaymentMethod" component={PaymentMethodScreen}/>
                 <Stack.Screen name="AddCard" component={AddCardScreen}/>
-                <Stack.Screen name="ClassesScreen" component={ClassesScreen}/>
+                <Stack.Screen name="ClassesScreen" component={ClassesScreen} options={{
+                    headerShown: false,
+                    gestureEnabled: false,
+                    animationEnabled: false
+                }}/>
             </Stack.Navigator>
         </NavigationContainer>
     );

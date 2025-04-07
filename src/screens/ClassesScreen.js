@@ -108,9 +108,10 @@ const dateRange = `Week of ${formatDate(saturday)} to ${formatDate(nextSunday)}`
 
 export default function ClassesScreen({navigation}) {
     return (
-        <View style={styles.container}>
-            <Text style={styles.header}>Available Classes</Text>
-            <Text style={styles.subHeader}>{dateRange}</Text>
+      <View style ={styles.container}>
+        
+        <Text style={styles.header}>Available Classes</Text>
+        <Text style={styles.subHeader}>{dateRange}</Text>
             <FlatList
                 data={classData}
                 renderItem={({item}) => (<ClassCard
@@ -121,7 +122,9 @@ export default function ClassesScreen({navigation}) {
                 numColumns={2}
                 contentContainerStyle={styles.grid}
                 showsVerticalScrollIndicator={false}/>
-                <BottomNavigationBar active="home" navigation={navigation} />
+                
+
+        <BottomNavigationBar active="home" navigation={navigation} />
         </View>
     );
 }
@@ -129,24 +132,33 @@ export default function ClassesScreen({navigation}) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
         paddingTop: 50,
-        paddingHorizontal: 12
+        backgroundColor: '#fff',
     },
+    body: {
+      backgroundColor: '#fff',
+      //
+      
+  },
+
     header: {
         fontSize: 20,
         fontWeight: 'bold',
         color: '#912338',
-        marginVertical: 12
+        marginVertical: 12,
+        paddingHorizontal: 12
     },
     subHeader: {
         fontSize: 14,
         fontWeight: '500',
-        color: '#333',
+        //color: '#333',
         marginBottom: 8,
         marginTop: -8,
+        paddingHorizontal: 12
       },
     grid: {
-        paddingBottom: 80
+        paddingBottom: 22,
+        paddingHorizontal: 12
+
     }
 });

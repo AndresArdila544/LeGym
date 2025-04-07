@@ -61,7 +61,9 @@ export default function LoginModal({onClose, onContinue, onGoToForgotPassword, o
                                     placeholder="Enter email address"
                                     placeholderTextColor="#888"
                                     value={email}
-                                    onChangeText={setEmail}/>
+                                    onChangeText={setEmail}
+                                    keyboardType='email-address'
+                                    />
                             </View>
 
                             <View style={styles.field}>

@@ -132,7 +132,14 @@ export default function CreateAccountModal({ onClose, onContinue }) {
                                 placeholder="Select option"
                                 style={styles.input} />
 
-                            <TouchableOpacity style={styles.continueButton} onPress={onContinue}>
+                            <TouchableOpacity style={styles.continueButton} 
+                            onPress={() => onContinue({
+    firstName,
+    lastName,
+    email,
+    dateOfBirth: date.toISOString(),
+    gender: value || '',
+  })}>
                                 <Text style={styles.buttonText}>CONTINUE</Text>
                             </TouchableOpacity>
 

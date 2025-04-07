@@ -160,7 +160,16 @@ export default function CreatePasswordModal({onClose, onContinue}) {
                                 </Text>
                             </View>
 
-                            <TouchableOpacity style={styles.continueButton} onPress={onContinue}>
+                            <TouchableOpacity style={styles.continueButton} 
+                            onPress={() => {
+                                if (!agree) return alert('Please agree to the terms');
+                                if (password !== confirmPassword) return alert('Passwords do not match');
+                                const isValid = Object.values(criteria).every(Boolean);
+                                if (!isValid) return alert('Password does not meet criteria');
+                                
+                                onContinue(password);
+                              }}
+                            >
                                 <Text style={styles.buttonText}>CREATE ACCOUNT</Text>
                             </TouchableOpacity>
 

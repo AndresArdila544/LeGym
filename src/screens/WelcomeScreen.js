@@ -11,11 +11,22 @@ import {
 import LoginModal from "../components/LoginModal";
 import CreateAccountModal from "../components/CreateAccountModal";
 import CreatePasswordModal from "../components/CreatePasswordModal";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function WelcomeScreen({ navigation }) {
   const [loginVisible, setLoginVisible] = useState(false);
   const [showCreateAccount, setShowCreateAccount] = useState(false);
   const [showCreatePassword, setShowCreatePassword] = useState(false);
+
+  const [userInfo, setUserInfo] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    dateOfBirth: '',
+    gender: '',
+    password: '',
+  });
+  
 
   useEffect(() => {
     console.log("✅ WelcomeScreen is rendering");
@@ -88,19 +99,34 @@ export default function WelcomeScreen({ navigation }) {
         <Modal visible={showCreateAccount} transparent animationType="slide">
           <CreateAccountModal
             onClose={() => setShowCreateAccount(false)}
-            onContinue={() => {
+            onContinue={(info) => {
+              setUserInfo(prev => ({ ...prev, ...info }));
               setShowCreateAccount(false);
               setShowCreatePassword(true);
             }}
           />
         </Modal>
         <Modal visible={showCreatePassword} transparent animationType="slide">
-          <CreatePasswordModal
-            onClose={() => setShowCreatePassword(false)}
-            onContinue={() => {
-              setShowCreatePassword(false);
-            }}
-          />
+        <CreatePasswordModal
+  onClose={() => setShowCreatePassword(false)}
+  onContinue={async (password) => {
+    const newUser = {
+      ...userInfo,
+      password,
+      memberSince: new Date().toISOString(),
+      membership: 'Monthly',
+    };
+
+    try {
+      await AsyncStorage.setItem('userData', JSON.stringify(newUser));
+      console.log('✅ User created and saved!');
+      setShowCreatePassword(false);
+      navigation.navigate("Home");
+    } catch (err) {
+      console.error('❌ Failed to save user:', err);
+    }
+  }}
+/>
         </Modal>
       </View>
     </ImageBackground>

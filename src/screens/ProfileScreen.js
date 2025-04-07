@@ -28,7 +28,14 @@ export default function ProfileScreen({ navigation }) {
       try {
         const storedUserData = await AsyncStorage.getItem('userData');
         if (storedUserData) {
-          setUserData(JSON.parse(storedUserData));
+          const parsed = JSON.parse(storedUserData);
+          setUserData({
+            firstName: parsed.firstName || 'John',
+            lastName: parsed.lastName || 'Smith',
+            email: parsed.email || 'john.smith@example.com',
+            memberSince: parsed.memberSince || '2023-09-01',
+            membership: parsed.membership || 'Monthly',
+          });
         }
       } catch (error) {
         console.error('Failed to load user data:', error);

@@ -41,8 +41,12 @@ useEffect(() => {
   const loadBookedClasses = async () => {
     try {
       const stored = await AsyncStorage.getItem('classBookings');
-      const parsed = stored ? JSON.parse(stored) : [];
-      setBookedClasses(parsed);
+      // console.log(stored);
+
+      if(stored) {
+        const parsed = JSON.parse(stored);
+        setBookedClasses(parsed);
+      }
     } catch (e) {
       console.error('Failed to load booked classes', e);
     }
@@ -114,7 +118,7 @@ useEffect(() => {
 
           {/* CROWD METER */}
           <CrowdMeterCard 
-            current={25} 
+            current={15}
             max={250} 
             image={crowded}
             crowdLevel="Not Crowded"

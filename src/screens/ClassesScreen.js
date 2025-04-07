@@ -1,7 +1,8 @@
 // src/screens/ClassesScreen.js
 import React from 'react';
-import {View, Text, StyleSheet, FlatList} from 'react-native';
+import {View, Text, StyleSheet, FlatList, SafeAreaView, TouchableOpacity, ScrollView} from 'react-native';
 import ClassCard from '../components/ClassCard';
+import { Ionicons } from "@expo/vector-icons";
 import BottomNavigationBar from '../components/BottomNavigationBar';
 
 const classData = [
@@ -108,10 +109,16 @@ const dateRange = `Week of ${formatDate(saturday)} to ${formatDate(nextSunday)}`
 
 export default function ClassesScreen({navigation}) {
     return (
-      <View style ={styles.container}>
-        
-        <Text style={styles.header}>Available Classes</Text>
-        <Text style={styles.subHeader}>{dateRange}</Text>
+        <SafeAreaView style={styles.container}>
+          <View style={styles.header}>
+                          <TouchableOpacity onPress={() => navigation.goBack()}>
+                              <Ionicons name="arrow-back" size={24} color="#000" />
+                          </TouchableOpacity>
+                          <Text style={styles.headerTitle}>Available Classes</Text>
+                          <View style={{ width: 24 }} />
+                      </View>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={styles.subHeader}>{dateRange}</Text>
             <FlatList
                 data={classData}
                 renderItem={({item}) => (<ClassCard
@@ -122,10 +129,10 @@ export default function ClassesScreen({navigation}) {
                 numColumns={2}
                 contentContainerStyle={styles.grid}
                 showsVerticalScrollIndicator={false}/>
-                
 
-        <BottomNavigationBar active="home" navigation={navigation} />
-        </View>
+            </ScrollView>
+                <BottomNavigationBar active="home" navigation={navigation} />
+        </SafeAreaView>
     );
 }
 
@@ -142,23 +149,28 @@ const styles = StyleSheet.create({
   },
 
     header: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#912338',
-        marginVertical: 12,
-        paddingHorizontal: 12
-    },
+      padding: 16,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: "#eee",
+  },
+  headerTitle: {
+      fontSize: 20,
+      fontWeight: "bold",
+  },
     subHeader: {
-        fontSize: 14,
-        fontWeight: '500',
-        //color: '#333',
-        marginBottom: 8,
-        marginTop: -8,
-        paddingHorizontal: 12
+        fontSize: 15,
+        fontWeight: '600',
+        color: '#800000',
+        marginBottom: 15,
+        textAlign: 'center',
+        marginTop: 10,
       },
     grid: {
-        paddingBottom: 22,
-        paddingHorizontal: 12
-
+        paddingBottom: 80,
+        paddingHorizontal: 10
     }
 });

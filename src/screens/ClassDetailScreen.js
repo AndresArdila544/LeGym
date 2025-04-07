@@ -64,6 +64,8 @@ export default function ClassDetailScreen({route, navigation}) {
                 newBooking
             ];
 
+            console.log(updatedBookings)
+
             // Save to AsyncStorage
             await AsyncStorage.setItem('classBookings', JSON.stringify(updatedBookings));
 

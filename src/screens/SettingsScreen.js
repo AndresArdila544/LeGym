@@ -140,7 +140,7 @@ export default function SettingsScreen({navigation}) {
                     </View>
 
                     <Text style={styles.profileName}>
-                        {userData.firstName } 
+                        {userData.firstName } {" "}
                         {userData.lastName}
                     </Text>
                     <Text style={styles.profileEmail}>{userData.email}</Text>

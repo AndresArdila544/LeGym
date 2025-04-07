@@ -34,8 +34,10 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         overflow: 'hidden',
         marginBottom: 20,
-        width: '90%',
-        margin: 'auto'
+        width: '92%',
+        margin: 'auto',
+        marginTop: 20
+
     },
     image: {
         flex: 1,
@@ -51,15 +53,16 @@ const styles = StyleSheet.create({
     content: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-end',
+        // alignItems: 'flex-end',
         padding: 20,
         flex: 1,
     },
     title: {
         color: '#fff',
-        fontSize: 16,
-        fontWeight: '500',
-        marginBottom: 6,
+        fontSize: 20,
+        fontWeight: '700',
+        marginBottom: 20,
+        width: '80%',
     },
     bold: {
         fontWeight: 'bold',
@@ -67,12 +70,12 @@ const styles = StyleSheet.create({
     badge: {
         alignSelf: 'flex-start',
         backgroundColor: 'rgba(0,0,0,0.6)',
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 20,
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderRadius: 9,
     },
     badgeText: {
         color: '#fff',
-        fontSize: 12,
+        fontSize: 14,
     },
 });

@@ -170,7 +170,7 @@ const isFocused = useIsFocused();
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff'
+        backgroundColor: '#fff',
     },
     header: {
         flexDirection: 'row',
@@ -187,7 +187,8 @@ const styles = StyleSheet.create({
     },
     content: {
         flex: 1,
-        padding: 16
+        padding: 16,
+        marginBottom: 70
     },
     statTextWrapper: {
         marginLeft: 10

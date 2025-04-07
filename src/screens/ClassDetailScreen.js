@@ -16,7 +16,8 @@ import BottomNavigationBar from '../components/BottomNavigationBar';
 
 export default function ClassDetailScreen({ route, navigation }) {
     const { classInfo, openCancelModal = false } = route.params
-
+    console.log(classInfo);
+    
     // || {
     //     classInfo: {
     //         id: '1',
@@ -76,7 +77,16 @@ export default function ClassDetailScreen({ route, navigation }) {
                 time: classInfo.time,
                 date: new Date().toISOString(),
                 location: classInfo.location,
-                classDate: getDateOfCurrentWeekday(classInfo.days)
+                classDate: getDateOfCurrentWeekday(classInfo.days),
+                description: classInfo.description,
+                image: classInfo.image,
+                imageUrl: classInfo.imageUrl,
+                instructorImage: classInfo.instructorImage,
+                rating: classInfo.rating,
+                reviews: classInfo.reviews,
+                duration: classInfo.duration,
+                booked: true,
+                days: classInfo.days,
             };
 
             const updatedBookings = [
@@ -148,7 +158,7 @@ export default function ClassDetailScreen({ route, navigation }) {
                         <Ionicons name="arrow-back" size={24} color="#000" />
                     </TouchableOpacity>
                     <Image
-                        source={require('../../assets/images/classes/ClassDefault.png')}
+                        source={classInfo.image ? classInfo.image : { uri: classInfo.imageUrl } }
                         style={styles.classImage}
                         resizeMode="cover" />
                 </View>

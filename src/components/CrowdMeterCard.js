@@ -33,10 +33,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#8B1C3B',
         borderRadius: 16,
         overflow: 'hidden',
-        marginHorizontal: 20,
-        marginBottom: 20,
-        marginHorizontal: 0, // Remove horizontal margins
-        marginBottom: 20,
+        marginVertical: 20,
         width: '100%'
     },
     image: {

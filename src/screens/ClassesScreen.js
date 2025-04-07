@@ -15,6 +15,7 @@ const classData = [
       id: '1',
       title: 'Hardcore',
       image: require('../../assets/images/classes/hardcore.png'),
+      imageUrl: 'https://images.unsplash.com/photo-1695835743477-68f580122cc1',
       instructor: 'Coach Raymond',
       time: '4:30 – 5:15 PM',
       days: 'Monday',

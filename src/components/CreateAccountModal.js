@@ -15,7 +15,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import DropDownPicker from 'react-native-dropdown-picker';
 
-export default function CreateAccountModal({ onClose, onContinue }) {
+export default function CreateAccountModal({ onClose, onContinue,onGoToLogIn }) {
     const slideAnim = useRef(new Animated.Value(300)).current;
 
     const [firstName,
@@ -48,6 +48,11 @@ export default function CreateAccountModal({ onClose, onContinue }) {
             }
         ]);
 
+        const isValidEmail = (email) => {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+          };
+          
     useEffect(() => {
         Animated
             .timing(slideAnim, {
@@ -133,17 +138,36 @@ export default function CreateAccountModal({ onClose, onContinue }) {
                                 style={styles.input} />
 
                             <TouchableOpacity style={styles.continueButton} 
-                            onPress={() => onContinue({
-    firstName,
-    lastName,
-    email,
-    dateOfBirth: date.toISOString(),
-    gender: value || '',
-  })}>
+                            onPress={() => {
+                                if (!firstName || !lastName || !email) {
+                                  alert('Please fill in all required fields.');
+                                  return;
+                                }
+                              
+                                if (!isValidEmail(email)) {
+                                  alert('Please enter a valid email address.');
+                                  return;
+                                }
+                              
+                                onContinue({
+                                  firstName,
+                                  lastName,
+                                  email,
+                                  dateOfBirth: date.toISOString(),
+                                  gender: value || '',
+                                });
+                              }}
+                              
+                            >
                                 <Text style={styles.buttonText}>CONTINUE</Text>
                             </TouchableOpacity>
 
-                            <TouchableOpacity>
+                            <TouchableOpacity
+                            onPress={() => {
+                                onClose();
+                                onGoToLogIn();
+                            }}
+                            >
                                 <Text style={styles.footerText}>
                                     Already a member?
                                     <Text style={styles.linkText}>Log in</Text>

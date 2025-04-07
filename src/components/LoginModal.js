@@ -9,10 +9,10 @@ import {
     Animated,
     Keyboard,
     KeyboardAvoidingView,
-    Platform,
+    Platform
 } from 'react-native';
 
-export default function LoginModal({onClose,onContinue, onGoToForgotPassword, onGoToSignup}) {
+export default function LoginModal({onClose, onContinue, onGoToForgotPassword, onGoToSignup}) {
     const [email,
         setEmail] = useState('');
     const [password,
@@ -41,7 +41,7 @@ export default function LoginModal({onClose,onContinue, onGoToForgotPassword, on
                 ? 'padding'
                 : 'height'}
                 keyboardVerticalOffset={0}>
-               
+
                 <Animated.View
                     style={[
                     styles.modalWrapper, {
@@ -79,11 +79,20 @@ export default function LoginModal({onClose,onContinue, onGoToForgotPassword, on
                                 <Text style={styles.forgot}>Forgot Password?</Text>
                             </TouchableOpacity>
 
-                            <TouchableOpacity style={styles.loginButton} onPress={onContinue}>
+                            <TouchableOpacity
+                                style={styles.loginButton}
+                                onPress={() => {
+                                if (!email || !password) {
+                                    alert("Please enter both email and password.");
+                                    return;
+                                }
+                                onContinue(email.trim().toLowerCase(), password);
+                            }}>
                                 <Text style={styles.loginButtonText}>LOG IN</Text>
                             </TouchableOpacity>
 
-                            <TouchableOpacity onPress={() => {
+                            <TouchableOpacity
+                                onPress={() => {
                                 onClose();
                                 onGoToSignup();
                             }}>

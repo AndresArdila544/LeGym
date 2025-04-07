@@ -1,20 +1,28 @@
 // src/screens/ClassesScreen.js
 import React from 'react';
-import {View, Text, StyleSheet, FlatList} from 'react-native';
+import {View, Text, StyleSheet, FlatList, SafeAreaView, TouchableOpacity, ScrollView} from 'react-native';
 import ClassCard from '../components/ClassCard';
+import { Ionicons } from "@expo/vector-icons";
 import BottomNavigationBar from '../components/BottomNavigationBar';
+import { LogBox } from 'react-native';
+
+LogBox.ignoreLogs([
+  'VirtualizedLists should never be nested'
+]);
 
 const classData = [
     {
       id: '1',
       title: 'Hardcore',
       image: require('../../assets/images/classes/hardcore.png'),
+      imageUrl: 'https://images.unsplash.com/photo-1695835743477-68f580122cc1',
       instructor: 'Coach Raymond',
       time: '4:30 – 5:15 PM',
-      days: 'Monday and Wednesdays',
+      days: 'Monday',
       location: 'SGW – Le Gym – Gymnasium',
       rating: '4.9',
       reviews: '231',
+      duration: '1hr',
       description:
         'A high intensity, cross-training session incorporating a blend of cardiovascular, strength and core exercises for an intense total body workout. I strive to make Hard Core as unique as possible, by coming up with creative and effective ways to challenge and strengthen my participants. Expect lots of variety to challenge all fitness levels, and be prepared to sweat!',
     },
@@ -24,10 +32,11 @@ const classData = [
       image: require('../../assets/images/classes/yoga.png'),
       instructor: 'Coach Priya',
       time: '7:00 – 8:00 AM',
-      days: 'Tuesdays and Thursdays',
+      days: 'Tuesday',
       location: 'SGW – Le Gym – Studio A',
       rating: '4.8',
       reviews: '198',
+      duration: '1hr',
       description:
         'A calming class that focuses on improving flexibility, breathing techniques, and mental clarity through a variety of traditional yoga poses. Perfect for beginners or those seeking a restorative experience.',
     },
@@ -37,10 +46,11 @@ const classData = [
       image: require('../../assets/images/classes/kinessis.png'),
       instructor: 'Coach Alex',
       time: '12:00 – 12:45 PM',
-      days: 'Fridays',
+      days: 'Friday',
       location: 'SGW – Le Gym – Functional Zone',
       rating: '4.6',
       reviews: '142',
+      duration: '1hr',
       description:
         'A functional movement class using Kinesis wall equipment to improve strength, flexibility, and coordination. Great for injury prevention and athletic performance.',
     },
@@ -50,10 +60,11 @@ const classData = [
       image: require('../../assets/images/classes/zumba.png'),
       instructor: 'Coach Isabella',
       time: '6:00 – 7:00 PM',
-      days: 'Wednesdays and Fridays',
+      days: 'Wednesday',
       location: 'SGW – Le Gym – Studio B',
       rating: '4.9',
       reviews: '312',
+      duration: '45m',
       description:
         'An energetic dance fitness class that combines Latin and international music with fun choreography to make cardio exercise exciting and addictive.',
     },
@@ -63,10 +74,11 @@ const classData = [
       image: require('../../assets/images/classes/yoga.png'),
       instructor: 'Coach Priya',
       time: '6:00 – 7:00 PM',
-      days: 'Mondays',
+      days: 'Monday',
       location: 'SGW – Le Gym – Studio A',
       rating: '4.7',
       reviews: '102',
+      duration: '30m',
       description:
         'An intermediate-level yoga class that explores deeper postures, longer holds, and more challenging flows. Ideal for those with previous yoga experience.',
     },
@@ -76,10 +88,11 @@ const classData = [
       image: require('../../assets/images/classes/personal.png'),
       instructor: 'Coach Nathan',
       time: 'By Appointment',
-      days: 'Custom Schedule',
+      days: 'Sunday',
       location: 'SGW – Le Gym – Weight Room',
       rating: '5.0',
       reviews: '89',
+      duration: '1hr',
       description:
         'A one-on-one training session tailored to your personal fitness goals. Whether it’s building muscle, losing weight, or improving your performance, our certified trainers will guide and support you throughout your journey.',
     },
@@ -108,10 +121,16 @@ const dateRange = `Week of ${formatDate(saturday)} to ${formatDate(nextSunday)}`
 
 export default function ClassesScreen({navigation}) {
     return (
-      <View style ={styles.container}>
-        
-        <Text style={styles.header}>Available Classes</Text>
-        <Text style={styles.subHeader}>{dateRange}</Text>
+        <SafeAreaView style={styles.container}>
+          <View style={styles.header}>
+                          <TouchableOpacity onPress={() => navigation.goBack()}>
+                              <Ionicons name="arrow-back" size={24} color="#000" />
+                          </TouchableOpacity>
+                          <Text style={styles.headerTitle}>Available Classes</Text>
+                          <View style={{ width: 24 }} />
+                      </View>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={styles.subHeader}>{dateRange}</Text>
             <FlatList
                 data={classData}
                 renderItem={({item}) => (<ClassCard
@@ -122,10 +141,10 @@ export default function ClassesScreen({navigation}) {
                 numColumns={2}
                 contentContainerStyle={styles.grid}
                 showsVerticalScrollIndicator={false}/>
-                
 
-        <BottomNavigationBar active="home" navigation={navigation} />
-        </View>
+            </ScrollView>
+                <BottomNavigationBar active="home" navigation={navigation} />
+        </SafeAreaView>
     );
 }
 
@@ -142,23 +161,28 @@ const styles = StyleSheet.create({
   },
 
     header: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#912338',
-        marginVertical: 12,
-        paddingHorizontal: 12
-    },
+      padding: 16,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: "#eee",
+  },
+  headerTitle: {
+      fontSize: 20,
+      fontWeight: "bold",
+  },
     subHeader: {
-        fontSize: 14,
-        fontWeight: '500',
-        //color: '#333',
-        marginBottom: 8,
-        marginTop: -8,
-        paddingHorizontal: 12
+        fontSize: 15,
+        fontWeight: '600',
+        color: '#800000',
+        marginBottom: 15,
+        textAlign: 'center',
+        marginTop: 10,
       },
     grid: {
-        paddingBottom: 22,
-        paddingHorizontal: 12
-
+        paddingBottom: 80,
+        paddingHorizontal: 10
     }
 });

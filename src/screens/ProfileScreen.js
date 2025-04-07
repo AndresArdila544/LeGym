@@ -66,6 +66,7 @@ export default function ProfileScreen({ navigation }) {
             try {
               // Clear user session
               await AsyncStorage.removeItem('userSession');
+              await AsyncStorage.clear();
               // Navigate to welcome screen
               navigation.reset({
                 index: 0,

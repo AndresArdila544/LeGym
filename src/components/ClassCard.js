@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     },
     title: {
         color: 'white',
-        fontWeight: '600',
-        fontSize: 14
+        fontWeight: '700',
+        fontSize: 16
     }
 });

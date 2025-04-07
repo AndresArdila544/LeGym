@@ -60,7 +60,7 @@ export default function FitnessTrackerScreen({ navigation }) {
   };
   
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="#000" />
@@ -137,7 +137,7 @@ export default function FitnessTrackerScreen({ navigation }) {
       </ScrollView>
       
       <BottomNavigationBar active="fitness" navigation={navigation} />
-    </SafeAreaView>
+    </View>
   );
 }
 

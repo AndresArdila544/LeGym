@@ -49,15 +49,11 @@ export default function CalendarScreen({ navigation }) {
   useEffect(() => {
     const loadEvents = async () => {
       try {
-        // const storedEvents = await AsyncStorage.getItem('calendarEvents');
-        // console.log(await AsyncStorage.getItem('calendarEvents'))
-        // if (storedEvents) {
-        //   setEvents(JSON.parse(storedEvents));
-        // } else {
-        await AsyncStorage.clear();
-        await AsyncStorage.setItem('calendarEvents', JSON.stringify(eventsData));
-        setEvents(eventsData);
-        // }
+        const storedEvents = await AsyncStorage.getItem('classBookings');
+        console.log("stored bookings" + storedEvents)
+        if (storedEvents) {
+          setEvents(JSON.parse(storedEvents));
+        }
       } catch (error) {
         console.error('Failed to load events:', error);
       }
@@ -68,8 +64,9 @@ export default function CalendarScreen({ navigation }) {
 
   // Filter events for selected date
   const todayEvents = events.filter(event => {
-
-    const eventDate = new Date(event.dateTime);
+    console.log(event.classDate);
+    
+    const eventDate = new Date(event.classDate);
     return eventDate.getDate() === selectedDate.getDate() &&
       eventDate.getMonth() === selectedDate.getMonth() &&
       eventDate.getFullYear() === selectedDate.getFullYear();
@@ -99,13 +96,13 @@ export default function CalendarScreen({ navigation }) {
             todayEvents.map((event, index) => (
               <View key={index} style={styles.eventCard}>
                 <View>
-                  <Text style={styles.eventTime}>{new Date(event.dateTime).getHours() + ":" + new Date(event.dateTime).getMinutes().toString().padStart(2, '0')}</Text>
+                  <Text style={styles.eventTime}>{event.time.split(" ")[0] + " " + event.time.split(" ").at(-1)}</Text>
                   <Text style={styles.eventDuration}>{event.duration}</Text>
                 </View>
 
                 <View style={styles.eventDetailsCard}>
                   <TouchableOpacity onPress={() => navigation.navigate('ClassDetail', { classInfo: event })}>
-                    <Text style={styles.eventTitle}>{event.eventName}</Text>
+                    <Text style={styles.eventTitle}>{event.title}</Text>
 
                   <View style={{ display: 'flex', flexDirection: 'row', gap: 10, alignItems: 'center', marginTop: 15 }}>
                     <Ionicons name="location-outline" size={24} color="#fff" /> 
@@ -113,10 +110,18 @@ export default function CalendarScreen({ navigation }) {
                   </View>
 
                   <View style={{ display: 'flex', flexDirection: 'row', gap: 10, alignItems: 'center', marginTop: 10 }}>
-                    <Image
+                    
+                    {
+                      event.instructorImage ? (
+                        <Image
                       source={{ uri: event.instructorImage }}
                       style={{ width: 25, height: 25, borderRadius: 20 }}
                     />
+                      ) : (
+                        <Ionicons name="person-outline" size={22} color="#fff" />
+                      )
+                    }
+                    
 
                     <Text style={styles.eventInstructor}>{event.instructor}</Text>
                   </View>

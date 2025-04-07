@@ -1,5 +1,5 @@
 // src/screens/ClassDetailScreen.js
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
     View,
     Text,
@@ -10,29 +10,31 @@ import {
     Modal,
     Image
 } from 'react-native';
-import {Ionicons} from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BottomNavigationBar from '../components/BottomNavigationBar';
 
-export default function ClassDetailScreen({route, navigation}) {
-    const {classInfo,openCancelModal = false} = route.params || {
-        classInfo: {
-            id: '1',
-            title: 'Hardcore',
-            instructor: 'Coach Raymond',
-            time: '4:30 – 5:15 PM',
-            days: 'Monday and Wednesdays',
-            location: 'SGW – Le Gym – Gymnasium',
-            rating: '4.9',
-            reviews: '231',
-            description: 'A high intensity, cross-training session incorporating a blend of cardiovascular' +
-                    ', strength and core exercises for an intense total body workout. I strive to mak' +
-                    'e Hard Core as unique as possible, by coming up with creative and effective ways' +
-                    ' to challenge and strengthen my participants. Expect lots of variety to challeng' +
-                    'e all fitness levels, and be prepared to sweat!',
-            image: 'https://via.placeholder.com/400'
-        }
-    };
+export default function ClassDetailScreen({ route, navigation }) {
+    const { classInfo, openCancelModal = false } = route.params
+
+    // || {
+    //     classInfo: {
+    //         id: '1',
+    //         title: 'Hardcore',
+    //         instructor: 'Coach Raymond',
+    //         time: '4:30 – 5:15 PM',
+    //         days: 'Monday and Wednesdays',
+    //         location: 'SGW – Le Gym – Gymnasium',
+    //         rating: '4.9',
+    //         reviews: '231',
+    //         description: 'A high intensity, cross-training session incorporating a blend of cardiovascular' +
+    //                 ', strength and core exercises for an intense total body workout. I strive to mak' +
+    //                 'e Hard Core as unique as possible, by coming up with creative and effective ways' +
+    //                 ' to challenge and strengthen my participants. Expect lots of variety to challeng' +
+    //                 'e all fitness levels, and be prepared to sweat!',
+    //         image: 'https://via.placeholder.com/400'
+    //     }
+    // };
 
     const [confirmationVisible,
         setConfirmationVisible] = useState(false);
@@ -41,7 +43,24 @@ export default function ClassDetailScreen({route, navigation}) {
     const [cancelConfirmVisible,
         setCancelConfirmVisible] = useState(openCancelModal);
 
-    const handleBookClass = async() => {
+    function getDateOfCurrentWeekday(weekday) {
+        const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const today = new Date();
+        const currentDay = today.getDay(); // 0 (Sun) - 6 (Sat)
+        const targetDay = weekdays.indexOf(weekday);
+
+        if (targetDay === -1) {
+            throw new Error('Invalid weekday name');
+        }
+
+        const diff = targetDay - currentDay;
+        const targetDate = new Date(today);
+        targetDate.setDate(today.getDate() + diff);
+
+        return targetDate.toISOString(); // Returns "YYYY-MM-DD"
+    }
+
+    const handleBookClass = async () => {
         try {
             // Get existing bookings
             const bookingsJson = await AsyncStorage.getItem('classBookings');
@@ -56,7 +75,8 @@ export default function ClassDetailScreen({route, navigation}) {
                 instructor: classInfo.instructor,
                 time: classInfo.time,
                 date: new Date().toISOString(),
-                location: classInfo.location
+                location: classInfo.location,
+                classDate: getDateOfCurrentWeekday(classInfo.days)
             };
 
             const updatedBookings = [
@@ -77,7 +97,7 @@ export default function ClassDetailScreen({route, navigation}) {
         }
     };
 
-    const handleCancelBooking = async() => {
+    const handleCancelBooking = async () => {
         try {
             // Get existing bookings
             const bookingsJson = await AsyncStorage.getItem('classBookings');
@@ -104,7 +124,7 @@ export default function ClassDetailScreen({route, navigation}) {
 
     // Check if class is already booked when component mounts
     React.useEffect(() => {
-        const checkBookingStatus = async() => {
+        const checkBookingStatus = async () => {
             try {
                 const bookingsJson = await AsyncStorage.getItem('classBookings');
                 if (bookingsJson) {
@@ -125,19 +145,19 @@ export default function ClassDetailScreen({route, navigation}) {
             <ScrollView>
                 <View style={styles.header}>
                     <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                        <Ionicons name="arrow-back" size={24} color="#000"/>
+                        <Ionicons name="arrow-back" size={24} color="#000" />
                     </TouchableOpacity>
                     <Image
                         source={require('../../assets/images/classes/ClassDefault.png')}
                         style={styles.classImage}
-                        resizeMode="cover"/>
+                        resizeMode="cover" />
                 </View>
 
                 <View style={styles.classInfo}>
                     <View style={styles.titleRow}>
                         <Text style={styles.title}>{classInfo.title}</Text>
                         <TouchableOpacity style={styles.bookmarkButton}>
-                            <Ionicons name="bookmark-outline" size={20} color="#8B1C3B"/>
+                            <Ionicons name="bookmark-outline" size={20} color="#8B1C3B" />
                         </TouchableOpacity>
                     </View>
                     <View style={styles.badge}>
@@ -145,21 +165,21 @@ export default function ClassDetailScreen({route, navigation}) {
                     </View>
 
                     <View style={styles.infoRow}>
-                        <Ionicons name="location-outline" size={16} color="#555"/>
+                        <Ionicons name="location-outline" size={16} color="#555" />
                         <Text style={styles.infoText}>{classInfo.location}</Text>
                     </View>
                     <View style={styles.infoRow}>
-                        <Ionicons name="star" size={16} color="#f5a623"/>
+                        <Ionicons name="star" size={16} color="#f5a623" />
                         <Text style={styles.infoText}>{classInfo.rating}
                             ({classInfo.reviews}
                             reviews)</Text>
                     </View>
                     <View style={styles.infoRow}>
-                        <Ionicons name="calendar-outline" size={16} color="#555"/>
+                        <Ionicons name="calendar-outline" size={16} color="#555" />
                         <Text style={styles.infoText}>{classInfo.days}</Text>
                     </View>
                     <View style={styles.infoRow}>
-                        <Ionicons name="time-outline" size={16} color="#555"/>
+                        <Ionicons name="time-outline" size={16} color="#555" />
                         <Text style={styles.infoText}>{classInfo.time}</Text>
                     </View>
 
@@ -189,16 +209,16 @@ export default function ClassDetailScreen({route, navigation}) {
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
                         <Image
-                        source={require('../../assets/images/sucess.png')}
-                        style={styles.modalImage}
-                        resizeMode="contain"/>
+                            source={require('../../assets/images/sucess.png')}
+                            style={styles.modalImage}
+                            resizeMode="contain" />
                         <Text style={styles.modalTitle}>Your booking has been confirmed!</Text>
                         <TouchableOpacity
                             style={styles.closeButton}
                             onPress={() => {
-                            setConfirmationVisible(false);
-                            navigation.goBack();
-                        }}>
+                                setConfirmationVisible(false);
+                                navigation.goBack();
+                            }}>
 
                             <Text style={styles.closeButtonText}>Close</Text>
                         </TouchableOpacity>

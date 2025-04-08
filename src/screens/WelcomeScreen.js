@@ -30,6 +30,21 @@ export default function WelcomeScreen({navigation}) {
         gender: '',
         password: ''
     });
+
+    useEffect(() => {
+        const logAsyncStorage = async () => {
+          const keys = await AsyncStorage.getAllKeys();
+          const items = await AsyncStorage.multiGet(keys);
+          console.log("📦 AsyncStorage contents:");
+          items.forEach(([key, value]) => {
+            console.log(`${key}:`, JSON.parse(value));
+          });
+        };
+      
+        logAsyncStorage();
+    }, []);
+
+
     const logAllUsers = async () => {
         try {
           const data = await AsyncStorage.getItem('users');
@@ -46,6 +61,7 @@ export default function WelcomeScreen({navigation}) {
         logAllUsers();
         console.log("✅ WelcomeScreen is rendering");
     }, []);
+    
 
     return (
         <ImageBackground

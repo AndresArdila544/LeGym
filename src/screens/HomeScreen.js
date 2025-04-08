@@ -58,53 +58,38 @@ export default function HomeScreen({ navigation }) {
   
 
   useEffect(() => {
-    const loadUserData = async () => {
+    const loadData = async () => {
       try {
         const stored = await AsyncStorage.getItem('activeUser');
-        const parsed = stored ? JSON.parse(stored) : null;
-        setUser(parsed);
-        console.log('🧑‍💻 Loaded activeUser:', parsed);
+        const parsedUser = stored ? JSON.parse(stored) : null;
+        setUser(parsedUser);
+        console.log('🧑‍💻 Loaded activeUser:', parsedUser);
+  
+        if (parsedUser?.email) {
+          // Load workouts
+          const workoutsKey = `workouts_${parsedUser.email}`;
+          const storedWorkouts = await AsyncStorage.getItem(workoutsKey);
+          const parsedWorkouts = storedWorkouts ? JSON.parse(storedWorkouts) : [];
+          setWorkouts(parsedWorkouts);
+          setStreakDays(calculateStreak(parsedWorkouts));
+  
+          // Load class bookings
+          const bookingsKey = `classBookings_${parsedUser.email}`;
+          const storedBookings = await AsyncStorage.getItem(bookingsKey);
+          const parsedBookings = storedBookings ? JSON.parse(storedBookings) : [];
+          setBookedClasses(parsedBookings);
+        }
+  
       } catch (e) {
-        console.error('Failed to load user data', e);
+        console.error('Failed to load home screen data', e);
       }
     };
-
-    const loadWorkouts = async () => {
-      if (!user?.email) return;
-    
-      try {
-        const key = `workouts_${user.email}`;
-        const stored = await AsyncStorage.getItem(key);
-        const parsed = stored ? JSON.parse(stored) : [];
-        setWorkouts(parsed);
-        setStreakDays(calculateStreak(parsed));
-      } catch (e) {
-        console.error('Failed to load workouts', e);
-      }
-    };
-    
-
-    const loadBookedClasses = async () => {
-      if (!user?.email) return;
-    
-      try {
-        const key = `classBookings_${user.email}`;
-        const stored = await AsyncStorage.getItem(key);
-        const parsed = stored ? JSON.parse(stored) : [];
-        setBookedClasses(parsed);
-      } catch (e) {
-        console.error('Failed to load booked classes', e);
-      }
-    };
-    
-    
-
+  
     if (isFocused) {
-      loadUserData();
-      loadBookedClasses();
-      loadWorkouts();
+      loadData();
     }
   }, [isFocused]);
+  
 
 
   return (

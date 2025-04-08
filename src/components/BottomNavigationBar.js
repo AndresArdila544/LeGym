@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
         elevation: 5
     },
     activeCircle: {
-        backgroundColor: '#800000',
+        backgroundColor: '#912338',
         padding: 10,
         borderRadius: 25,
       },

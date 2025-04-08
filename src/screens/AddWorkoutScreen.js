@@ -170,7 +170,7 @@ export default function AddWorkoutScreen({ navigation, route }) {
           <Text style={styles.label}>Date</Text>
           <TouchableOpacity style={styles.dateSelector} onPress={() => setShowDatePicker(true)}>
             <Text>{date.toLocaleDateString()}</Text>
-            <Ionicons name="calendar" size={20} color="#800000" />
+            <Ionicons name="calendar" size={20} color="#912338" />
           </TouchableOpacity>
           {showDatePicker && (
             <DateTimePicker
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   },
   saveButton: {
 
-      backgroundColor: '#800000',
+      backgroundColor: '#912338',
       paddingVertical: 14,
       borderRadius: 30,
       alignItems: 'center',
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   deleteButton: {
-    backgroundColor: '#800000',
+    backgroundColor: '#912338',
     paddingVertical: 14,
     borderRadius: 30,
     alignItems: 'center',

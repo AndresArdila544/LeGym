@@ -126,7 +126,7 @@ export default function ProfileScreen({ navigation }) {
             style={styles.menuItem}
             onPress={() => navigation.navigate('Membership')}
           >
-            <Ionicons name="card-outline" size={24} color="#800000" />
+            <Ionicons name="card-outline" size={24} color="#912338" />
             <Text style={styles.menuItemText}>Membership</Text>
             <Ionicons name="chevron-forward" size={20} color="#999" />
           </TouchableOpacity>
@@ -135,25 +135,25 @@ export default function ProfileScreen({ navigation }) {
             style={styles.menuItem}
             onPress={() => navigation.navigate('PaymentMethod')}
           >
-            <Ionicons name="wallet-outline" size={24} color="#800000" />
+            <Ionicons name="wallet-outline" size={24} color="#912338" />
             <Text style={styles.menuItemText}>Payment Methods</Text>
             <Ionicons name="chevron-forward" size={20} color="#999" />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.menuItem}>
-            <Ionicons name="notifications-outline" size={24} color="#800000" />
+            <Ionicons name="notifications-outline" size={24} color="#912338" />
             <Text style={styles.menuItemText}>Notifications</Text>
             <Ionicons name="chevron-forward" size={20} color="#999" />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('ProfileSetting')}>
-            <Ionicons name="settings-outline" size={24} color="#800000" />
+            <Ionicons name="settings-outline" size={24} color="#912338" />
             <Text style={styles.menuItemText}>Update Profile</Text>
             <Ionicons name="chevron-forward" size={20} color="#999" />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.menuItem}>
-            <Ionicons name="help-circle-outline" size={24} color="#800000" />
+            <Ionicons name="help-circle-outline" size={24} color="#912338" />
             <Text style={styles.menuItemText}>Help & Support</Text>
             <Ionicons name="chevron-forward" size={20} color="#999" />
           </TouchableOpacity>
@@ -162,7 +162,7 @@ export default function ProfileScreen({ navigation }) {
             style={[styles.menuItem, styles.logoutItem]}
             onPress={handleLogout}
           >
-            <Ionicons name="log-out-outline" size={24} color="#800000" />
+            <Ionicons name="log-out-outline" size={24} color="#912338" />
             <Text style={[styles.menuItemText, styles.logoutText]}>Logout</Text>
           </TouchableOpacity>
         </View>
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: "#800000",
+    color: "#912338",
     //paddingLeft:16
   },
   content: {
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#800000',
+    backgroundColor: '#912338',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   membershipBadge: {
-    backgroundColor: '#800000',
+    backgroundColor: '#912338',
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 16,
@@ -268,6 +268,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   logoutText: {
-    color: '#800000',
+    color: '#912338',
   },
 });

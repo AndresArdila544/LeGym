@@ -113,7 +113,7 @@ export default function CalendarScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
+          <Ionicons name="arrow-back" size={24} color="#912338" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>My Calendar</Text>
         <View style={{ width: 24 }} />
@@ -234,6 +234,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   headerTitle: {
+    color:"#912338",
     fontSize: 20,
     fontWeight: "bold",
   },
@@ -272,7 +273,7 @@ const styles = StyleSheet.create({
     opacity: 0.3,
   },
   selectedDay: {
-    backgroundColor: "#800000",
+    backgroundColor: "#912338",
     borderRadius: 20,
   },
   dayText: {
@@ -309,7 +310,7 @@ const styles = StyleSheet.create({
     // marginBottom: 8,
   },
   eventDetailsCard: {
-    backgroundColor: "#93243A",
+    backgroundColor: "#912338",
     borderRadius: 16,
     minHeight: "fit-content",
     // width: '60%',

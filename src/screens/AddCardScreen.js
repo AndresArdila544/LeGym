@@ -110,7 +110,7 @@ export default function AddCardScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#800000" />
+          <Ionicons name="arrow-back" size={24} color="#912338" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Add Payment Method</Text>
         <View style={{ width: 24 }} />
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color:"#800000"
+    color:"#912338"
   },
   content: {
     flex: 1,
@@ -259,19 +259,19 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderWidth: 2,
-    borderColor: '#800000',
+    borderColor: '#912338',
     borderRadius: 4,
     justifyContent: 'center',
     alignItems: 'center',
   },
   checkboxChecked: {
-    backgroundColor: '#800000',
+    backgroundColor: '#912338',
   },
   checkboxLabel: {
     fontSize: 16,
   },
   saveButton: {
-    backgroundColor: '#800000',
+    backgroundColor: '#912338',
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',

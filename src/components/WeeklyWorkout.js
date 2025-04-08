@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 2 // Optional spacing tweak
     },
     completed: {
-        backgroundColor: '#8B1C3B'
+        backgroundColor: '#912338'
     },
     pending: {
         backgroundColor: '#f2f2f2'

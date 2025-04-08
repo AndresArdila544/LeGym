@@ -124,7 +124,7 @@ export default function ClassesScreen({navigation}) {
         <SafeAreaView style={styles.container}>
           <View style={styles.header}>
                           <TouchableOpacity onPress={() => navigation.goBack()}>
-                              <Ionicons name="arrow-back" size={24} color="#000" />
+                              <Ionicons name="arrow-back" size={24} color="#912338" />
                           </TouchableOpacity>
                           <Text style={styles.headerTitle}>Available Classes</Text>
                           <View style={{ width: 24 }} />
@@ -172,11 +172,12 @@ const styles = StyleSheet.create({
   headerTitle: {
       fontSize: 20,
       fontWeight: "bold",
+      color:"#912338"
   },
     subHeader: {
         fontSize: 15,
         fontWeight: '600',
-        color: '#800000',
+        color: '#912338',
         marginBottom: 15,
         textAlign: 'center',
         marginTop: 10,

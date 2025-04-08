@@ -30,7 +30,7 @@ export default function CrowdMeterCard({
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
-        backgroundColor: '#8B1C3B',
+        backgroundColor: '#912338',
         borderRadius: 16,
         overflow: 'hidden',
         marginVertical: 20,
@@ -63,6 +63,6 @@ const styles = StyleSheet.create({
         width: 100,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#8B1C3B'
+        backgroundColor: '#912338'
     }
 });

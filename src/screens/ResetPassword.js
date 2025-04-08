@@ -24,7 +24,7 @@ export default function ForgotPassword({ navigation }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
+          <Ionicons name="arrow-back" size={24} color="#912338" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Forgot password</Text>
         <View style={{ width: 24 }} />
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   button: {
-    backgroundColor: "#800000",
+    backgroundColor: "#912338",
     borderRadius: 8,
     padding: 16,
     alignItems: "center",

@@ -130,7 +130,7 @@ export default function SettingsScreen({navigation}) {
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Ionicons name="arrow-back" size={24} color="#800000"/>
+                    <Ionicons name="arrow-back" size={24} color="#912338"/>
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Update Profile</Text>
                 <View style={{
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 20,
         fontWeight: "bold",
-        color:"#800000"
+        color:"#912338"
     },
     profileSection: {
         alignItems: "center",
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
         width: 85,
         height: 85,
         borderRadius: 85,
-        backgroundColor: "#800000",
+        backgroundColor: "#912338",
         justifyContent: "center",
         alignItems: "center"
     },
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
         paddingLeft: 15
     },
     button: {
-        backgroundColor: "#800000",
+        backgroundColor: "#912338",
         borderRadius: 8,
         padding: 16,
         alignItems: "center",
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 8,
-        backgroundColor: '#800000'
+        backgroundColor: '#912338'
     },
     closeButtonText: {
         color: 'white',

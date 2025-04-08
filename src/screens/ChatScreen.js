@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
         position: 'relative',
     },
     header: {
-      backgroundColor: '#800000',
+      backgroundColor: '#912338',
       padding: 16,
       flexDirection: 'row',
       justifyContent: 'space-between',
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
         borderRadius: 16
     },
     userMessage: {
-        backgroundColor: '#800000',
+        backgroundColor: '#912338',
         borderTopRightRadius: 4,
         
     },

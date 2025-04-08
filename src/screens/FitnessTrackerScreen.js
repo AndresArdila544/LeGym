@@ -152,7 +152,7 @@ const isFocused = useIsFocused();
 
                     <View style={styles.statsContainer}>
                         <View style={styles.statCard}>
-                            <Ionicons name="flame-outline" size={24} color="#800000"/>
+                            <Ionicons name="flame-outline" size={24} color="#912338"/>
                             <View style={styles.statTextWrapper}>
                                 <Text style={styles.statLabel}>Calories</Text>
                                 <Text style={styles.statValue}>{totalCalories}
@@ -161,7 +161,7 @@ const isFocused = useIsFocused();
                         </View>
 
                         <View style={styles.statCard}>
-                            <Ionicons name="time-outline" size={24} color="#800000"/>
+                            <Ionicons name="time-outline" size={24} color="#912338"/>
                             <View style={styles.statTextWrapper}>
                                 <Text style={styles.statLabel}>Time Spent</Text>
                                 <Text style={styles.statValue}>{formatTime(totalTime)}</Text>
@@ -193,7 +193,7 @@ const isFocused = useIsFocused();
                                 setSelectedPeriod(periods[nextIndex]);
                             }}>
                                 <Text style={styles.periodText}>{selectedPeriod}</Text>
-                                <Ionicons name="chevron-down" size={16} color="#800000"/>
+                                <Ionicons name="chevron-down" size={16} color="#912338"/>
                             </TouchableOpacity>
                         </View>
 
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: "#800000"
+        color: "#912338"
     },
     content: {
         flex: 1,
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
     activityTitle: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#800000',
+        color: '#912338',
         marginBottom: 8
     },
     activityDetail: {
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
     },
     periodText: {
         fontSize: 16,
-        color: '#800000',
+        color: '#912338',
         marginRight: 4
     },
     workoutCard: {
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
         marginTop: 24
     },
     addButton: {
-        backgroundColor: '#800000',
+        backgroundColor: '#912338',
         borderRadius: 8,
         padding: 16,
         alignItems: 'center',
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     },
     addWorkoutButton: {
-        backgroundColor: '#800000',
+        backgroundColor: '#912338',
         paddingVertical: 14,
         borderRadius: 30,
         alignItems: 'center',
@@ -432,14 +432,14 @@ const styles = StyleSheet.create({
         fontSize: 16
     },
     editButton: {
-      backgroundColor: '#800000',
+      backgroundColor: '#912338',
       paddingVertical: 8,
       paddingHorizontal: 16,
       borderRadius: 8,
     },
     
     deleteButton: {
-      backgroundColor: '#800000',
+      backgroundColor: '#912338',
       paddingVertical: 8,
       paddingHorizontal: 16,
       borderRadius: 8,

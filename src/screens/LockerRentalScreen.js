@@ -238,7 +238,7 @@ export default function LockerRentalScreen({ navigation }) {
             <Switch
               value={includesPadlock}
               onValueChange={setIncludesPadlock}
-              trackColor={{ false: '#767577', true: '#800000' }}
+              trackColor={{ false: '#767577', true: '#912338' }}
               thumbColor={includesPadlock ? '#f4f3f4' : '#f4f3f4'}
             />
           </View>
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
   cancelReservationButton: {
     marginTop: 8,
     padding: 12,
-    backgroundColor: '#800000',
+    backgroundColor: '#912338',
     borderRadius: 8,
     alignItems: 'center',
   },
@@ -449,8 +449,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   selectedOption: {
-    backgroundColor: '#800000',
-    borderColor: '#800000',
+    backgroundColor: '#912338',
+    borderColor: '#912338',
   },
   reservedOption: {
     backgroundColor: '#f9f9f9',
@@ -468,7 +468,7 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   errorText: {
-    color: '#f44336',
+    color: '#912338',
     marginTop: 8,
     fontSize: 14,
   },
@@ -508,10 +508,10 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#800000',
+    color: '#912338',
   },
   rentButton: {
-    backgroundColor: '#800000',
+    backgroundColor: '#912338',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f1f1f1',
   },
   confirmModalButton: {
-    backgroundColor: '#800000',
+    backgroundColor: '#912338',
   },
   cancelModalButtonText: {
     color: '#333',
@@ -609,7 +609,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
-    backgroundColor: '#800000',
+    backgroundColor: '#912338',
     marginTop: 16,
   },
   closeButtonText: {

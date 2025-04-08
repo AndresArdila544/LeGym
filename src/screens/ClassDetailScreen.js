@@ -147,7 +147,7 @@ export default function ClassDetailScreen({ route, navigation }) {
                     <View style={styles.titleRow}>
                         <Text style={styles.title}>{classInfo.title}</Text>
                         <TouchableOpacity style={styles.bookmarkButton}>
-                            <Ionicons name="bookmark-outline" size={20} color="#8B1C3B" />
+                            <Ionicons name="bookmark-outline" size={20} color="#912338" />
                         </TouchableOpacity>
                     </View>
                     <View style={styles.badge}>
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
         lineHeight: 24
     },
     actionButton: {
-        backgroundColor: '#8B1C3B',
+        backgroundColor: '#912338',
         margin: 16,
         padding: 16,
         borderRadius: 8,

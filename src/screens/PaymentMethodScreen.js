@@ -93,7 +93,7 @@ export default function PaymentMethodScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#800000" />
+          <Ionicons name="arrow-back" size={24} color="#912338" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Payment Methods</Text>
         <View style={{ width: 24 }} />
@@ -107,7 +107,7 @@ export default function PaymentMethodScreen({ navigation }) {
                 <Ionicons
                   name={method.type === 'Visa' ? 'card' : 'card-outline'}
                   size={24}
-                  color="#800000"
+                  color="#912338"
                 />
                 <Text style={styles.cardType}>{method.type}</Text>
               </View>
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color:"#800000"
+    color:"#912338"
   },
   content: {
     flex: 1,
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   defaultBadge: {
-    backgroundColor: '#800000',
+    backgroundColor: '#912338',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 4,
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   setDefaultText: {
-    color: '#800000',
+    color: '#912338',
     fontWeight: '500',
   },
   deleteButton: {
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   },
   addButton: {
     flexDirection: 'row',
-    backgroundColor: '#800000',
+    backgroundColor: '#912338',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',

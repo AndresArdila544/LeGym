@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
         marginBottom: 50
     },
     createButton: {
-        backgroundColor: "#8B1C3B", // Concordia maroon
+        backgroundColor: "#912338", // Concordia maroon
         paddingVertical: 14,
         paddingHorizontal: 60,
         borderRadius: 30,

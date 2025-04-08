@@ -163,7 +163,7 @@ export default function MembershipScreen({navigation}) {
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Ionicons name="arrow-back" size={24} color="#800000"/>
+                    <Ionicons name="arrow-back" size={24} color="#912338"/>
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Membership</Text>
                 <View style={{
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: "#800000"
+        color: "#912338"
     },
     content: {
         flex: 1,
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
     },
     selectedOption: {
         borderWidth: 2,
-        borderColor: '#800000'
+        borderColor: '#912338'
     },
     optionHeader: {
         flexDirection: 'row',
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
     optionPrice: {
         fontSize: 16,
         fontWeight: '500',
-        color: '#800000'
+        color: '#912338'
     },
     optionDescription: {
         fontSize: 14,
@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 8,
         right: 8,
-        backgroundColor: '#800000',
+        backgroundColor: '#912338',
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 4
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#f1f1f1'
     },
     confirmButton: {
-        backgroundColor: '#800000'
+        backgroundColor: '#912338'
     },
     cancelText: {
         color: '#333',

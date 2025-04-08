@@ -120,7 +120,7 @@ export default function ClassDetailScreen({ route, navigation }) {
 
         const notification = {
             id: uuid.v4(),
-            title: 'Booking Confirmed',
+            title: 'Class Booking Confirmed',
             body: `Your ${classInfo.title} class for ${classInfo.days} is confirmed!`,
             timestamp: new Date().toISOString(),
             type: 'bookClass'
@@ -148,7 +148,7 @@ export default function ClassDetailScreen({ route, navigation }) {
 
         const notification = {
             id: uuid.v4(),
-            title: 'Booking Cancelled',
+            title: 'Class Booking Cancelled',
             body: `You cancelled your ${classInfo.title} class happening on ${classInfo.days}.`,
             timestamp: new Date().toISOString(),
             type: 'cancelClass'

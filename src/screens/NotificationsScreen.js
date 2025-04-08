@@ -1,24 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-/*
-const mockNotifications = [
-  {
-    id: '1',
-    title: 'Booking Confirmed',
-    body: 'Your Hardcore class for Monday is confirmed!',
-    timestamp: '2025-04-07T10:30:00Z',
-  },
-  {
-    id: '2',
-    title: 'Class Cancelled',
-    body: 'Zumba Fitness on Wednesday has been cancelled.',
-    timestamp: '2025-04-06T15:00:00Z',
-  },
-];
-*/
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import moment from 'moment';
+import { Swipeable } from 'react-native-gesture-handler';
 
 export default function NotificationsScreen({ navigation }) {
   const [notifications, setNotifications] = useState([]);
@@ -26,28 +11,80 @@ export default function NotificationsScreen({ navigation }) {
   useEffect(() => {
     const loadNotifications = async () => {
       try {
-        const storedNotifications = await AsyncStorage.getItem('notifications');
+        const storedNotifications = await AsyncStorage.getItem("notifications");
         if (storedNotifications) {
-          setNotifications(JSON.parse(storedNotifications));
-        } else {
-          setNotifications([]);
+          setNotifications(JSON.parse(storedNotifications).reverse());
         }
       } catch (error) {
-        console.error('Error loading notifications:', error);
-        setNotifications([]);
+        console.error("Failed to load notifications:", error);
       }
     };
-  
+
     loadNotifications();
   }, []);
-  
+
+  const getIconName = (type) => {
+    switch (type) {
+      case 'bookClass':
+        return 'people-circle-outline';
+      case 'cancelClass':
+        return 'close-circle-outline';
+      case 'addWorkout':
+        return 'fitness-outline';
+      case 'lockerRental':
+        return 'lock-closed-outline';
+      case 'membershipUpdate':
+        return 'person-add-outline';
+      default:
+        return 'notifications';
+    }
+  };
+
+  const renderRightActions = (onDelete) => (
+    <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
+      <Ionicons name="trash" size={24} color="red" style={{
+        padding: 10,
+      }} />
+    </TouchableOpacity>
+  );
+
+  const handleDelete = async (id) => {
+    try {
+      const notifications = await AsyncStorage.getItem("notifications");
+      console.log(notifications);
+
+      if (notifications) {
+        const parsedNotifications = JSON.parse(notifications);
+        const updatedNotifications = parsedNotifications.filter((item) => item.id !== id);
+        setNotifications(updatedNotifications);
+        await AsyncStorage.setItem("notifications", JSON.stringify(updatedNotifications));
+      }
+
+    } catch (error) {
+      console.error("Failed to delete notification:", error);
+    }
+
+  }
 
   const renderItem = ({ item }) => (
-    <View style={styles.notificationCard}>
-      <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.body}>{item.body}</Text>
-      <Text style={styles.timestamp}>{new Date(item.timestamp).toLocaleString()}</Text>
-    </View>
+    <Swipeable
+      renderRightActions={() => renderRightActions(() => handleDelete(item.id))}
+    >
+      <View style={styles.notificationCard}>
+        <View style={styles.notifIcon}>
+          <Ionicons name={getIconName(item.type)} size={24} color="#912338" />
+        </View>
+
+        <View style={styles.rhs}>
+          <Text style={styles.title}>{item.title}</Text>
+          <Text style={styles.body}>{item.body}</Text>
+          <Text style={styles.timestamp}>
+            {moment(item.timestamp, 'YYYY-MM-DDTHH:mm:ssZ').fromNow()}
+          </Text>
+        </View>
+
+      </View>
+    </Swipeable>
   );
 
   return (
@@ -60,12 +97,25 @@ export default function NotificationsScreen({ navigation }) {
         <View style={{ width: 24 }} />
       </View>
 
-      <FlatList
-        data={notifications}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={styles.list}
-      />
+
+
+      {notifications.length === 0 || !notifications ? (
+        <Text style={{ textAlign: 'center', marginTop: 20, fontSize: 16 }}>
+          You have no notifications yet.
+        </Text>
+      ) : (
+        <View >
+          <Text style={styles.deleteMsg}>Swipe right to delete notification.</Text>
+          <FlatList
+            data={notifications}
+            keyExtractor={(item) => item.id}
+            renderItem={renderItem}
+            contentContainerStyle={styles.list}
+          /> 
+        </View>
+
+
+      )}
     </SafeAreaView>
   );
 }
@@ -89,26 +139,64 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   notificationCard: {
-    backgroundColor: '#f9f9f9',
+    // backgroundColor: '#f9f9f9',
     padding: 14,
-    borderRadius: 10,
-    marginBottom: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: '#912338',
+    borderBottomColor: '#F0F1F3',
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    borderRightColor: '#F0F1F3',
+    borderRightWidth: 1,
+    // backgroundColor: 'red'
+    // borderRadius: 10,
+    // marginBottom: 12,
+    // borderLeftWidth: 4,
+    // borderLeftColor: '#912338',
   },
   title: {
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 14,
     marginBottom: 4,
-    color: '#222',
+    color: '#667085'
+  },
+  notifIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  rhs: {
+    // backgroundColor: 'blue',
+    flex: 1
   },
   body: {
-    fontSize: 14,
-    color: '#444',
+    fontSize: 16,
+    fontWeight: 500,
+    lineHeight: 24,
+    // color: '#444',
+    color: '#0C1523'
   },
   timestamp: {
-    marginTop: 6,
-    fontSize: 12,
-    color: '#888',
+    marginTop: 8,
+    fontSize: 13,
+    // color: '#888',
+    color: '#667085'
   },
+  deleteButton: {
+    backgroundColor: 'whitesmoke',
+    width: 60,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    marginLeft: 10,
+  },
+  deleteMsg: {
+    textAlign: 'center',
+    marginTop: 10,
+    fontSize: 14,
+    color: '#667085'
+  }
 });

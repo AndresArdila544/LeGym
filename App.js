@@ -2,6 +2,12 @@ import React, {useCallback, useEffect, useState} from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
 import AppNavigator from './src/navigation/AppNavigator';
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en'
+import ca from 'javascript-time-ago/locale/ca'
+
+TimeAgo.addDefaultLocale(en)
+TimeAgo.addLocale(ca)
 
 SplashScreen.preventAutoHideAsync();
 

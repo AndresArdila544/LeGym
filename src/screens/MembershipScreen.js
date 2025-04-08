@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -8,10 +8,11 @@ import {
     SafeAreaView,
     Modal
 } from 'react-native';
-import {Ionicons} from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import uuid from 'react-native-uuid';
 
-export default function MembershipScreen({navigation}) {
+export default function MembershipScreen({ navigation }) {
     const [currentMembership,
         setCurrentMembership] = useState('Monthly');
     const [renewalDate,
@@ -21,39 +22,39 @@ export default function MembershipScreen({navigation}) {
     const [confirmModalVisible,
         setConfirmModalVisible] = useState(false);
 
-        useEffect(() => {
-            const loadMembershipData = async () => {
-              try {
+    useEffect(() => {
+        const loadMembershipData = async () => {
+            try {
                 const storedUser = await AsyncStorage.getItem('activeUser');
                 if (storedUser) {
-                  const parsedData = JSON.parse(storedUser);
-                  const membership = parsedData.membership || 'Monthly';
-                  const startDate = parsedData.memberSince ? new Date(parsedData.memberSince) : new Date();
-          
-                  const newRenewalDate = new Date(startDate);
-                  switch (membership) {
-                    case 'Monthly':
-                      newRenewalDate.setMonth(newRenewalDate.getMonth() + 1);
-                      break;
-                    case 'Annual':
-                      newRenewalDate.setFullYear(newRenewalDate.getFullYear() + 1);
-                      break;
-                    case 'Weekly':
-                      newRenewalDate.setDate(newRenewalDate.getDate() + 7);
-                      break;
-                  }
-          
-                  setCurrentMembership(membership);
-                  setRenewalDate(newRenewalDate);
+                    const parsedData = JSON.parse(storedUser);
+                    const membership = parsedData.membership || 'Monthly';
+                    const startDate = parsedData.memberSince ? new Date(parsedData.memberSince) : new Date();
+
+                    const newRenewalDate = new Date(startDate);
+                    switch (membership) {
+                        case 'Monthly':
+                            newRenewalDate.setMonth(newRenewalDate.getMonth() + 1);
+                            break;
+                        case 'Annual':
+                            newRenewalDate.setFullYear(newRenewalDate.getFullYear() + 1);
+                            break;
+                        case 'Weekly':
+                            newRenewalDate.setDate(newRenewalDate.getDate() + 7);
+                            break;
+                    }
+
+                    setCurrentMembership(membership);
+                    setRenewalDate(newRenewalDate);
                 }
-              } catch (error) {
+            } catch (error) {
                 console.error('Failed to load membership data:', error);
-              }
-            };
-          
-            loadMembershipData();
-          }, []);
-          
+            }
+        };
+
+        loadMembershipData();
+    }, []);
+
 
     const openConfirmationModal = (membership) => {
         setSelectedMembership(membership);
@@ -62,55 +63,66 @@ export default function MembershipScreen({navigation}) {
 
     const confirmMembershipChange = async () => {
         if (!selectedMembership || selectedMembership === currentMembership) {
-          setConfirmModalVisible(false);
-          return;
-        }
-      
-        try {
-          const storedUser = await AsyncStorage.getItem('activeUser');
-          if (storedUser) {
-            const parsedData = JSON.parse(storedUser);
-            const startDate = new Date();
-      
-            parsedData.membership = selectedMembership;
-            parsedData.memberSince = startDate.toISOString();
-      
-            await AsyncStorage.setItem('activeUser', JSON.stringify(parsedData));
-      
-            setCurrentMembership(selectedMembership);
-            setSelectedMembership(null);
             setConfirmModalVisible(false);
-      
-            const newRenewalDate = new Date(startDate);
-            switch (selectedMembership) {
-              case 'Monthly':
-                newRenewalDate.setMonth(newRenewalDate.getMonth() + 1);
-                break;
-              case 'Annual':
-                newRenewalDate.setFullYear(newRenewalDate.getFullYear() + 1);
-                break;
-              case 'Weekly':
-                newRenewalDate.setDate(newRenewalDate.getDate() + 7);
-                break;
-            }
-      
-            setRenewalDate(newRenewalDate);
-      
-            // Also update the user in the users array:
-            const allUsersRaw = await AsyncStorage.getItem('users');
-            if (allUsersRaw) {
-              const users = JSON.parse(allUsersRaw);
-              const updatedUsers = users.map(u =>
-                u.email === parsedData.email ? parsedData : u
-              );
-              await AsyncStorage.setItem('users', JSON.stringify(updatedUsers));
-            }
-          }
-        } catch (error) {
-          console.error('Failed to update membership:', error);
+            return;
         }
-      };
-      
+
+        try {
+            const storedUser = await AsyncStorage.getItem('activeUser');
+            if (storedUser) {
+                const parsedData = JSON.parse(storedUser);
+                const startDate = new Date();
+
+                parsedData.membership = selectedMembership;
+                parsedData.memberSince = startDate.toISOString();
+
+                await AsyncStorage.setItem('activeUser', JSON.stringify(parsedData));
+
+                setCurrentMembership(selectedMembership);
+                setSelectedMembership(null);
+                setConfirmModalVisible(false);
+
+                const newRenewalDate = new Date(startDate);
+                switch (selectedMembership) {
+                    case 'Monthly':
+                        newRenewalDate.setMonth(newRenewalDate.getMonth() + 1);
+                        break;
+                    case 'Annual':
+                        newRenewalDate.setFullYear(newRenewalDate.getFullYear() + 1);
+                        break;
+                    case 'Weekly':
+                        newRenewalDate.setDate(newRenewalDate.getDate() + 7);
+                        break;
+                }
+
+                setRenewalDate(newRenewalDate);
+
+                // Also update the user in the users array:
+                const allUsersRaw = await AsyncStorage.getItem('users');
+                if (allUsersRaw) {
+                    const users = JSON.parse(allUsersRaw);
+                    const updatedUsers = users.map(u =>
+                        u.email === parsedData.email ? parsedData : u
+                    );
+                    await AsyncStorage.setItem('users', JSON.stringify(updatedUsers));
+                }
+
+                const notification = {
+                    id: uuid.v4(),
+                    title: 'Membership Updated',
+                    body: `Your membership has been updated to ${selectedMembership}.`,
+                    timestamp: new Date().toISOString(),
+                    type: 'membershipUpdate'
+                }
+                const notifications = JSON.parse(await AsyncStorage.getItem('notifications')) || [];
+                notifications.push(notification);
+                await AsyncStorage.setItem('notifications', JSON.stringify(notifications));
+            }
+        } catch (error) {
+            console.error('Failed to update membership:', error);
+        }
+    };
+
 
     const getMembershipPrice = (type) => {
         switch (type) {
@@ -141,8 +153,8 @@ export default function MembershipScreen({navigation}) {
     const renderMembershipOption = (type, price) => (
         <TouchableOpacity
             style={[
-            styles.membershipOption, currentMembership === type && styles.selectedOption
-        ]}
+                styles.membershipOption, currentMembership === type && styles.selectedOption
+            ]}
             onPress={() => openConfirmationModal(type)}>
             <View style={styles.optionHeader}>
                 <Text style={styles.optionType}>{type}</Text>
@@ -163,12 +175,12 @@ export default function MembershipScreen({navigation}) {
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Ionicons name="arrow-back" size={24} color="#912338"/>
+                    <Ionicons name="arrow-back" size={24} color="#912338" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Membership</Text>
                 <View style={{
                     width: 24
-                }}/>
+                }} />
             </View>
 
             <ScrollView style={styles.content}>

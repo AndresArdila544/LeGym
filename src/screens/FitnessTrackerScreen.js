@@ -25,64 +25,70 @@ export default function FitnessTrackerScreen({navigation}) {
         setStreakDays] = useState(0);
     const [selectedPeriod,
         setSelectedPeriod] = useState('1 week');
+        const [user, setUser] = useState(null);
+
 const isFocused = useIsFocused();
 
 
     useEffect(() => {
-        const loadWorkouts = async() => {
-            try {
-                const storedWorkouts = await AsyncStorage.getItem('workouts');
-                if (storedWorkouts) {
-                    const parsedWorkouts = JSON.parse(storedWorkouts);
-                    setWorkouts(parsedWorkouts);
+    const loadData = async () => {
+      try {
+        const stored = await AsyncStorage.getItem('activeUser');
+        const parsedUser = stored ? JSON.parse(stored) : null;
+        setUser(parsedUser);
+  
+        if (parsedUser?.email) {
+          const key = `workouts_${parsedUser.email}`;
+          const storedWorkouts = await AsyncStorage.getItem(key);
+          const parsedWorkouts = storedWorkouts ? JSON.parse(storedWorkouts) : [];
+          setWorkouts(parsedWorkouts);
 
-                    // Calculate total calories and time
-                    let calories = 0;
-                    let minutes = 0;
-                    parsedWorkouts.forEach(workout => {
-                        calories += workout.calories || 0;
-                        minutes += workout.duration || 0;
-                    });
+          console.log(`📥 Loaded ${workouts.length} workouts for ${parsedUser?.email}`);
 
-                    setTotalCalories(calories);
-                    setTotalTime(minutes);
-                }
-
-                // Load streak days
-                // Load streak days
-                if (storedWorkouts) {
-                  const parsedWorkouts = JSON.parse(storedWorkouts);
-                  const uniqueWorkoutDays = new Set(parsedWorkouts.map(w => {
-                    const d = new Date(w.date);
-                    d.setHours(0, 0, 0, 0); // normalize time
-                    return d.getTime(); // use timestamp for comparison
-                  }));
-
-                  let streak = 0;
-                  const today = new Date();
-                  today.setHours(0, 0, 0, 0);
-
-                  for (let i = 0; ; i++) {
-                    const checkDate = new Date(today);
-                    checkDate.setDate(today.getDate() - i);
-
-                    if (uniqueWorkoutDays.has(checkDate.getTime())) {
-                      streak++;
-                    } else {
-                      break;
-                    }
-                  }
-
-                  setStreakDays(streak);
-                }
-            } catch (error) {
-                console.error('Failed to load workouts:', error);
+          // Calculate calories and time
+          let calories = 0;
+          let minutes = 0;
+          parsedWorkouts.forEach(workout => {
+            calories += workout.calories || 0;
+            minutes += workout.duration || 0;
+          });
+  
+          setTotalCalories(calories);
+          setTotalTime(minutes);
+  
+          // Calculate streak
+          const uniqueWorkoutDays = new Set(parsedWorkouts.map(w => {
+            const d = new Date(w.date);
+            d.setHours(0, 0, 0, 0);
+            return d.getTime();
+          }));
+  
+          let streak = 0;
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+  
+          for (let i = 0; ; i++) {
+            const checkDate = new Date(today);
+            checkDate.setDate(today.getDate() - i);
+  
+            if (uniqueWorkoutDays.has(checkDate.getTime())) {
+              streak++;
+            } else {
+              break;
             }
-        };
-        if (isFocused) {
-          loadWorkouts(); 
+          }
+  
+          setStreakDays(streak);
         }
-    }, [isFocused]);
+      } catch (error) {
+        console.error('❌ Failed to load user-specific workouts:', error);
+      }
+    };
+  
+    if (isFocused) {
+      loadData();
+    }
+  }, [isFocused]);
 
     // Format time as hours and minutes
     const formatTime = (minutes) => {

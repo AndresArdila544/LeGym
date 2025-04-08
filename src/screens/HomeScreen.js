@@ -60,17 +60,21 @@ export default function HomeScreen({ navigation }) {
   useEffect(() => {
     const loadUserData = async () => {
       try {
-        const stored = await AsyncStorage.getItem('userData');
+        const stored = await AsyncStorage.getItem('activeUser');
         const parsed = stored ? JSON.parse(stored) : null;
         setUser(parsed);
+        console.log('🧑‍💻 Loaded activeUser:', parsed);
       } catch (e) {
         console.error('Failed to load user data', e);
       }
     };
 
     const loadWorkouts = async () => {
+      if (!user?.email) return;
+    
       try {
-        const stored = await AsyncStorage.getItem('workouts');
+        const key = `workouts_${user.email}`;
+        const stored = await AsyncStorage.getItem(key);
         const parsed = stored ? JSON.parse(stored) : [];
         setWorkouts(parsed);
         setStreakDays(calculateStreak(parsed));
@@ -78,20 +82,21 @@ export default function HomeScreen({ navigation }) {
         console.error('Failed to load workouts', e);
       }
     };
+    
 
     const loadBookedClasses = async () => {
+      if (!user?.email) return;
+    
       try {
-        const stored = await AsyncStorage.getItem('classBookings');
-        // console.log(stored);
-
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          setBookedClasses(parsed);
-        }
+        const key = `classBookings_${user.email}`;
+        const stored = await AsyncStorage.getItem(key);
+        const parsed = stored ? JSON.parse(stored) : [];
+        setBookedClasses(parsed);
       } catch (e) {
         console.error('Failed to load booked classes', e);
       }
     };
+    
     
 
     if (isFocused) {

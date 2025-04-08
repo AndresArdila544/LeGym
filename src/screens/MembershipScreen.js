@@ -21,93 +21,96 @@ export default function MembershipScreen({navigation}) {
     const [confirmModalVisible,
         setConfirmModalVisible] = useState(false);
 
-    useEffect(() => {
-        const loadMembershipData = async() => {
-            try {
-                const userData = await AsyncStorage.getItem('userData');
-
-                if (userData) {
-                    const parsedData = JSON.parse(userData);
-                    const membership = parsedData.membership || 'Monthly';
-                    const startDate = parsedData.memberSince
-                        ? new Date(parsedData.memberSince)
-                        : new Date();
-                    const newRenewalDate = new Date(startDate);
-
-                    switch (membership) {
-                        case 'Monthly':
-                            newRenewalDate.setMonth(newRenewalDate.getMonth() + 1);
-                            break;
-                        case 'Annual':
-                            newRenewalDate.setFullYear(newRenewalDate.getFullYear() + 1);
-                            break;
-                        case 'Weekly':
-                            newRenewalDate.setDate(newRenewalDate.getDate() + 7);
-                            break;
-                        default:
-                            newRenewalDate.setMonth(newRenewalDate.getMonth() + 1);
-                    }
-
-                    setCurrentMembership(membership);
-                    setRenewalDate(newRenewalDate);
+        useEffect(() => {
+            const loadMembershipData = async () => {
+              try {
+                const storedUser = await AsyncStorage.getItem('activeUser');
+                if (storedUser) {
+                  const parsedData = JSON.parse(storedUser);
+                  const membership = parsedData.membership || 'Monthly';
+                  const startDate = parsedData.memberSince ? new Date(parsedData.memberSince) : new Date();
+          
+                  const newRenewalDate = new Date(startDate);
+                  switch (membership) {
+                    case 'Monthly':
+                      newRenewalDate.setMonth(newRenewalDate.getMonth() + 1);
+                      break;
+                    case 'Annual':
+                      newRenewalDate.setFullYear(newRenewalDate.getFullYear() + 1);
+                      break;
+                    case 'Weekly':
+                      newRenewalDate.setDate(newRenewalDate.getDate() + 7);
+                      break;
+                  }
+          
+                  setCurrentMembership(membership);
+                  setRenewalDate(newRenewalDate);
                 }
-            } catch (error) {
+              } catch (error) {
                 console.error('Failed to load membership data:', error);
-            }
-        };
-
-        loadMembershipData();
-    }, []);
+              }
+            };
+          
+            loadMembershipData();
+          }, []);
+          
 
     const openConfirmationModal = (membership) => {
         setSelectedMembership(membership);
         setConfirmModalVisible(true);
     };
 
-    const confirmMembershipChange = async() => {
+    const confirmMembershipChange = async () => {
         if (!selectedMembership || selectedMembership === currentMembership) {
-            setConfirmModalVisible(false);
-            return;
+          setConfirmModalVisible(false);
+          return;
         }
-
+      
         try {
-            const userData = await AsyncStorage.getItem('userData');
-            console.log(userData)
-            if (userData) {
-                const parsedData = JSON.parse(userData);
-                const startDate = new Date();
-
-                parsedData.membership = selectedMembership;
-                parsedData.memberSince = startDate.toISOString();
-
-                await AsyncStorage.setItem('userData', JSON.stringify(parsedData));
-                setCurrentMembership(selectedMembership);
-                console.log(selectedMembership)
-
-                setSelectedMembership(null);
-                setConfirmModalVisible(false);
-
-                const newRenewalDate = new Date(startDate);
-                switch (selectedMembership) {
-                    case 'Monthly':
-                        newRenewalDate.setMonth(newRenewalDate.getMonth() + 1);
-                        break;
-                    case 'Annual':
-                        newRenewalDate.setFullYear(newRenewalDate.getFullYear() + 1);
-                        break;
-                    case 'Weekly':
-                        newRenewalDate.setDate(newRenewalDate.getDate() + 7);
-                        break;
-                    default:
-                        newRenewalDate.setMonth(newRenewalDate.getMonth() + 1);
-                }
-
-                setRenewalDate(newRenewalDate);
+          const storedUser = await AsyncStorage.getItem('activeUser');
+          if (storedUser) {
+            const parsedData = JSON.parse(storedUser);
+            const startDate = new Date();
+      
+            parsedData.membership = selectedMembership;
+            parsedData.memberSince = startDate.toISOString();
+      
+            await AsyncStorage.setItem('activeUser', JSON.stringify(parsedData));
+      
+            setCurrentMembership(selectedMembership);
+            setSelectedMembership(null);
+            setConfirmModalVisible(false);
+      
+            const newRenewalDate = new Date(startDate);
+            switch (selectedMembership) {
+              case 'Monthly':
+                newRenewalDate.setMonth(newRenewalDate.getMonth() + 1);
+                break;
+              case 'Annual':
+                newRenewalDate.setFullYear(newRenewalDate.getFullYear() + 1);
+                break;
+              case 'Weekly':
+                newRenewalDate.setDate(newRenewalDate.getDate() + 7);
+                break;
             }
+      
+            setRenewalDate(newRenewalDate);
+      
+            // Also update the user in the users array:
+            const allUsersRaw = await AsyncStorage.getItem('users');
+            if (allUsersRaw) {
+              const users = JSON.parse(allUsersRaw);
+              const updatedUsers = users.map(u =>
+                u.email === parsedData.email ? parsedData : u
+              );
+              await AsyncStorage.setItem('users', JSON.stringify(updatedUsers));
+            }
+          }
         } catch (error) {
-            console.error('Failed to update membership:', error);
+          console.error('Failed to update membership:', error);
         }
-    };
+      };
+      
 
     const getMembershipPrice = (type) => {
         switch (type) {

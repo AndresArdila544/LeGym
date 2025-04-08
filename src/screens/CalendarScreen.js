@@ -19,20 +19,26 @@ export default function CalendarScreen({ navigation }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [events, setEvents] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [activeUser, setActiveUser] = useState(null);
 
-  const onRefresh = () => {
+
+  const onRefresh = async () => {
     setRefreshing(true);
-    setTimeout(async () => {
-      const storedEvents = await AsyncStorage.getItem("classBookings");
-      // console.log("stored bookings" + storedEvents)
+    if (!activeUser) return;
+  
+    try {
+      const key = `classBookings_${activeUser.email}`;
+      const storedEvents = await AsyncStorage.getItem(key);
       if (storedEvents) {
         setEvents(JSON.parse(storedEvents));
       }
-
-      // setEvents(); // Simulate adding new data
+    } catch (error) {
+      console.error("Refresh error:", error);
+    } finally {
       setRefreshing(false);
-    }, 1000);
+    }
   };
+  
 
   const eventsData = [
     {
@@ -69,20 +75,27 @@ export default function CalendarScreen({ navigation }) {
 
   // Load events from AsyncStorage
   useEffect(() => {
-    const loadEvents = async () => {
+    const loadUserAndEvents = async () => {
       try {
-        const storedEvents = await AsyncStorage.getItem("classBookings");
-        // console.log("stored bookings" + storedEvents)
-        if (storedEvents) {
-          setEvents(JSON.parse(storedEvents));
+        const storedUser = await AsyncStorage.getItem("activeUser");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          setActiveUser(parsedUser);
+  
+          const key = `classBookings_${parsedUser.email}`;
+          const storedEvents = await AsyncStorage.getItem(key);
+          if (storedEvents) {
+            setEvents(JSON.parse(storedEvents));
+          }
         }
       } catch (error) {
-        console.error("Failed to load events:", error);
+        console.error("Failed to load user events:", error);
       }
     };
-
-    loadEvents();
+  
+    loadUserAndEvents();
   }, []);
+  
 
   // Filter events for selected date
   const todayEvents = events.filter((event) => {

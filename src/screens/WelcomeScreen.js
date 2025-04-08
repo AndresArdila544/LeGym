@@ -30,8 +30,20 @@ export default function WelcomeScreen({navigation}) {
         gender: '',
         password: ''
     });
-
+    const logAllUsers = async () => {
+        try {
+          const data = await AsyncStorage.getItem('users');
+          const users = data ? JSON.parse(data) : [];
+          console.log('👥 Saved Users:');
+          users.forEach((user, index) => {
+            console.log(`${index + 1}. ${user.firstName} ${user.lastName} – ${user.email}`);
+          });
+        } catch (error) {
+          console.error('❌ Failed to log users:', error);
+        }
+      };
     useEffect(() => {
+        logAllUsers();
         console.log("✅ WelcomeScreen is rendering");
     }, []);
 
@@ -73,25 +85,30 @@ export default function WelcomeScreen({navigation}) {
                     <LoginModal
                         onClose={() => setLoginVisible(false)}
                         onContinue={async(email, password) => {
-                        try {
-                            const storedUserData = await AsyncStorage.getItem('userData');
-                            if (!storedUserData) {
-                                alert('No user found. Please sign up first.');
+                            try {
+                              const allUsers = await AsyncStorage.getItem('users');
+                              if (!allUsers) {
+                                alert('No users found. Please sign up first.');
                                 return;
-                            }
-                            const user = JSON.parse(storedUserData);
-                            if (email.trim().toLowerCase() === user.email.trim().toLowerCase() && password === user.password) {
+                              }
+                              const users = JSON.parse(allUsers);
+                              const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+                          
+                              if (user && user.password === password) {
                                 console.log('✅ Login successful');
+                                await AsyncStorage.setItem('activeUser', JSON.stringify(user)); // Store logged-in user
                                 setLoginVisible(false);
                                 navigation.navigate('Home');
-                            } else {
+                              } else {
                                 alert('Incorrect email or password.');
+                              }
+                          
+                            } catch (error) {
+                              console.error('❌ Login failed:', error);
+                              alert('An error occurred during login. Please try again.');
                             }
-                        } catch (error) {
-                            console.error('❌ Login failed:', error);
-                            alert('An error occurred during login. Please try again.');
-                        }
-                    }}
+                          }}
+                          
                         onGoToForgotPassword={() => {
                         setLoginVisible(false);
                         navigation.navigate('ForgotPassword');
@@ -135,8 +152,20 @@ export default function WelcomeScreen({navigation}) {
                             membership: 'Monthly'
                         };
                         try {
-                            await AsyncStorage.setItem('userData', JSON.stringify(newUser));
-                            console.log('✅ User created and saved!');
+                            const existing = await AsyncStorage.getItem('users');
+                            let users = existing ? JSON.parse(existing) : [];
+
+                            const isDuplicate = users.some(u => u.email.toLowerCase() === newUser.email.toLowerCase());
+                            if (isDuplicate) {
+                            alert('An account with this email already exists.');
+                            return;
+                            }
+
+                            users.push(newUser);
+                            await AsyncStorage.setItem('users', JSON.stringify(users));
+                            await AsyncStorage.setItem('activeUser', JSON.stringify(newUser));
+
+                            console.log(`✅ User created and saved! with email: ${newUser.email}`);
                             setShowCreatePassword(false);
                             navigation.navigate("Home");
                         } catch (err) {

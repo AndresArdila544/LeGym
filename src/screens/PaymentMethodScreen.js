@@ -1,13 +1,7 @@
-// src/screens/PaymentMethodScreen.js
 import React, { useState, useEffect } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  SafeAreaView,
-  Alert,
+  View, Text, StyleSheet, TouchableOpacity, ScrollView,
+  SafeAreaView, Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -15,71 +9,74 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function PaymentMethodScreen({ navigation }) {
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [defaultMethod, setDefaultMethod] = useState(null);
-  
+  const [activeUser, setActiveUser] = useState(null);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const stored = await AsyncStorage.getItem('activeUser');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        setActiveUser(parsed);
+      }
+    };
+    loadUser();
+  }, []);
+
   useEffect(() => {
     const loadPaymentMethods = async () => {
+      if (!activeUser) return;
+      const key = `paymentMethods_${activeUser.email}`;
       try {
-        const storedMethods = await AsyncStorage.getItem('paymentMethods');
+        const storedMethods = await AsyncStorage.getItem(key);
         if (storedMethods) {
           const parsedMethods = JSON.parse(storedMethods);
           setPaymentMethods(parsedMethods);
-          
-          // Find default method
-          const defaultCard = parsedMethods.find(method => method.isDefault);
-          if (defaultCard) {
-            setDefaultMethod(defaultCard.id);
-          } else if (parsedMethods.length > 0) {
-            setDefaultMethod(parsedMethods[0].id);
-          }
+
+          const defaultCard = parsedMethods.find(m => m.isDefault);
+          setDefaultMethod(defaultCard ? defaultCard.id : parsedMethods[0]?.id);
         }
       } catch (error) {
         console.error('Failed to load payment methods:', error);
       }
     };
-    
+
     loadPaymentMethods();
-  }, []);
-  
+  }, [activeUser]);
+
+  const getStorageKey = () => `paymentMethods_${activeUser?.email}`;
+
   const handleSetDefault = async (id) => {
     try {
       const updatedMethods = paymentMethods.map(method => ({
         ...method,
-        isDefault: method.id === id
+        isDefault: method.id === id,
       }));
-      
       setPaymentMethods(updatedMethods);
       setDefaultMethod(id);
-      
-      await AsyncStorage.setItem('paymentMethods', JSON.stringify(updatedMethods));
+
+      await AsyncStorage.setItem(getStorageKey(), JSON.stringify(updatedMethods));
     } catch (error) {
       console.error('Failed to set default payment method:', error);
     }
   };
-  
-  const handleDeleteMethod = async (id) => {
+
+  const handleDeleteMethod = (id) => {
     Alert.alert(
       'Delete Payment Method',
       'Are you sure you want to delete this payment method?',
       [
+        { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Delete',
-          style: 'destructive',
+          text: 'Delete', style: 'destructive',
           onPress: async () => {
             try {
               const updatedMethods = paymentMethods.filter(method => method.id !== id);
-              
-              // If we're deleting the default method, set a new default
               if (id === defaultMethod && updatedMethods.length > 0) {
                 updatedMethods[0].isDefault = true;
                 setDefaultMethod(updatedMethods[0].id);
               }
-              
               setPaymentMethods(updatedMethods);
-              await AsyncStorage.setItem('paymentMethods', JSON.stringify(updatedMethods));
+              await AsyncStorage.setItem(getStorageKey(), JSON.stringify(updatedMethods));
             } catch (error) {
               console.error('Failed to delete payment method:', error);
             }
@@ -89,12 +86,9 @@ export default function PaymentMethodScreen({ navigation }) {
       { cancelable: true }
     );
   };
-  
-  // Function to mask card number
-  const maskCardNumber = (number) => {
-    return `•••• •••• •••• ${number.slice(-4)}`;
-  };
-  
+
+  const maskCardNumber = (number) => `•••• •••• •••• ${number.slice(-4)}`;
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -104,42 +98,42 @@ export default function PaymentMethodScreen({ navigation }) {
         <Text style={styles.headerTitle}>Payment Methods</Text>
         <View style={{ width: 24 }} />
       </View>
-      
+
       <ScrollView style={styles.content}>
         {paymentMethods.length > 0 ? (
           paymentMethods.map((method) => (
             <View key={method.id} style={styles.paymentCard}>
               <View style={styles.cardTypeContainer}>
-                <Ionicons 
-                  name={method.type === 'Visa' ? 'card' : 'card-outline'} 
-                  size={24} 
-                  color="#800000" 
+                <Ionicons
+                  name={method.type === 'Visa' ? 'card' : 'card-outline'}
+                  size={24}
+                  color="#800000"
                 />
                 <Text style={styles.cardType}>{method.type}</Text>
               </View>
-              
+
               <Text style={styles.cardNumber}>{maskCardNumber(method.cardNumber)}</Text>
               <Text style={styles.cardHolder}>{method.cardHolder}</Text>
-              
+
               <View style={styles.cardActions}>
                 {method.id === defaultMethod ? (
                   <View style={styles.defaultBadge}>
                     <Text style={styles.defaultText}>Default</Text>
                   </View>
                 ) : (
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.setDefaultButton}
                     onPress={() => handleSetDefault(method.id)}
                   >
                     <Text style={styles.setDefaultText}>Set as Default</Text>
                   </TouchableOpacity>
                 )}
-                
-                <TouchableOpacity 
+
+                <TouchableOpacity
                   style={styles.deleteButton}
                   onPress={() => handleDeleteMethod(method.id)}
                 >
-                  <Ionicons name="trash-outline" size={20} color="#ff3b30" />
+                  <Ionicons name="trash-outline" size={20} color="#800000" />
                 </TouchableOpacity>
               </View>
             </View>
@@ -150,8 +144,8 @@ export default function PaymentMethodScreen({ navigation }) {
             <Text style={styles.emptyText}>No payment methods added yet</Text>
           </View>
         )}
-        
-        <TouchableOpacity 
+
+        <TouchableOpacity
           style={styles.addButton}
           onPress={() => navigation.navigate('AddCard')}
         >
@@ -162,6 +156,7 @@ export default function PaymentMethodScreen({ navigation }) {
     </SafeAreaView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

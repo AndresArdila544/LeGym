@@ -24,47 +24,63 @@ export default function ChatScreen({navigation}) {
     const [inputText,
         setInputText] = useState('');
     const scrollViewRef = useRef();
+    const [activeUser, setActiveUser] = useState(null);
 
     useEffect(() => {
-        const loadMessages = async() => {
-            try {
-                const storedMessages = await AsyncStorage.getItem('chatMessages');
-                if (storedMessages) {
-                    setMessages(JSON.parse(storedMessages));
-                } else {
-                    const welcomeMessage = {
-                        id: Date
-                            .now()
-                            .toString(),
-                        text: "Hello, I'm StingerBot! 👋 I'm your personal Le Gym assistant. How can I help you" +
-                                "?",
-                        sender: 'bot',
-                        timestamp: new Date().toISOString()
-                    };
-                    setMessages([welcomeMessage]);
-                    await AsyncStorage.setItem('chatMessages', JSON.stringify([welcomeMessage]));
-                }
-            } catch (error) {
-                console.error('Failed to load messages:', error);
-            }
-        };
-
-        loadMessages();
-    }, []);
-
-    useEffect(() => {
-        const saveMessages = async() => {
-            try {
-                await AsyncStorage.setItem('chatMessages', JSON.stringify(messages));
-            } catch (error) {
-                console.error('Failed to save messages:', error);
-            }
-        };
-
-        if (messages.length > 0) {
-            saveMessages();
+      const loadUser = async () => {
+        const stored = await AsyncStorage.getItem('activeUser');
+        if (stored) {
+          setActiveUser(JSON.parse(stored));
         }
-    }, [messages]);
+      };
+      loadUser();
+    }, []);
+    const getChatKey = () => `chatMessages_${activeUser?.email}`;
+
+
+    useEffect(() => {
+        const loadMessages = async () => {
+          if (!activeUser) return;
+          const key = getChatKey();
+          try {
+            const storedMessages = await AsyncStorage.getItem(key);
+            if (storedMessages) {
+              setMessages(JSON.parse(storedMessages));
+            } else {
+              const welcomeMessage = {
+                id: Date.now().toString(),
+                text: "Hello, I'm StingerBot! 👋 I'm your personal Le Gym assistant. How can I help you?",
+                sender: 'bot',
+                timestamp: new Date().toISOString(),
+              };
+              setMessages([welcomeMessage]);
+              await AsyncStorage.setItem(key, JSON.stringify([welcomeMessage]));
+            }
+          } catch (error) {
+            console.error('Failed to load messages:', error);
+          }
+        };
+      
+        loadMessages();
+      }, [activeUser]);
+      
+
+      useEffect(() => {
+        const saveMessages = async () => {
+          if (!activeUser) return;
+          const key = getChatKey();
+          try {
+            await AsyncStorage.setItem(key, JSON.stringify(messages));
+          } catch (error) {
+            console.error('Failed to save messages:', error);
+          }
+        };
+      
+        if (messages.length > 0) {
+          saveMessages();
+        }
+      }, [messages, activeUser]);
+      
 
     useEffect(() => {
         setTimeout(() => {

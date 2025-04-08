@@ -23,6 +23,21 @@ export default function AddWorkoutScreen({ navigation, route }) {
   const [notes, setNotes] = useState('');
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const loadActiveUser = async () => {
+      try {
+        const stored = await AsyncStorage.getItem('activeUser');
+        const parsed = stored ? JSON.parse(stored) : null;
+        setUser(parsed);
+      } catch (err) {
+        console.error('Failed to load active user:', err);
+      }
+    };
+  
+    loadActiveUser();
+  }, []);
 
   useEffect(() => {
     if (workoutToEdit) {
@@ -41,38 +56,37 @@ export default function AddWorkoutScreen({ navigation, route }) {
     }
 
     try {
-      const existingWorkoutsJson = await AsyncStorage.getItem('workouts');
-      const existingWorkouts = existingWorkoutsJson ? JSON.parse(existingWorkoutsJson) : [];
+    const key = `workouts_${user.email}`;
+    const existingWorkoutsJson = await AsyncStorage.getItem(key);
+    const existingWorkouts = existingWorkoutsJson ? JSON.parse(existingWorkoutsJson) : [];
 
-      const updatedWorkout = {
-        id: workoutToEdit?.id || Date.now().toString(),
-        activity,
-        duration: parseInt(duration),
-        calories: parseInt(calories) || 0,
-        notes,
-        date: date.toISOString(),
-      };
+    const updatedWorkout = {
+      id: workoutToEdit?.id || Date.now().toString(),
+      activity,
+      duration: parseInt(duration),
+      calories: parseInt(calories) || 0,
+      notes,
+      date: date.toISOString(),
+    };
 
-      let updatedWorkouts;
-      if (workoutToEdit) {
-        // Editing
-        updatedWorkouts = existingWorkouts.map(w =>
-          w.id === workoutToEdit.id ? updatedWorkout : w
-        );
-      } else {
-        // Creating
-        updatedWorkouts = [updatedWorkout, ...existingWorkouts];
-      }
-
-      await AsyncStorage.setItem('workouts', JSON.stringify(updatedWorkouts));
-
-      Alert.alert('Success', `Workout ${workoutToEdit ? 'updated' : 'added'} successfully`, [
-        { text: 'OK', onPress: () => navigation.goBack() },
-      ]);
-    } catch (error) {
-      console.error('Error saving workout:', error);
-      Alert.alert('Error', 'Failed to save workout');
+    let updatedWorkouts;
+    if (workoutToEdit) {
+      updatedWorkouts = existingWorkouts.map(w =>
+        w.id === workoutToEdit.id ? updatedWorkout : w
+      );
+    } else {
+      updatedWorkouts = [updatedWorkout, ...existingWorkouts];
     }
+
+    await AsyncStorage.setItem(key, JSON.stringify(updatedWorkouts));
+
+    Alert.alert('Success', `Workout ${workoutToEdit ? 'updated' : 'added'} successfully`, [
+      { text: 'OK', onPress: () => navigation.goBack() },
+    ]);
+  } catch (error) {
+    console.error('Error saving workout:', error);
+    Alert.alert('Error', 'Failed to save workout');
+  }
   };
 
   const handleDelete = () => {
@@ -83,11 +97,12 @@ export default function AddWorkoutScreen({ navigation, route }) {
         style: 'destructive',
         onPress: async () => {
           try {
-            const existingWorkoutsJson = await AsyncStorage.getItem('workouts');
+            const key = `workouts_${user.email}`;
+            const existingWorkoutsJson = await AsyncStorage.getItem(key);
             const existingWorkouts = existingWorkoutsJson ? JSON.parse(existingWorkoutsJson) : [];
-
+  
             const updatedWorkouts = existingWorkouts.filter(w => w.id !== workoutToEdit.id);
-            await AsyncStorage.setItem('workouts', JSON.stringify(updatedWorkouts));
+            await AsyncStorage.setItem(key, JSON.stringify(updatedWorkouts));
             navigation.goBack();
           } catch (err) {
             console.error('Error deleting workout:', err);
@@ -97,6 +112,7 @@ export default function AddWorkoutScreen({ navigation, route }) {
       },
     ]);
   };
+  
 
   const onDateChange = (event, selectedDate) => {
     setShowDatePicker(false);

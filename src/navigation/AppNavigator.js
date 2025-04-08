@@ -5,8 +5,6 @@ import {NavigationContainer} from '@react-navigation/native';
 import SplashScreen from '../screens/SplashScreen';
 import WelcomeScreen from '../screens/WelcomeScreen';
 import HomeScreen from '../screens/HomeScreen';
-import LoginScreen from '../screens/LoginScreen';
-import RegisterScreen from '../screens/ForgotPassword';
 import CalendarScreen from '../screens/CalendarScreen';
 import FitnessTrackerScreen from '../screens/FitnessTrackerScreen';
 import AddWorkoutScreen from '../screens/AddWorkoutScreen';

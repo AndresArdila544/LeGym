@@ -66,7 +66,7 @@ export default function SettingsScreen({navigation}) {
     useEffect(() => {
         const loadUserData = async() => {
             try {
-                const storedUserData = await AsyncStorage.getItem("userData");
+                const storedUserData = await AsyncStorage.getItem("activeUser");
                 console.log(storedUserData);
 
                 if (storedUserData) {
@@ -90,27 +90,41 @@ export default function SettingsScreen({navigation}) {
         loadUserData();
     }, []);
 
-    const handleProfileUpdate = async() => {
+    const handleProfileUpdate = async () => {
         try {
-            const updatedUser = {
-                ...userData,
-                firstName: updatedFirstName,
-                lastName: updatedLastName,
-                email: updatedEmail,
-                dateOfBirth: updatedDob,
-                gender: updatedGender,
-                weight: updatedWeight,
-                height: updatedHeight,
-              };
-              
-              await AsyncStorage.setItem('userData', JSON.stringify(updatedUser));
-              setUserData(updatedUser);
-              showConfirmationModal(false);
-
+          const updatedUser = {
+            ...userData,
+            firstName: updatedFirstName,
+            lastName: updatedLastName,
+            email: updatedEmail,
+            dateOfBirth: updatedDob,
+            gender: updatedGender,
+            weight: updatedWeight,
+            height: updatedHeight,
+          };
+      
+          // Save to activeUser
+          await AsyncStorage.setItem('activeUser', JSON.stringify(updatedUser));
+          setUserData(updatedUser);
+      
+          // Update user in the users list
+          const usersRaw = await AsyncStorage.getItem('users');
+          if (usersRaw) {
+            const users = JSON.parse(usersRaw);
+            const updatedUsers = users.map(u =>
+              u.email === userData.email ? updatedUser : u
+            );
+            await AsyncStorage.setItem('users', JSON.stringify(updatedUsers));
+          }
+      
+          showConfirmationModal(false);
+          Alert.alert('✅ Profile updated successfully');
         } catch (error) {
-            console.error('Error canceling booking:', error);
+          console.error('Error updating profile:', error);
+          Alert.alert('❌ Failed to update profile');
         }
-    };
+      };
+      
 
     return (
         <SafeAreaView style={styles.container}>

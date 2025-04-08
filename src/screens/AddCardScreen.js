@@ -1,14 +1,7 @@
-// src/screens/AddCardScreen.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  SafeAreaView,
-  Alert,
+  View, Text, TextInput, StyleSheet, TouchableOpacity,
+  ScrollView, SafeAreaView, Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -19,31 +12,40 @@ export default function AddCardScreen({ navigation }) {
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCvv] = useState('');
   const [setAsDefault, setSetAsDefault] = useState(true);
-  
+  const [activeUser, setActiveUser] = useState(null);
+
+  useEffect(() => {
+    const loadActiveUser = async () => {
+      const stored = await AsyncStorage.getItem('activeUser');
+      if (stored) {
+        setActiveUser(JSON.parse(stored));
+      }
+    };
+    loadActiveUser();
+  }, []);
+
   const handleSave = async () => {
-    // Basic validation
+    if (!activeUser) return;
+
     if (!cardHolder || !cardNumber || !expiryDate || !cvv) {
       Alert.alert('Missing Information', 'Please fill in all fields');
       return;
     }
-    
     if (cardNumber.length < 16) {
       Alert.alert('Invalid Card Number', 'Please enter a valid card number');
       return;
     }
-    
     if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
       Alert.alert('Invalid Expiry Date', 'Please use MM/YY format');
       return;
     }
-    
     if (cvv.length < 3) {
       Alert.alert('Invalid CVV', 'Please enter a valid CVV');
       return;
     }
-    
+
     try {
-      // Create new payment method object
+      const key = `paymentMethods_${activeUser.email}`;
       const newPaymentMethod = {
         id: Date.now().toString(),
         cardHolder,
@@ -53,12 +55,10 @@ export default function AddCardScreen({ navigation }) {
         type: getCardType(cardNumber),
         isDefault: setAsDefault,
       };
-      
-      // Get existing payment methods
-      const existingMethodsJson = await AsyncStorage.getItem('paymentMethods');
+
+      const existingMethodsJson = await AsyncStorage.getItem(key);
       const existingMethods = existingMethodsJson ? JSON.parse(existingMethodsJson) : [];
-      
-      // If this is set as default, update all other cards
+
       let updatedMethods = existingMethods;
       if (setAsDefault) {
         updatedMethods = existingMethods.map(method => ({
@@ -66,68 +66,45 @@ export default function AddCardScreen({ navigation }) {
           isDefault: false
         }));
       }
-      
-      // Add new payment method
+
       const finalMethods = [...updatedMethods, newPaymentMethod];
-      
-      // Save to AsyncStorage
-      await AsyncStorage.setItem('paymentMethods', JSON.stringify(finalMethods));
-      
+
+      await AsyncStorage.setItem(key, JSON.stringify(finalMethods));
+
       Alert.alert('Success', 'Payment method added successfully', [
-        { text: 'OK', onPress: () => navigation.navigate('Profile') }
+        { text: 'OK', onPress: () => navigation.navigate('PaymentMethod') }
       ]);
     } catch (error) {
       console.error('Error saving payment method:', error);
       Alert.alert('Error', 'Failed to save payment method');
     }
   };
-  
-  // Format card number with spaces
+
   const formatCardNumber = (text) => {
     const cleaned = text.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-    const limit = 16;
-    const formatted = cleaned.substring(0, limit);
-    
-    // Add spaces after every 4 digits
+    const formatted = cleaned.substring(0, 16);
     let result = '';
     for (let i = 0; i < formatted.length; i++) {
-      if (i > 0 && i % 4 === 0) {
-        result += ' ';
-      }
+      if (i > 0 && i % 4 === 0) result += ' ';
       result += formatted[i];
     }
-    
     setCardNumber(result);
   };
-  
-  // Format expiry date
+
   const formatExpiryDate = (text) => {
-    const cleaned = text.replace(/[^0-9]/gi, '');
-    const limit = 4;
-    const formatted = cleaned.substring(0, limit);
-    
-    if (formatted.length > 2) {
-      setExpiryDate(`${formatted.substring(0, 2)}/${formatted.substring(2)}`);
-    } else {
-      setExpiryDate(formatted);
-    }
+    const cleaned = text.replace(/[^0-9]/gi, '').substring(0, 4);
+    setExpiryDate(cleaned.length > 2 ? `${cleaned.substring(0, 2)}/${cleaned.substring(2)}` : cleaned);
   };
-  
-  // Determine card type based on first digits
+
   const getCardType = (number) => {
     const firstDigit = number.charAt(0);
-    const firstTwoDigits = number.substring(0, 2);
-    
-    if (firstDigit === '4') {
-      return 'Visa';
-    } else if (['51', '52', '53', '54', '55'].includes(firstTwoDigits)) {
-      return 'MasterCard';
-    } else if (['34', '37'].includes(firstTwoDigits)) {
-      return 'American Express';
-    } else {
-      return 'Card';
-    }
+    const firstTwo = number.substring(0, 2);
+    if (firstDigit === '4') return 'Visa';
+    if (['51', '52', '53', '54', '55'].includes(firstTwo)) return 'MasterCard';
+    if (['34', '37'].includes(firstTwo)) return 'American Express';
+    return 'Card';
   };
+
   
   return (
     <SafeAreaView style={styles.container}>

@@ -37,11 +37,26 @@ export default function LockerRentalScreen({ navigation }) {
     'Month Pass',
     'Semester Pass'
   ];
+  const [activeUser, setActiveUser] = useState(null);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const stored = await AsyncStorage.getItem('activeUser');
+      if (stored) {
+        setActiveUser(JSON.parse(stored));
+      }
+    };
+    loadUser();
+  }, []);
+  const getLockerKey = () => `lockerReservations_${activeUser?.email}`;
+
+
   
   useEffect(() => {
     const loadReservations = async () => {
       try {
-        const storedReservations = await AsyncStorage.getItem('lockerReservations');
+        if (!activeUser) return;
+        const storedReservations = await AsyncStorage.getItem(getLockerKey());
         if (storedReservations) {
           setReservations(JSON.parse(storedReservations));
         }
@@ -49,9 +64,9 @@ export default function LockerRentalScreen({ navigation }) {
         console.error('Error loading reservations:', error);
       }
     };
-    
     loadReservations();
-  }, []);
+  }, [activeUser]);
+  
   
   const getPrice = () => {
     return includesPadlock ? 10 : 0;
@@ -63,12 +78,13 @@ export default function LockerRentalScreen({ navigation }) {
   
   const handleRentLocker = async () => {
     try {
+      if (!activeUser) return;
       if (isLockerAlreadyReserved(location)) {
         setError('This locker is already reserved. Please choose a different one.');
         setSummaryVisible(false);
         return;
       }
-      
+  
       const newReservation = {
         id: Date.now().toString(),
         location,
@@ -77,9 +93,9 @@ export default function LockerRentalScreen({ navigation }) {
         price: getPrice(),
         date: new Date().toISOString(),
       };
-      
+  
       const updatedReservations = [...reservations, newReservation];
-      await AsyncStorage.setItem('lockerReservations', JSON.stringify(updatedReservations));
+      await AsyncStorage.setItem(getLockerKey(), JSON.stringify(updatedReservations));
       setReservations(updatedReservations);
       setConfirmationVisible(true);
     } catch (error) {
@@ -88,16 +104,19 @@ export default function LockerRentalScreen({ navigation }) {
     }
   };
   
+  
   const handleCancelReservation = async (id) => {
     try {
+      if (!activeUser) return;
       const updatedReservations = reservations.filter(res => res.id !== id);
-      await AsyncStorage.setItem('lockerReservations', JSON.stringify(updatedReservations));
+      await AsyncStorage.setItem(getLockerKey(), JSON.stringify(updatedReservations));
       setReservations(updatedReservations);
     } catch (error) {
       console.error('Error canceling reservation:', error);
       Alert.alert('Error', 'Failed to cancel reservation. Please try again.');
     }
   };
+  
 
   const renderReservationItem = ({ item }) => (
     <View style={styles.reservationCard}>

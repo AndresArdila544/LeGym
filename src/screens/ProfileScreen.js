@@ -30,10 +30,11 @@ export default function ProfileScreen({ navigation }) {
     
     const loadUserData = async () => {
       try {
-        const storedUserData = await AsyncStorage.getItem('userData');
+        const storedUserData = await AsyncStorage.getItem('activeUser');
         
         if (storedUserData) {
           const parsed = JSON.parse(storedUserData);
+          console.log("👤 Loaded user for ProfileScreen:", parsed);
           setUserData({
             firstName: parsed.firstName || 'John',
             lastName: parsed.lastName || 'Smith',
@@ -42,6 +43,7 @@ export default function ProfileScreen({ navigation }) {
             membership: parsed.membership || 'Monthly',
           });
         }
+        
       } catch (error) {
         console.error('Failed to load user data:', error);
       }
@@ -65,9 +67,7 @@ export default function ProfileScreen({ navigation }) {
           onPress: async () => {
             try {
               // Clear user session
-              await AsyncStorage.removeItem('userSession');
-              await AsyncStorage.clear();
-              // Navigate to welcome screen
+              await AsyncStorage.removeItem('activeUser');
               navigation.reset({
                 index: 0,
                 routes: [{ name: 'Welcome' }],

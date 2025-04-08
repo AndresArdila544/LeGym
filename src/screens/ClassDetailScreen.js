@@ -1,5 +1,5 @@
 // src/screens/ClassDetailScreen.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -43,6 +43,8 @@ export default function ClassDetailScreen({ route, navigation }) {
         setIsBooked] = useState(false);
     const [cancelConfirmVisible,
         setCancelConfirmVisible] = useState(openCancelModal);
+        const [activeUser, setActiveUser] = useState(null);
+
 
     function getDateOfCurrentWeekday(weekday) {
         const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -61,94 +63,72 @@ export default function ClassDetailScreen({ route, navigation }) {
         return targetDate.toISOString(); // Returns "YYYY-MM-DD"
     }
 
+    useEffect(() => {
+        const loadUser = async () => {
+          const stored = await AsyncStorage.getItem('activeUser');
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            setActiveUser(parsed);
+          }
+        };
+        loadUser();
+      }, []);
+    const getBookingKey = () => `classBookings_${activeUser?.email}`;
+
     const handleBookClass = async () => {
-        try {
-            // Get existing bookings
-            const bookingsJson = await AsyncStorage.getItem('classBookings');
-            const bookings = bookingsJson
-                ? JSON.parse(bookingsJson)
-                : [];
+        if (!activeUser) return;
+        const key = getBookingKey();
+      
+        const bookingsJson = await AsyncStorage.getItem(key);
+        const bookings = bookingsJson ? JSON.parse(bookingsJson) : [];
+      
+        const newBooking = {
+          ...classInfo,
+          booked: true,
+          date: new Date().toISOString(),
+          classDate: getDateOfCurrentWeekday(classInfo.days)
+        };
+      
+        const updatedBookings = [...bookings, newBooking];
+        await AsyncStorage.setItem(key, JSON.stringify(updatedBookings));
+      
+        setIsBooked(true);
+        setConfirmationVisible(true);
+      };
+      
 
-            // Add new booking
-            const newBooking = {
-                id: classInfo.id,
-                title: classInfo.title,
-                instructor: classInfo.instructor,
-                time: classInfo.time,
-                date: new Date().toISOString(),
-                location: classInfo.location,
-                classDate: getDateOfCurrentWeekday(classInfo.days),
-                description: classInfo.description,
-                image: classInfo.image,
-                imageUrl: classInfo.imageUrl,
-                instructorImage: classInfo.instructorImage,
-                rating: classInfo.rating,
-                reviews: classInfo.reviews,
-                duration: classInfo.duration,
-                booked: true,
-                days: classInfo.days,
-            };
-
-            const updatedBookings = [
-                ...bookings,
-                newBooking
-            ];
-
-            console.log(updatedBookings)
-
-            // Save to AsyncStorage
-            await AsyncStorage.setItem('classBookings', JSON.stringify(updatedBookings));
-
-            // Show confirmation
-            setIsBooked(true);
-            setConfirmationVisible(true);
-        } catch (error) {
-            console.error('Error booking class:', error);
-        }
-    };
-
-    const handleCancelBooking = async () => {
-        try {
-            // Get existing bookings
-            const bookingsJson = await AsyncStorage.getItem('classBookings');
-            const bookings = bookingsJson
-                ? JSON.parse(bookingsJson)
-                : [];
-
-            // Remove this booking
-            const updatedBookings = bookings.filter(booking => booking.id !== classInfo.id);
-
-            // Save to AsyncStorage
-            await AsyncStorage.setItem('classBookings', JSON.stringify(updatedBookings));
-
-            // Update state
-            setIsBooked(false);
-            setCancelConfirmVisible(false);
-
-            // Navigate back
-            navigation.goBack();
-        } catch (error) {
-            console.error('Error canceling booking:', error);
-        }
-    };
+      const handleCancelBooking = async () => {
+        if (!activeUser) return;
+        const key = getBookingKey();
+      
+        const bookingsJson = await AsyncStorage.getItem(key);
+        const bookings = bookingsJson ? JSON.parse(bookingsJson) : [];
+      
+        const updatedBookings = bookings.filter(booking => booking.id !== classInfo.id);
+        await AsyncStorage.setItem(key, JSON.stringify(updatedBookings));
+      
+        setIsBooked(false);
+        setCancelConfirmVisible(false);
+        navigation.goBack();
+      };
+      
 
     // Check if class is already booked when component mounts
     React.useEffect(() => {
         const checkBookingStatus = async () => {
-            try {
-                const bookingsJson = await AsyncStorage.getItem('classBookings');
-                if (bookingsJson) {
-                    const bookings = JSON.parse(bookingsJson);
-                    const isAlreadyBooked = bookings.some(booking => booking.id === classInfo.id);
-                    setIsBooked(isAlreadyBooked);
-                }
-            } catch (error) {
-                console.error('Error checking booking status:', error);
+            if (!activeUser) return;
+            const key = getBookingKey();
+            const bookingsJson = await AsyncStorage.getItem(key);
+            if (bookingsJson) {
+              const bookings = JSON.parse(bookingsJson);
+              const isAlreadyBooked = bookings.some(booking => booking.id === classInfo.id);
+              setIsBooked(isAlreadyBooked);
             }
-        };
+          };
+          
 
         checkBookingStatus();
-    }, [classInfo.id]);
+    }, [classInfo.id,, activeUser]);
 
     return (
         <SafeAreaView style={styles.container}>

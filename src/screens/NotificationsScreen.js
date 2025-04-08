@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
+/*
 const mockNotifications = [
   {
     id: '1',
@@ -16,14 +18,29 @@ const mockNotifications = [
     timestamp: '2025-04-06T15:00:00Z',
   },
 ];
+*/
 
 export default function NotificationsScreen({ navigation }) {
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    // You can replace this with AsyncStorage or Firebase calls later
-    setNotifications(mockNotifications);
+    const loadNotifications = async () => {
+      try {
+        const storedNotifications = await AsyncStorage.getItem('notifications');
+        if (storedNotifications) {
+          setNotifications(JSON.parse(storedNotifications));
+        } else {
+          setNotifications([]);
+        }
+      } catch (error) {
+        console.error('Error loading notifications:', error);
+        setNotifications([]);
+      }
+    };
+  
+    loadNotifications();
   }, []);
+  
 
   const renderItem = ({ item }) => (
     <View style={styles.notificationCard}>

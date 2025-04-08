@@ -77,7 +77,27 @@ export default function ClassDetailScreen({ route, navigation }) {
 
     const handleBookClass = async () => {
         if (!activeUser) return;
+      
         const key = getBookingKey();
+      
+        // Parse the first weekday from classInfo.days (e.g., "Monday and Wednesday" -> "Monday")
+        const weekday = classInfo.days.split(' ')[0];
+      
+        const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const today = new Date();
+        const todayIndex = today.getDay(); // 0 = Sunday
+      
+        const targetIndex = weekdays.indexOf(weekday);
+      
+        // Check if the class is today or later in the current week
+        const isFutureOrToday =
+          targetIndex === todayIndex || (targetIndex > todayIndex) ||
+          todayIndex === 0; // if today is Sunday, always allow
+      
+        if (!isFutureOrToday) {
+          alert(`You can only book classes from today onward. This class runs on ${weekday}.`);
+          return;
+        }
       
         const bookingsJson = await AsyncStorage.getItem(key);
         const bookings = bookingsJson ? JSON.parse(bookingsJson) : [];
@@ -86,7 +106,7 @@ export default function ClassDetailScreen({ route, navigation }) {
           ...classInfo,
           booked: true,
           date: new Date().toISOString(),
-          classDate: getDateOfCurrentWeekday(classInfo.days)
+          classDate: getDateOfCurrentWeekday(weekday)
         };
       
         const updatedBookings = [...bookings, newBooking];
@@ -95,6 +115,7 @@ export default function ClassDetailScreen({ route, navigation }) {
         setIsBooked(true);
         setConfirmationVisible(true);
       };
+      
       
 
       const handleCancelBooking = async () => {

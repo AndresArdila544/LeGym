@@ -117,7 +117,9 @@ export default function HomeScreen({ navigation }) {
 
           <View style={styles.headerIcons}>
 
+          <TouchableOpacity onPress={() => navigation.navigate('NotificationsScreen')}>
             <Ionicons name="notifications-outline" size={24} color="#333" />
+          </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.profileCircle}

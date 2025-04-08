@@ -105,19 +105,20 @@ const today = new Date();
 // Get the day of the week (0 = Sunday, 6 = Saturday)
 const dayOfWeek = today.getDay();
 
-// Calculate the previous Saturday
-const saturday = new Date(today);
-saturday.setDate(today.getDate() - dayOfWeek - 1 + 7); // Ensures it goes to Saturday of the current week
+// Calculate past Sunday
+const pastSunday = new Date(today);
+pastSunday.setDate(today.getDate() - dayOfWeek);
 
-// Calculate the next Sunday after that Saturday
-const nextSunday = new Date(saturday);
-nextSunday.setDate(saturday.getDate() + 8); // Next week's Sunday
+// Calculate next Saturday
+const nextSaturday = new Date(pastSunday);
+nextSaturday.setDate(pastSunday.getDate() + 6);
 
-// Format the dates
+
 const formatDate = (date) =>
   date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
-const dateRange = `Week of ${formatDate(saturday)} to ${formatDate(nextSunday)}`;
+const dateRange = `Week of ${formatDate(pastSunday)} to ${formatDate(nextSaturday)}`;
+
 
 export default function ClassesScreen({navigation}) {
     return (
@@ -130,7 +131,9 @@ export default function ClassesScreen({navigation}) {
                           <View style={{ width: 24 }} />
                       </View>
             <ScrollView showsVerticalScrollIndicator={false}>
-              <Text style={styles.subHeader}>{dateRange}</Text>
+            <Text style={styles.subHeader}>{dateRange}</Text>
+            <Text style={styles.helperText}>Classes update every Sunday</Text>
+
             <FlatList
                 data={classData}
                 renderItem={({item}) => (<ClassCard
@@ -174,6 +177,13 @@ const styles = StyleSheet.create({
       fontWeight: "bold",
       color:"#912338"
   },
+  helperText: {
+    fontSize: 13,
+    color: '#888',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  
     subHeader: {
         fontSize: 15,
         fontWeight: '600',

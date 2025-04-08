@@ -3,11 +3,13 @@ import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 
 const screenWidth = Dimensions.get('window').width;
-const now = new Date();
+
 const formatDate = (d) => d.toISOString().split('T')[0];
 
 const WorkoutChart = ({ workouts = [], selectedPeriod = '1 month' }) => {
+  
   const chartData = useMemo(() => {
+    const now = new Date();
     try {
       let labels = [];
       let data = [];
@@ -32,6 +34,12 @@ const WorkoutChart = ({ workouts = [], selectedPeriod = '1 month' }) => {
         });
 
         data = Object.values(dateMap);
+
+        const allSame = new Set(data).size === 1;
+        if (allSame && data[0] !== 0) {
+          data.push(data[0] + 0.001); // Invisible nudge to fix axis glitch
+        }
+
       } else {
         // 3 months or 1 year: weekly buckets
         const weeks = selectedPeriod === '3 months' ? 12 : 52;
@@ -81,6 +89,36 @@ const WorkoutChart = ({ workouts = [], selectedPeriod = '1 month' }) => {
   // ✅ Calculate dynamic chart width
   const chartWidth = Math.max(chartData?.labels?.length * 50, screenWidth - 32);
 
+  // Pad data slightly to avoid flat lines
+  let paddedData = [...chartData.datasets[0].data];
+  const uniqueValues = new Set(paddedData);
+
+  if (uniqueValues.size === 1) {
+    // Pad to avoid visual artifacts
+    paddedData[0] += 0.01;
+  }
+
+  chartData.datasets[0].data = paddedData;
+
+  const maxValue = Math.max(...paddedData);
+  const segmentsCount = Math.max(2, Math.ceil(maxValue));
+
+
+
+  if (!chartData || chartData.datasets[0].data.every(v => v === 0)) {
+    return (
+      <View style={styles.chartCard}>
+        <View style={styles.chartFilters}>
+          <Text style={styles.filterLabel}>Workouts</Text>
+          <Text style={styles.filterLabel}>{selectedPeriod}</Text>
+        </View>
+        <Text style={{ textAlign: 'center', color: '#888', paddingVertical: 20 }}>
+          No workout data to display
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.chartCard}>
       <View style={styles.chartFilters}>
@@ -90,21 +128,21 @@ const WorkoutChart = ({ workouts = [], selectedPeriod = '1 month' }) => {
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
       <LineChart
-  data={chartData}
-  width={chartWidth}
-  height={220}
-  chartConfig={chartConfig}
-  bezier
-  fromZero
-  withInnerLines={true}
-  yLabelsOffset={10}
-  withHorizontalLines={true} 
-  withVerticalLines={false} 
-  withVerticalLabels={true}
-  formatYLabel={(y) => `${parseInt(y)}`}
-  segments={Math.min(5, Math.max(1, Math.ceil(Math.max(...chartData.datasets[0].data) || 1)))} // ⬅ dynamic segments
-  style={[styles.chart, { marginLeft: -30 }]}
-/>
+        data={chartData}
+        width={chartWidth}
+        height={220}
+        chartConfig={chartConfig}
+        bezier
+        fromZero={true}
+        withInnerLines={true}
+        yLabelsOffset={10}
+        withHorizontalLines={true} 
+        withVerticalLines={false} 
+        withVerticalLabels={true}
+        formatYLabel={(y) => `${parseInt(y)}`}
+        segments={segmentsCount} // ⬅ dynamic segments
+        style={[styles.chart, { marginLeft: -30 }]}
+      />
 
       </ScrollView>
     </View>
@@ -114,14 +152,20 @@ const WorkoutChart = ({ workouts = [], selectedPeriod = '1 month' }) => {
 const chartConfig = {
   backgroundGradientFrom: '#fff',
   backgroundGradientTo: '#fff',
-  segments: 3,
+  //segments: 3,
   decimalPlaces: 0,
   color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
   labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-  propsForDots: {
-    r: '4',
-    strokeWidth: '2',
-    stroke: '#800000',
+  propsForDots: ({ index, dataset }) => {
+    // hide the artificial dot
+    if (dataset.data[index] % 1 !== 0) {
+      return { r: '0' };
+    }
+    return {
+      r: '4',
+      strokeWidth: '2',
+      stroke: '#800000',
+    };
   },
   propsForBackgroundLines: {
     strokeWidth: 1, // remove Y axis grid duplication

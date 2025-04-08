@@ -1,5 +1,5 @@
 // src/screens/FitnessTrackerScreen.js
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect,useMemo } from 'react';
 import {
     View,
     Text,
@@ -24,8 +24,10 @@ export default function FitnessTrackerScreen({navigation}) {
     const [streakDays,
         setStreakDays] = useState(0);
     const [selectedPeriod,
-        setSelectedPeriod] = useState('1 month');
+        setSelectedPeriod] = useState('1 week');
 const isFocused = useIsFocused();
+
+
     useEffect(() => {
         const loadWorkouts = async() => {
             try {
@@ -47,9 +49,31 @@ const isFocused = useIsFocused();
                 }
 
                 // Load streak days
-                const storedStreak = await AsyncStorage.getItem('streakDays');
-                if (storedStreak) {
-                    setStreakDays(parseInt(storedStreak));
+                // Load streak days
+                if (storedWorkouts) {
+                  const parsedWorkouts = JSON.parse(storedWorkouts);
+                  const uniqueWorkoutDays = new Set(parsedWorkouts.map(w => {
+                    const d = new Date(w.date);
+                    d.setHours(0, 0, 0, 0); // normalize time
+                    return d.getTime(); // use timestamp for comparison
+                  }));
+
+                  let streak = 0;
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+
+                  for (let i = 0; ; i++) {
+                    const checkDate = new Date(today);
+                    checkDate.setDate(today.getDate() - i);
+
+                    if (uniqueWorkoutDays.has(checkDate.getTime())) {
+                      streak++;
+                    } else {
+                      break;
+                    }
+                  }
+
+                  setStreakDays(streak);
                 }
             } catch (error) {
                 console.error('Failed to load workouts:', error);
@@ -66,6 +90,32 @@ const isFocused = useIsFocused();
         const mins = minutes % 60;
         return `${hours}h ${mins}min`;
     };
+    const getFilteredWorkouts = () => {
+      const now = new Date();
+      now.setHours(0, 0, 0, 0); // normalize current date
+    
+      return workouts.filter(w => {
+        const workoutDate = new Date(w.date);
+        workoutDate.setHours(0, 0, 0, 0); // normalize workout date
+    
+        const diffTime = now - workoutDate;
+        const diffDays = diffTime / (1000 * 60 * 60 * 24);
+    
+        if (selectedPeriod === '1 week') return diffDays >= 0 && diffDays <= 7;
+        if (selectedPeriod === '1 month') return diffDays >= 0 && diffDays <= 30;
+        if (selectedPeriod === '3 months') return diffDays >= 0 && diffDays <= 90;
+        if (selectedPeriod === '1 year') return diffDays >= 0 && diffDays <= 365;
+    
+        return true; // fallback
+      });
+    };
+    
+    const filteredWorkouts = useMemo(() => getFilteredWorkouts(), [workouts, selectedPeriod]);
+    console.log(`Showing ${filteredWorkouts.length} workouts for period: ${selectedPeriod}`);
+    
+    filteredWorkouts.forEach(w =>
+      console.log(`Workout: ${w.activity}, Date: ${new Date(w.date).toLocaleDateString()}`)
+    );
 
     return (
         <SafeAreaView style={styles.container}>
@@ -141,8 +191,9 @@ const isFocused = useIsFocused();
                             </TouchableOpacity>
                         </View>
 
-                        {workouts.length > 0
-                            ? (workouts.map((workout, index) => (
+                        {filteredWorkouts.length > 0
+                          ? (filteredWorkouts.map((workout, index) => (
+                              
                                 <View key={index} style={styles.workoutCard}>
                                     <Text style={styles.workoutDate}>Date: {new Date(workout.date).toLocaleDateString()}</Text>
                                     <Text style={styles.workoutActivity}>Activity: {workout.activity}</Text>
@@ -151,6 +202,18 @@ const isFocused = useIsFocused();
                                     <Text style={styles.workoutCalories}>Calories: {workout.calories}
                                         kcal</Text>
                                     {workout.notes && <Text style={styles.workoutNotes}>Notes: "{workout.notes}"</Text>}
+
+                                    <View style={{ flexDirection: 'row', marginTop: 10, gap: 12 }}>
+                                    <TouchableOpacity 
+                                      style={[styles.editButton]} 
+                                      onPress={() => navigation.navigate('AddWorkout', { workoutToEdit: workout })}
+                                    >
+                                      <Text style={styles.buttonText}>Edit</Text>
+                                    </TouchableOpacity>
+
+                                    </View>
+
+
                                 </View>
                             )))
                             : (
@@ -188,7 +251,7 @@ const styles = StyleSheet.create({
     content: {
         flex: 1,
         padding: 16,
-        marginBottom: 70
+        //marginBottom: 70
     },
     statTextWrapper: {
         marginLeft: 10
@@ -361,5 +424,24 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontWeight: 'bold',
         fontSize: 16
-    }
+    },
+    editButton: {
+      backgroundColor: '#800000',
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+      borderRadius: 8,
+    },
+    
+    deleteButton: {
+      backgroundColor: '#800000',
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+      borderRadius: 8,
+    },
+    
+    buttonText: {
+      color: 'white',
+      fontWeight: 'bold',
+    },
+    
 });

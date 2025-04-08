@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
 
@@ -7,38 +7,58 @@ const SCREEN_WIDTH = Dimensions
     .width;
 const PILL_WIDTH = SCREEN_WIDTH / 8; // 7 items + a bit of margin
 
-const days = [
-    {
-        label: 'Sun',
-        completed: true
-    }, {
-        label: 'Mon',
-        completed: true
-    }, {
-        label: 'Tue',
-        completed: true
-    }, {
-        label: 'Wen',
-        completed: false
-    }, {
-        label: 'Thu',
-        completed: true
-    }, {
-        label: 'Fri',
-        completed: false
-    }, {
-        label: 'Sat',
-        completed: false
-    }
-];
+// const days = [
+//     {
+//         label: 'Sun',
+//         completed: true
+//     }, {
+//         label: 'Mon',
+//         completed: true
+//     }, {
+//         label: 'Tue',
+//         completed: true
+//     }, {
+//         label: 'Wen',
+//         completed: false
+//     }, {
+//         label: 'Thu',
+//         completed: true
+//     }, {
+//         label: 'Fri',
+//         completed: false
+//     }, {
+//         label: 'Sat',
+//         completed: false
+//     }
+// ];
+export default function WeeklyWorkout({ workouts = [],navigation  }) {
+    const today = new Date();
+    const currentWeekStart = new Date(today);
+    currentWeekStart.setDate(today.getDate() - today.getDay()); // Sunday
+  
+    const days = useMemo(() => {
+        return Array.from({ length: 7 }).map((_, i) => {
+          const date = new Date();
+          date.setDate(today.getDate() - (6 - i)); // last 6 days + today
+      
+          const label = date.toLocaleDateString('en-US', { weekday: 'short' }); // e.g., 'Mon'
+          const dateKey = date.toISOString().split('T')[0];
+      
+          const completed = workouts.some(workout => {
+            const workoutDate = new Date(workout.date).toISOString().split('T')[0];
+            return workoutDate === dateKey;
+          });
+      
+          return { label, completed };
+        });
+      }, [workouts]);
 
-export default function WeeklyWorkout() {
     return (
         <View style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
                 <Text style={styles.title}>My workouts this week</Text>
-                <Text style={styles.link}>See more</Text>
+                <Text style={styles.link} onPress={() => navigation.navigate('FitnessTracker')}>See more</Text>
             </View>
 
             {/* Days */}

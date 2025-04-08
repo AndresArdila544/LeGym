@@ -24,7 +24,38 @@ export default function HomeScreen({ navigation }) {
   const isFocused = useIsFocused();
   const [bookedClasses, setBookedClasses] = useState([]);
   const [user, setUser] = useState(null);
+  const [workouts, setWorkouts] = useState([]);
+  const [streakDays, setStreakDays] = useState(0);
 
+
+
+  const calculateStreak = (workouts) => {
+    const uniqueWorkoutDays = new Set(
+      workouts.map(w => {
+        const d = new Date(w.date);
+        d.setHours(0, 0, 0, 0); // normalize time
+        return d.getTime();
+      })
+    );
+  
+    let streak = 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // normalize today
+  
+    for (let i = 0; ; i++) {
+      const checkDate = new Date(today);
+      checkDate.setDate(today.getDate() - i);
+  
+      if (uniqueWorkoutDays.has(checkDate.getTime())) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+  
+    return streak;
+  };
+  
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -37,6 +68,16 @@ export default function HomeScreen({ navigation }) {
       }
     };
 
+    const loadWorkouts = async () => {
+      try {
+        const stored = await AsyncStorage.getItem('workouts');
+        const parsed = stored ? JSON.parse(stored) : [];
+        setWorkouts(parsed);
+        setStreakDays(calculateStreak(parsed));
+      } catch (e) {
+        console.error('Failed to load workouts', e);
+      }
+    };
 
     const loadBookedClasses = async () => {
       try {
@@ -51,10 +92,12 @@ export default function HomeScreen({ navigation }) {
         console.error('Failed to load booked classes', e);
       }
     };
+    
 
     if (isFocused) {
       loadUserData();
       loadBookedClasses();
+      loadWorkouts();
     }
   }, [isFocused]);
 
@@ -107,14 +150,14 @@ export default function HomeScreen({ navigation }) {
                 Hi {user?.firstName || 'there'}! 👋
               </Text>
               <Text style={styles.heroSub}>Ready for your next workout?</Text>
-              <Text style={styles.streak}>🔥 Streak: 5 Days</Text>
+              <Text style={styles.streak}>🔥 Streak: {streakDays} Days</Text>
             </View>
 
           </ImageBackground>
 
           <View style={styles.cards}>
             {/* WEEKLY WORKOUTS */}
-            <WeeklyWorkout />
+            <WeeklyWorkout workouts={workouts} navigation={navigation}/>
 
             {/* CROWD METER */}
             <CrowdMeterCard

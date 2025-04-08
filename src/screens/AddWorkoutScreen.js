@@ -1,5 +1,5 @@
 // src/screens/AddWorkoutScreen.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,76 +13,110 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Picker } from '@react-native-picker/picker';
 
-export default function AddWorkoutScreen({ navigation }) {
+export default function AddWorkoutScreen({ navigation, route }) {
+  const workoutToEdit = route.params?.workoutToEdit;
+
   const [activity, setActivity] = useState('');
   const [duration, setDuration] = useState('');
   const [calories, setCalories] = useState('');
   const [notes, setNotes] = useState('');
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  
+
+  useEffect(() => {
+    if (workoutToEdit) {
+      setActivity(workoutToEdit.activity);
+      setDuration(workoutToEdit.duration.toString());
+      setCalories(workoutToEdit.calories.toString());
+      setNotes(workoutToEdit.notes || '');
+      setDate(new Date(workoutToEdit.date));
+    }
+  }, [workoutToEdit]);
+
   const handleSave = async () => {
     if (!activity || !duration) {
       Alert.alert('Missing Information', 'Please enter activity and duration');
       return;
     }
-    
+
     try {
-      // Create new workout object
-      const newWorkout = {
-        id: Date.now().toString(),
+      const existingWorkoutsJson = await AsyncStorage.getItem('workouts');
+      const existingWorkouts = existingWorkoutsJson ? JSON.parse(existingWorkoutsJson) : [];
+
+      const updatedWorkout = {
+        id: workoutToEdit?.id || Date.now().toString(),
         activity,
         duration: parseInt(duration),
         calories: parseInt(calories) || 0,
         notes,
         date: date.toISOString(),
       };
-      
-      // Get existing workouts
-      const existingWorkoutsJson = await AsyncStorage.getItem('workouts');
-      const existingWorkouts = existingWorkoutsJson ? JSON.parse(existingWorkoutsJson) : [];
-      
-      // Add new workout
-      const updatedWorkouts = [newWorkout, ...existingWorkouts];
-      
-      // Save to AsyncStorage
-      await AsyncStorage.setItem('workouts', JSON.stringify(updatedWorkouts));
-      
-      // Update streak if workout is from today
-      const today = new Date();
-      if (date.toDateString() === today.toDateString()) {
-        const streakDays = parseInt(await AsyncStorage.getItem('streakDays') || '0');
-        await AsyncStorage.setItem('streakDays', (streakDays + 1).toString());
+
+      let updatedWorkouts;
+      if (workoutToEdit) {
+        // Editing
+        updatedWorkouts = existingWorkouts.map(w =>
+          w.id === workoutToEdit.id ? updatedWorkout : w
+        );
+      } else {
+        // Creating
+        updatedWorkouts = [updatedWorkout, ...existingWorkouts];
       }
-      
-      Alert.alert('Success', 'Workout added successfully', [
-        { text: 'OK', onPress: () => navigation.goBack() }
+
+      await AsyncStorage.setItem('workouts', JSON.stringify(updatedWorkouts));
+
+      Alert.alert('Success', `Workout ${workoutToEdit ? 'updated' : 'added'} successfully`, [
+        { text: 'OK', onPress: () => navigation.goBack() },
       ]);
     } catch (error) {
       console.error('Error saving workout:', error);
       Alert.alert('Error', 'Failed to save workout');
     }
   };
-  
+
+  const handleDelete = () => {
+    Alert.alert('Delete Workout', 'Are you sure you want to delete this workout?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            const existingWorkoutsJson = await AsyncStorage.getItem('workouts');
+            const existingWorkouts = existingWorkoutsJson ? JSON.parse(existingWorkoutsJson) : [];
+
+            const updatedWorkouts = existingWorkouts.filter(w => w.id !== workoutToEdit.id);
+            await AsyncStorage.setItem('workouts', JSON.stringify(updatedWorkouts));
+            navigation.goBack();
+          } catch (err) {
+            console.error('Error deleting workout:', err);
+            Alert.alert('Error', 'Failed to delete workout');
+          }
+        },
+      },
+    ]);
+  };
+
   const onDateChange = (event, selectedDate) => {
     setShowDatePicker(false);
     if (selectedDate) {
       setDate(selectedDate);
     }
   };
-  
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Add Workout</Text>
+        <Text style={styles.headerTitle}>
+          {workoutToEdit ? 'Edit Workout' : 'Add Workout'}
+        </Text>
         <View style={{ width: 24 }} />
       </View>
-      
+
       <ScrollView style={styles.content}>
         <View style={styles.formGroup}>
           <Text style={styles.label}>Activity</Text>
@@ -93,7 +127,7 @@ export default function AddWorkoutScreen({ navigation }) {
             onChangeText={setActivity}
           />
         </View>
-        
+
         <View style={styles.formGroup}>
           <Text style={styles.label}>Duration (minutes)</Text>
           <TextInput
@@ -104,7 +138,7 @@ export default function AddWorkoutScreen({ navigation }) {
             onChangeText={setDuration}
           />
         </View>
-        
+
         <View style={styles.formGroup}>
           <Text style={styles.label}>Calories</Text>
           <TextInput
@@ -115,13 +149,10 @@ export default function AddWorkoutScreen({ navigation }) {
             onChangeText={setCalories}
           />
         </View>
-        
+
         <View style={styles.formGroup}>
           <Text style={styles.label}>Date</Text>
-          <TouchableOpacity 
-            style={styles.dateSelector}
-            onPress={() => setShowDatePicker(true)}
-          >
+          <TouchableOpacity style={styles.dateSelector} onPress={() => setShowDatePicker(true)}>
             <Text>{date.toLocaleDateString()}</Text>
             <Ionicons name="calendar" size={20} color="#800000" />
           </TouchableOpacity>
@@ -135,7 +166,7 @@ export default function AddWorkoutScreen({ navigation }) {
             />
           )}
         </View>
-        
+
         <View style={styles.formGroup}>
           <Text style={styles.label}>Notes (optional)</Text>
           <TextInput
@@ -146,13 +177,18 @@ export default function AddWorkoutScreen({ navigation }) {
             onChangeText={setNotes}
           />
         </View>
-        
-        <TouchableOpacity 
-          style={styles.saveButton}
-          onPress={handleSave}
-        >
-          <Text style={styles.saveButtonText}>Save Workout</Text>
+
+        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+          <Text style={styles.saveButtonText}>
+            {workoutToEdit ? 'Update Workout' : 'Save Workout'}
+          </Text>
         </TouchableOpacity>
+
+        {workoutToEdit && (
+          <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+            <Text style={styles.deleteButtonText}>Delete Workout</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -208,14 +244,29 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   saveButton: {
-    backgroundColor: '#800000',
-    borderRadius: 8,
-    padding: 16,
-    alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 40,
+
+      backgroundColor: '#800000',
+      paddingVertical: 14,
+      borderRadius: 30,
+      alignItems: 'center',
+      marginVertical: 20
+
   },
   saveButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  deleteButton: {
+    backgroundColor: '#800000',
+    paddingVertical: 14,
+    borderRadius: 30,
+    alignItems: 'center',
+    marginVertical: 20,
+    marginTop: 10,
+    marginBottom: 40,
+  },
+  deleteButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',

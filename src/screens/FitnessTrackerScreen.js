@@ -435,15 +435,10 @@ const styles = StyleSheet.create({
       backgroundColor: '#912338',
       paddingVertical: 8,
       paddingHorizontal: 16,
-      borderRadius: 8,
+      borderRadius: 20,
     },
     
-    deleteButton: {
-      backgroundColor: '#912338',
-      paddingVertical: 8,
-      paddingHorizontal: 16,
-      borderRadius: 8,
-    },
+
     
     buttonText: {
       color: 'white',

@@ -134,13 +134,17 @@ export default function ClassDetailScreen({ route, navigation }) {
         <SafeAreaView style={styles.container}>
             <ScrollView>
                 <View style={styles.header}>
-                    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                        <Ionicons name="arrow-back" size={24} color="#000" />
-                    </TouchableOpacity>
-                    <Image
-                        source={classInfo.image ? classInfo.image : { uri: classInfo.imageUrl } }
-                        style={styles.classImage}
-                        resizeMode="cover" />
+                <View style={styles.imageWrapper}>
+                <Image
+                    source={classInfo.image ? classInfo.image : { uri: classInfo.imageUrl }}
+                    style={styles.classImage}
+                    resizeMode="cover"
+                />
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                    <Ionicons name="arrow-back" size={24} color="#fff" />
+                </TouchableOpacity>
+                </View>
+
                 </View>
 
                 <View style={styles.classInfo}>
@@ -248,17 +252,32 @@ const styles = StyleSheet.create({
     header: {
         //padding: 16
     },
-    backButton: {
-        width: 40,
-        height: 40,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    classImage: {
+    imageWrapper: {
+        position: 'relative',
         width: '100%',
         height: 220,
-        //borderBottomLeftRadius: 16, borderBottomRightRadius: 16,
-    },
+      },
+      
+      classImage: {
+        width: '100%',
+        height: '100%',
+        borderBottomLeftRadius: 16,
+        borderBottomRightRadius: 16,
+      },
+      
+      backButton: {
+        position: 'absolute',
+        top: 16,
+        left: 16,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'rgba(0,0,0,0.6)', // optional for contrast
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 10,
+      },
+      
     classInfo: {
         padding: 16
     },
@@ -346,10 +365,12 @@ const styles = StyleSheet.create({
         margin: 16,
         padding: 16,
         borderRadius: 8,
-        alignItems: 'center'
+        alignItems: 'center',
+        borderRadius: 20,
     },
     cancelButton: {
-        backgroundColor: '#912338'
+        backgroundColor: '#912338',
+        borderRadius: 20,
     },
     actionButtonText: {
         color: 'white',
@@ -378,8 +399,9 @@ const styles = StyleSheet.create({
     closeButton: {
         paddingVertical: 12,
         paddingHorizontal: 24,
-        borderRadius: 8,
-        backgroundColor: '#912338'
+        //borderRadius: 8,
+        backgroundColor: '#912338',
+        borderRadius: 20,
     },
     closeButtonText: {
         color: 'white',
@@ -399,10 +421,12 @@ const styles = StyleSheet.create({
         marginHorizontal: 8
     },
     cancelModalButton: {
-        backgroundColor: '#f1f1f1'
+        backgroundColor: '#f1f1f1',
+        borderRadius: 20,
     },
     confirmModalButton: {
-        backgroundColor: '#912338'
+        backgroundColor: '#912338',
+        borderRadius: 20,
     },
     cancelModalButtonText: {
         color: '#333',

@@ -90,7 +90,18 @@ export default function HomeScreen({ navigation }) {
     }
   }, [isFocused]);
   
-
+  const formatClassDate = (isoDate) => {
+    const d = new Date(isoDate);
+    return d.toLocaleDateString(undefined, {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+  
+  const sortedClasses = [...bookedClasses].sort(
+    (a, b) => new Date(a.classDate) - new Date(b.classDate)
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -169,52 +180,72 @@ export default function HomeScreen({ navigation }) {
               </TouchableOpacity>
             </View>
 
-            {bookedClasses.length === 0 ? (
+            {sortedClasses.length === 0 ? (
               <View style={{ alignItems: 'center', paddingVertical: 40 }}>
                 <Text style={{ fontSize: 16, color: '#666' }}>
                   You don't have any classes booked this week.
                 </Text>
               </View>
-            ) : (bookedClasses.map((classItem, index) => (
+            ) : (sortedClasses.map((classItem, index) => (
+              
               <TouchableOpacity
                 key={index}
                 style={styles.classCard}
                 onPress={() => navigation.navigate('ClassDetail', { classInfo: classItem })}
               >
-                <Image
-                  source={
-                    typeof classItem.image === 'number'
-                      ? classItem.image
-                      : classItem.imageUrl
-                  }
-                  style={styles.classImage}
-                  resizeMode="cover"
-                />
-                <View style={styles.classInfo}>
-
+                <View style={styles.classImageWrapper}>
+                  <Image
+                    source={
+                      typeof classItem.image === 'number'
+                        ? classItem.image
+                        : { uri: classItem.imageUrl }
+                    }
+                    style={styles.classImage}
+                    resizeMode="cover"
+                  />
                   <View style={styles.classRatingContainer}>
+                    <Ionicons name="star" size={12} color="#fff" />
                     <Text style={styles.classRating}>{classItem.rating}</Text>
                   </View>
+                </View>
+
+                <View style={styles.classInfo}>
+                <View style={styles.classHeaderRow}>
                   <Text style={styles.classTitle}>{classItem.title}</Text>
-                  <View style={styles.classMetaContainer}>
-                    <View style={styles.classBadge}>
-                      <Ionicons name="time-outline" size={16} color="white" />
-                      <Text style={styles.classBadgeText}>{classItem.time}</Text>
-                    </View>
-                    <View style={styles.classBadge}>
-                      <Ionicons name="person-outline" size={16} color="white" />
-                      <Text style={styles.classBadgeText}>{classItem.instructor}</Text>
-                    </View>
+                  <View style={styles.classDateBadge}>
+                    <Ionicons name="calendar-outline" size={12} color="#fff" />
+                    <Text style={styles.classDateText}>
+                      {formatClassDate(classItem.classDate)}
+                    </Text>
                   </View>
-                  <TouchableOpacity style={styles.cancelButton}
-                    onPress={() => navigation.navigate('ClassDetail', {
-                      classInfo: classItem,
-                      openCancelModal: true
-                    })}>
+                </View>
+
+                <View style={styles.classMetaContainer}> 
+                  <View style={styles.classBadge}>
+                    <Ionicons name="time-outline" size={14} color="white" />
+                    <Text style={styles.classBadgeText}>{classItem.time}</Text>
+                  </View>
+                  <View style={styles.classBadge}>
+                    <Ionicons name="person-outline" size={14} color="white" />
+                    <Text style={styles.classBadgeText}>{classItem.instructor}</Text>
+                  </View>
+                </View>
+
+
+                  <TouchableOpacity
+                    style={styles.cancelButton}
+                    onPress={() =>
+                      navigation.navigate('ClassDetail', {
+                        classInfo: classItem,
+                        openCancelModal: true,
+                      })
+                    }
+                  >
                     <Text style={styles.cancelButtonText}>Cancel Booking</Text>
                   </TouchableOpacity>
                 </View>
               </TouchableOpacity>
+
             )))}
           </View>
 
@@ -329,88 +360,120 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     textDecorationLine: 'underline',
   },
+  classHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  
+  classDateBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#912338',
+    borderRadius: 20,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    gap: 4,
+  },
+  
+  classDateText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: '500',
+  },
+  
   classCard: {
-    backgroundColor: 'white',
+    backgroundColor: '#fff',
     borderRadius: 12,
-    marginBottom: 12,
+    marginBottom: 16,
     borderWidth: 1,
     borderColor: '#EAF0F6',
     overflow: 'hidden',
-    display: 'flex',
-    flexDirection: 'row',
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 2,
   },
-  classInfo: {
-    flex: 1,
-    padding: 8,
+  
+  classImageWrapper: {
+    position: 'relative',
+    width: '100%',
+    height: 120,
   },
+  
   classImage: {
-    width: '20%',
+    width: '100%',
     height: '100%',
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
   },
+  
+  classRatingContainer: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    backgroundColor: '#912338',
+    paddingVertical: 4,
+    paddingHorizontal: 6,
+    borderRadius: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  
+  classRating: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  
+  classInfo: {
+    padding: 12,
+  },
+  
   classTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 4,
-    paddingLeft: 4,
-    marginTop: 10,
+    marginBottom: 10,
+    color: '#222',
   },
-  classTime: {
-    fontSize: 14,
-    marginBottom: 4,
-  },
-  classInstructor: {
-    fontSize: 14,
-    marginBottom: 12,
-  },
-  cancelButton: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#912338',
-    borderWidth: 'none',
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    marginTop: 10,
-    alignItems: 'center',
-    width: '100%',
-  },
-  cancelButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '500',
-  },
+  
   classMetaContainer: {
-    display: 'flex',
     flexDirection: 'row',
-    marginBottom: 12,
-    width: '100%',
-    gap: 8, // Increased spacing between badges
+    gap: 8,
+    marginBottom: 16,
   },
+  
   classBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#222222',
+    backgroundColor: '#222',
     borderRadius: 20,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
     gap: 6,
-    width: 'fit-content',
   },
+  
   classBadgeText: {
-    color: 'white',
+    color: '#fff',
     fontSize: 12,
     fontWeight: '500',
   },
-  classRatingContainer: {
-    position: 'absolute',
-    right: 0,
-    top: 0,
+  
+  cancelButton: {
     backgroundColor: '#912338',
-    borderRadius: 4,
-    padding: 4,
+    borderRadius: 20,
+    paddingVertical: 10,
+    alignItems: 'center',
   },
-  classRating: {
+  
+  cancelButtonText: {
     color: 'white',
+    fontSize: 14,
     fontWeight: 'bold',
-    fontSize: 12,
   },
+  
+  
 });

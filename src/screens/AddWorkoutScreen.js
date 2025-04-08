@@ -125,7 +125,7 @@ export default function AddWorkoutScreen({ navigation, route }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
+          <Ionicons name="arrow-back" size={24} color="#912338" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
           {workoutToEdit ? 'Edit Workout' : 'Add Workout'}
@@ -226,6 +226,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
+    color:"#912338"
   },
   content: {
     flex: 1,
@@ -274,7 +275,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   deleteButton: {
-    backgroundColor: '#912338',
+    backgroundColor: '#333',
     paddingVertical: 14,
     borderRadius: 30,
     alignItems: 'center',

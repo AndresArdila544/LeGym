@@ -1,3 +1,4 @@
+// src/screens/LockerRentalScreen.js
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -100,26 +101,27 @@ export default function LockerRentalScreen({ navigation }) {
 
   const renderReservationItem = ({ item }) => (
     <View style={styles.reservationCard}>
-      <View style={styles.reservationItem}>
+      <View style={styles.reservationRow}>
         <Text style={styles.reservationLabel}>Location:</Text>
         <Text style={styles.reservationValue}>{item.location}</Text>
       </View>
-      <View style={styles.reservationItem}>
+      <View style={styles.reservationRow}>
         <Text style={styles.reservationLabel}>Duration:</Text>
         <Text style={styles.reservationValue}>{item.duration}</Text>
       </View>
-      <View style={styles.reservationItem}>
+      <View style={styles.reservationRow}>
         <Text style={styles.reservationLabel}>Padlock:</Text>
         <Text style={styles.reservationValue}>
           {item.includesPadlock ? 'Yes (+$10)' : 'Not included'}
         </Text>
       </View>
-      <View style={styles.reservationItem}>
+      <View style={styles.reservationRow}>
         <Text style={styles.reservationLabel}>Total:</Text>
         <Text style={styles.reservationValue}>
           {item.price === 0 ? 'FREE' : `$${item.price}`}
         </Text>
       </View>
+      <View style={styles.divider} />
       <TouchableOpacity 
         style={styles.cancelReservationButton}
         onPress={() => handleCancelReservation(item.id)}
@@ -250,21 +252,21 @@ export default function LockerRentalScreen({ navigation }) {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Reservation Summary</Text>
-            <View style={styles.summaryItem}>
+            <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Location:</Text>
               <Text style={styles.summaryValue}>{location}</Text>
             </View>
-            <View style={styles.summaryItem}>
+            <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Duration:</Text>
               <Text style={styles.summaryValue}>{duration}</Text>
             </View>
-            <View style={styles.summaryItem}>
+            <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Padlock:</Text>
               <Text style={styles.summaryValue}>
                 {includesPadlock ? 'Yes (+$10)' : 'Not included'}
               </Text>
             </View>
-            <View style={styles.summaryItem}>
+            <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Total:</Text>
               <Text style={styles.summaryValue}>
                 {getPrice() === 0 ? 'FREE' : `$${getPrice()}`}
@@ -299,9 +301,8 @@ export default function LockerRentalScreen({ navigation }) {
         animationType="fade"
       >
         <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Ionicons name="checkmark-circle" size={60} color="#4CAF50" style={styles.successIcon} />
-            <Text style={styles.modalTitle}>Locker Reserved Successfully!</Text>
+          <View style={styles.confirmationContent}>
+            <Text style={styles.confirmationTitle}>Your booking has been confirmed!</Text>
             <Text style={styles.confirmationText}>
               Your {duration.toLowerCase()} locker at {location} is confirmed.
             </Text>
@@ -340,10 +341,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
+    color: '#333',
   },
   content: {
     flex: 1,
@@ -353,6 +357,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 16,
+    color: '#333',
   },
   existingReservationContainer: {
     marginBottom: 24,
@@ -361,36 +366,49 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   reservationCard: {
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#fff',
     borderRadius: 8,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: '#e0e0e0',
     marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
-  reservationItem: {
+  reservationRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   reservationLabel: {
     fontSize: 16,
     color: '#666',
+    fontWeight: '500',
   },
   reservationValue: {
     fontSize: 16,
     fontWeight: '500',
+    color: '#333',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#e0e0e0',
+    marginVertical: 12,
   },
   cancelReservationButton: {
-    marginTop: 16,
+    marginTop: 8,
     padding: 12,
-    backgroundColor: '#f44336',
+    backgroundColor: '#800000',
     borderRadius: 8,
     alignItems: 'center',
   },
   cancelReservationButtonText: {
     color: 'white',
     fontWeight: 'bold',
+    fontSize: 16,
   },
   formGroup: {
     marginBottom: 24,
@@ -399,15 +417,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 12,
+    color: '#333',
   },
   optionsContainer: {
     flexDirection: 'column',
   },
   optionButton: {
-    padding: 12,
+    padding: 16,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#e0e0e0',
     marginBottom: 8,
   },
   selectedOption: {
@@ -415,11 +434,12 @@ const styles = StyleSheet.create({
     borderColor: '#800000',
   },
   reservedOption: {
-    backgroundColor: '#f5f5f5',
-    borderColor: '#ddd',
+    backgroundColor: '#f9f9f9',
+    borderColor: '#e0e0e0',
   },
   optionText: {
     fontSize: 16,
+    color: '#333',
   },
   selectedOptionText: {
     color: 'white',
@@ -427,24 +447,25 @@ const styles = StyleSheet.create({
   },
   reservedOptionText: {
     color: '#999',
-    textDecorationLine: 'line-through',
   },
   errorText: {
     color: '#f44336',
     marginTop: 8,
+    fontSize: 14,
   },
   switchContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 12,
+    padding: 16,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#e0e0e0',
   },
   switchLabel: {
     fontSize: 16,
     fontWeight: '500',
+    color: '#333',
   },
   switchSubLabel: {
     fontSize: 14,
@@ -463,6 +484,7 @@ const styles = StyleSheet.create({
   priceLabel: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#333',
   },
   price: {
     fontSize: 24,
@@ -493,23 +515,38 @@ const styles = StyleSheet.create({
     padding: 24,
     width: '80%',
   },
+  confirmationContent: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 24,
+    width: '80%',
+    alignItems: 'center',
+  },
   successIcon: {
-    alignSelf: 'center',
     marginBottom: 16,
+  },
+  confirmationTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 16,
+    color: '#333',
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 16,
+    marginBottom: 24,
+    color: '#333',
   },
   confirmationText: {
     fontSize: 16,
     textAlign: 'center',
     marginBottom: 12,
     color: '#666',
+    lineHeight: 24,
   },
-  summaryItem: {
+  summaryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 12,
@@ -521,6 +558,7 @@ const styles = StyleSheet.create({
   summaryValue: {
     fontSize: 16,
     fontWeight: '500',
+    color: '#333',
   },
   modalButtons: {
     flexDirection: 'row',
@@ -553,7 +591,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     borderRadius: 8,
     backgroundColor: '#800000',
-    alignSelf: 'center',
     marginTop: 16,
   },
   closeButtonText: {

@@ -104,14 +104,14 @@ export default function NotificationsScreen({ navigation }) {
           You have no notifications yet.
         </Text>
       ) : (
-        <View >
+        <View style={{ flex: 1 }}>
           <Text style={styles.deleteMsg}>Swipe right to delete notification.</Text>
           <FlatList
             data={notifications}
             keyExtractor={(item) => item.id}
             renderItem={renderItem}
             contentContainerStyle={styles.list}
-          /> 
+          />
         </View>
 
 
@@ -187,11 +187,11 @@ const styles = StyleSheet.create({
   deleteButton: {
     backgroundColor: 'whitesmoke',
     width: 60,
-    height: '100%',
+    // height: '90%',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
-    marginLeft: 10,
+    margin: 10,
   },
   deleteMsg: {
     textAlign: 'center',

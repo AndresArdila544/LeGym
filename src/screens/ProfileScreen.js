@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   Image,
   Alert,
+  Linking
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -152,7 +153,7 @@ export default function ProfileScreen({ navigation }) {
             <Ionicons name="chevron-forward" size={20} color="#999" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => Linking.openURL('https://www.concordia.ca/campus-life/recreation/facilities/le-gym.html')}>
             <Ionicons name="help-circle-outline" size={24} color="#912338" />
             <Text style={styles.menuItemText}>Help & Support</Text>
             <Ionicons name="chevron-forward" size={20} color="#999" />

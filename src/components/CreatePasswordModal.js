@@ -10,7 +10,8 @@ import {
     Keyboard,
     Platform,
     KeyboardAvoidingView,
-    ScrollView
+    ScrollView,
+    Linking
 } from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
 import Checkbox from 'expo-checkbox';
@@ -156,7 +157,7 @@ export default function CreatePasswordModal({onClose, onContinue}) {
                                 <Checkbox value={agree} onValueChange={setAgree}/>
                                 <Text style={styles.terms}>
                                     I agree to the
-                                    <Text style={styles.link}>Terms & Conditions</Text>.
+                                    <Text style={styles.link} onPress={() => Linking.openURL('https://www.concordia.ca/campus-life/recreation/membership/rules.html')}>Terms & Conditions</Text>.
                                 </Text>
                             </View>
 

@@ -35,25 +35,8 @@ export default function LockerRentalScreen({ navigation }) {
   ];
   
   const getPrice = () => {
-    let basePrice = 0;
-    switch (duration) {
-      case 'Day Pass':
-        basePrice = 5;
-        break;
-      case 'Week Pass':
-        basePrice = 15;
-        break;
-      case 'Month Pass':
-        basePrice = 40;
-        break;
-      case 'Semester Pass':
-        basePrice = 100;
-        break;
-      default:
-        basePrice = 5;
-    }
-    
-    return includesPadlock ? basePrice + 10 : basePrice;
+    // Lockers are free, only charge for padlock
+    return includesPadlock ? 10 : 0;
   };
   
   const handleRentLocker = async () => {
@@ -84,7 +67,7 @@ export default function LockerRentalScreen({ navigation }) {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Locker rental</Text>
+        <Text style={styles.headerTitle}>Locker Rental</Text>
         <View style={{ width: 24 }} />
       </View>
       
@@ -152,14 +135,16 @@ export default function LockerRentalScreen({ navigation }) {
         
         <View style={styles.priceContainer}>
           <Text style={styles.priceLabel}>Total</Text>
-          <Text style={styles.price}>${getPrice()}</Text>
+          <Text style={styles.price}>
+            {getPrice() === 0 ? 'FREE' : `$${getPrice()}`}
+          </Text>
         </View>
         
         <TouchableOpacity 
           style={styles.rentButton}
           onPress={() => setSummaryVisible(true)}
         >
-          <Text style={styles.rentButtonText}>Rent Locker</Text>
+          <Text style={styles.rentButtonText}>Reserve Locker</Text>
         </TouchableOpacity>
       </ScrollView>
       
@@ -171,7 +156,7 @@ export default function LockerRentalScreen({ navigation }) {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Summary</Text>
+            <Text style={styles.modalTitle}>Reservation Summary</Text>
             <View style={styles.summaryItem}>
               <Text style={styles.summaryLabel}>Location:</Text>
               <Text style={styles.summaryValue}>{location}</Text>
@@ -181,12 +166,16 @@ export default function LockerRentalScreen({ navigation }) {
               <Text style={styles.summaryValue}>{duration}</Text>
             </View>
             <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>Includes Padlock:</Text>
-              <Text style={styles.summaryValue}>{includesPadlock ? 'Yes' : 'No'}</Text>
+              <Text style={styles.summaryLabel}>Padlock:</Text>
+              <Text style={styles.summaryValue}>
+                {includesPadlock ? 'Yes (+$10)' : 'Not included'}
+              </Text>
             </View>
             <View style={styles.summaryItem}>
               <Text style={styles.summaryLabel}>Total:</Text>
-              <Text style={styles.summaryValue}>${getPrice()}</Text>
+              <Text style={styles.summaryValue}>
+                {getPrice() === 0 ? 'FREE' : `$${getPrice()}`}
+              </Text>
             </View>
             
             <View style={styles.modalButtons}>
@@ -218,7 +207,15 @@ export default function LockerRentalScreen({ navigation }) {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Your Locker has been confirmed!</Text>
+            <Text style={styles.modalTitle}>Locker Reserved Successfully!</Text>
+            <Text style={styles.confirmationText}>
+              Your {duration.toLowerCase()} locker at {location} is confirmed.
+            </Text>
+            {includesPadlock && (
+              <Text style={styles.confirmationText}>
+                Please pick up your padlock at the front desk.
+              </Text>
+            )}
             <TouchableOpacity 
               style={styles.closeButton}
               onPress={() => {
@@ -350,6 +347,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 24,
+  },
+  confirmationText: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 12,
+    color: '#666',
   },
   summaryItem: {
     flexDirection: 'row',

@@ -88,7 +88,7 @@ const classData = [
       image: require('../../assets/images/classes/personal.png'),
       instructor: 'Coach Nathan',
       time: 'By Appointment',
-      days: 'Sunday',
+      days: 'Monday',
       location: 'SGW – Le Gym – Weight Room',
       rating: '5.0',
       reviews: '89',
@@ -96,6 +96,62 @@ const classData = [
       description:
         'A one-on-one training session tailored to your personal fitness goals. Whether it’s building muscle, losing weight, or improving your performance, our certified trainers will guide and support you throughout your journey.',
     },
+    {
+      id: '7',
+      title: 'Cycling Blast',
+      image: require('../../assets/images/classes/cycling.jpg'),
+      instructor: 'Coach Liam',
+      time: '7:30 – 8:30 PM',
+      days: 'Wednesday',
+      location: 'SGW – Le Gym – Studio B',
+      rating: '4.8',
+      reviews: '87',
+      duration: '45m',
+      description:
+        'A high-energy indoor cycling class designed to build endurance and burn calories through intense intervals and motivating music. Perfect for all fitness levels looking for a cardio challenge.',
+    },
+    {
+      id: '8',
+      title: 'Kickboxing',
+      image: require('../../assets/images/classes/savatekickboxing.jpg'),
+      instructor: 'Coach Marc',
+      time: '5:00 – 6:00 PM',
+      days: 'Thursday',
+      location: 'SGW – Le Gym – Studio C',
+      rating: '4.6',
+      reviews: '73',
+      duration: '60m',
+      description:
+        'A dynamic French martial arts class combining precision kicks and fluid boxing techniques. Focuses on agility, coordination, and self-defense. Suitable for all levels, from curious beginners to seasoned fighters.',
+    },
+    {
+      id: '9',
+      title: 'Pilates',
+      image: require('../../assets/images/classes/pilates.jpg'),
+      instructor: 'Coach Elena',
+      time: '12:00 – 1:00 PM',
+      days: 'Saturday',
+      location: 'SGW – Le Gym – Studio A',
+      rating: '4.8',
+      reviews: '94',
+      duration: '60m',
+      description:
+        'A core-focused Pilates class that enhances flexibility, balance, and posture through controlled movements and mindful breathing. Great for building strength without impact. All levels welcome.',
+    },
+    {
+      id: '10',
+      title: 'Basketball',
+      image: require('../../assets/images/classes/basketball.webp'),
+      instructor: 'Coach Jordan',
+      time: '6:30 – 8:00 PM',
+      days: 'Friday',
+      location: 'SGW – Le Gym – Main Court',
+      rating: '4.9',
+      reviews: '120',
+      duration: '90m',
+      description:
+        'Sharpen your dribbling, shooting, and defensive skills in this energetic basketball class. Includes skill drills followed by team scrimmages. Open to players of all levels.',
+    }
   ];
   
 

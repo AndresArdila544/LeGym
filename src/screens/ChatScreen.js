@@ -86,6 +86,42 @@ export default function ChatScreen({navigation}) {
         };
     }, []);
 
+    const getBotReply = (text) => {
+        const lower = text.toLowerCase();
+      
+        if (lower.includes('hours') || lower.includes('open')) {
+          return 'Le Gym is open from 6am–10pm on weekdays, and 8am–8pm on weekends.';
+        }
+      
+        if (lower.includes('locker')) {
+          return 'You can rent lockers daily, weekly, or by semester. Just visit the front desk or the Locker section.';
+        }
+      
+        if (lower.includes('class') && lower.includes('book')) {
+          return 'To book a class, head to the Classes tab. Tap on a class and select "Book".';
+        }
+      
+        if (lower.includes('classes') || lower.includes('schedule')) {
+          return 'We offer yoga, spin, pilates, strength, and more! Check the schedule in the Classes section.';
+        }
+      
+        if (lower.includes('crowded') || lower.includes('busy') || lower.includes('occupancy')) {
+          return 'According to the live occupancy meter, it’s a good time to visit! 💪';
+        }
+      
+        if (lower.includes('track') || lower.includes('workout')) {
+          return 'You can track your workouts and see progress in the Fitness tab!';
+        }
+      
+        if (lower.includes('help') || lower.includes('hi') || lower.includes('hello')) {
+          return "Hey there! 👋 I can help with booking classes, gym hours, locker info, or your workouts.";
+        }
+      
+        return "I'm not sure I understand 😅 Try asking me about gym hours, classes, lockers, or workouts!";
+      };
+      
+
+
     const handleSend = async() => {
         if (inputText.trim() === '') 
             return;
@@ -106,31 +142,18 @@ export default function ChatScreen({navigation}) {
         setInputText('');
 
         setTimeout(() => {
-            const botResponses = [
-                "I can help you with class schedules, locker rentals, or workout tracking.",
-                "You can book a class through the Classes section.",
-                "Gym hours: 6am-10pm weekdays, 8am-8pm weekends.",
-                "You can rent a locker for a day, week, or semester.",
-                "It's not crowded right now – perfect time to visit!",
-                "Is there anything else I can help you with?"
-            ];
-
-            const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
-
+            const botText = getBotReply(userMessage.text);
+          
             const botMessage = {
-                id: Date
-                    .now()
-                    .toString(),
-                text: randomResponse,
-                sender: 'bot',
-                timestamp: new Date().toISOString()
+              id: Date.now().toString(),
+              text: botText,
+              sender: 'bot',
+              timestamp: new Date().toISOString(),
             };
-
-            setMessages(prevMessages => [
-                ...prevMessages,
-                botMessage
-            ]);
-        }, 1000);
+          
+            setMessages(prevMessages => [...prevMessages, botMessage]);
+          }, 1000);
+          
     };
 
     const formatTime = (timestamp) => {

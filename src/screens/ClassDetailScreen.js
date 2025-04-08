@@ -13,6 +13,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BottomNavigationBar from '../components/BottomNavigationBar';
+import uuid from 'react-native-uuid';
 
 export default function ClassDetailScreen({ route, navigation }) {
     const { classInfo, openCancelModal = false } = route.params
@@ -111,9 +112,23 @@ export default function ClassDetailScreen({ route, navigation }) {
       
         const updatedBookings = [...bookings, newBooking];
         await AsyncStorage.setItem(key, JSON.stringify(updatedBookings));
-      
+
+
+
         setIsBooked(true);
         setConfirmationVisible(true);
+
+        const notification = {
+            id: uuid.v4(),
+            title: 'Booking Confirmed',
+            body: `Your ${classInfo.title} class for ${classInfo.days} is confirmed!`,
+            timestamp: new Date().toISOString(),
+            type: 'bookClass'
+        }
+        const notifications = JSON.parse(await AsyncStorage.getItem('notifications')) || [];
+        notifications.push(notification);
+        await AsyncStorage.setItem('notifications', JSON.stringify(notifications));
+
       };
       
       
@@ -130,6 +145,18 @@ export default function ClassDetailScreen({ route, navigation }) {
       
         setIsBooked(false);
         setCancelConfirmVisible(false);
+
+        const notification = {
+            id: uuid.v4(),
+            title: 'Booking Cancelled',
+            body: `You cancelled your ${classInfo.title} class happening on ${classInfo.days}.`,
+            timestamp: new Date().toISOString(),
+            type: 'cancelClass'
+        }
+        const notifications = JSON.parse(await AsyncStorage.getItem('notifications')) || [];
+        notifications.push(notification);
+        await AsyncStorage.setItem('notifications', JSON.stringify(notifications));
+
         navigation.goBack();
       };
       

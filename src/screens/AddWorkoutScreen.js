@@ -13,6 +13,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import uuid from 'react-native-uuid';
 
 export default function AddWorkoutScreen({ navigation, route }) {
   const workoutToEdit = route.params?.workoutToEdit;
@@ -35,7 +36,7 @@ export default function AddWorkoutScreen({ navigation, route }) {
         console.error('Failed to load active user:', err);
       }
     };
-  
+
     loadActiveUser();
   }, []);
 
@@ -56,37 +57,48 @@ export default function AddWorkoutScreen({ navigation, route }) {
     }
 
     try {
-    const key = `workouts_${user.email}`;
-    const existingWorkoutsJson = await AsyncStorage.getItem(key);
-    const existingWorkouts = existingWorkoutsJson ? JSON.parse(existingWorkoutsJson) : [];
+      const key = `workouts_${user.email}`;
+      const existingWorkoutsJson = await AsyncStorage.getItem(key);
+      const existingWorkouts = existingWorkoutsJson ? JSON.parse(existingWorkoutsJson) : [];
 
-    const updatedWorkout = {
-      id: workoutToEdit?.id || Date.now().toString(),
-      activity,
-      duration: parseInt(duration),
-      calories: parseInt(calories) || 0,
-      notes,
-      date: date.toISOString(),
-    };
+      const updatedWorkout = {
+        id: workoutToEdit?.id || Date.now().toString(),
+        activity,
+        duration: parseInt(duration),
+        calories: parseInt(calories) || 0,
+        notes,
+        date: date.toISOString(),
+      };
 
-    let updatedWorkouts;
-    if (workoutToEdit) {
-      updatedWorkouts = existingWorkouts.map(w =>
-        w.id === workoutToEdit.id ? updatedWorkout : w
-      );
-    } else {
-      updatedWorkouts = [updatedWorkout, ...existingWorkouts];
+      let updatedWorkouts;
+      if (workoutToEdit) {
+        updatedWorkouts = existingWorkouts.map(w =>
+          w.id === workoutToEdit.id ? updatedWorkout : w
+        );
+      } else {
+        updatedWorkouts = [updatedWorkout, ...existingWorkouts];
+      }
+
+      await AsyncStorage.setItem(key, JSON.stringify(updatedWorkouts));
+
+      const notification = {
+        id: uuid.v4(),
+        title: 'Workout Added',
+        body: `Great job! You logged a new workout activity: ${activity}.`,
+        timestamp: new Date().toISOString(),
+        type: 'addWorkout'
+      }
+      const notifications = JSON.parse(await AsyncStorage.getItem('notifications')) || [];
+      notifications.push(notification);
+      await AsyncStorage.setItem('notifications', JSON.stringify(notifications));
+
+      Alert.alert('Success', `Workout ${workoutToEdit ? 'updated' : 'added'} successfully`, [
+        { text: 'OK', onPress: () => navigation.goBack() },
+      ]);
+    } catch (error) {
+      console.error('Error saving workout:', error);
+      Alert.alert('Error', 'Failed to save workout');
     }
-
-    await AsyncStorage.setItem(key, JSON.stringify(updatedWorkouts));
-
-    Alert.alert('Success', `Workout ${workoutToEdit ? 'updated' : 'added'} successfully`, [
-      { text: 'OK', onPress: () => navigation.goBack() },
-    ]);
-  } catch (error) {
-    console.error('Error saving workout:', error);
-    Alert.alert('Error', 'Failed to save workout');
-  }
   };
 
   const handleDelete = () => {
@@ -100,7 +112,7 @@ export default function AddWorkoutScreen({ navigation, route }) {
             const key = `workouts_${user.email}`;
             const existingWorkoutsJson = await AsyncStorage.getItem(key);
             const existingWorkouts = existingWorkoutsJson ? JSON.parse(existingWorkoutsJson) : [];
-  
+
             const updatedWorkouts = existingWorkouts.filter(w => w.id !== workoutToEdit.id);
             await AsyncStorage.setItem(key, JSON.stringify(updatedWorkouts));
             navigation.goBack();
@@ -112,7 +124,7 @@ export default function AddWorkoutScreen({ navigation, route }) {
       },
     ]);
   };
-  
+
 
   const onDateChange = (event, selectedDate) => {
     setShowDatePicker(false);
@@ -226,7 +238,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color:"#912338"
+    color: "#912338"
   },
   content: {
     flex: 1,
@@ -262,11 +274,11 @@ const styles = StyleSheet.create({
   },
   saveButton: {
 
-      backgroundColor: '#912338',
-      paddingVertical: 14,
-      borderRadius: 30,
-      alignItems: 'center',
-      marginVertical: 20
+    backgroundColor: '#912338',
+    paddingVertical: 14,
+    borderRadius: 30,
+    alignItems: 'center',
+    marginVertical: 20
 
   },
   saveButtonText: {

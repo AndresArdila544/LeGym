@@ -26,7 +26,7 @@ export default function HomeScreen({ navigation }) {
   const [user, setUser] = useState(null);
   const [workouts, setWorkouts] = useState([]);
   const [streakDays, setStreakDays] = useState(0);
-
+  const [isNotificationListEmpty, setIsNotificationListEmpty] = useState(true);
 
 
   const calculateStreak = (workouts) => {
@@ -79,6 +79,12 @@ export default function HomeScreen({ navigation }) {
           const parsedBookings = storedBookings ? JSON.parse(storedBookings) : [];
           setBookedClasses(parsedBookings);
         }
+
+        const notifications = await AsyncStorage.getItem("notifications");
+        if (notifications) {
+          const parsedNotifications = JSON.parse(notifications);
+          setIsNotificationListEmpty(parsedNotifications.length === 0);
+        }
   
       } catch (e) {
         console.error('Failed to load home screen data', e);
@@ -118,7 +124,13 @@ export default function HomeScreen({ navigation }) {
           <View style={styles.headerIcons}>
 
           <TouchableOpacity onPress={() => navigation.navigate('NotificationsScreen')}>
-            <Ionicons name="notifications-outline" size={24} color="#333" />
+            {
+              isNotificationListEmpty === true ? (
+                <Ionicons name="notifications-outline" size={24} color="#333" />
+              ) : (
+                <Ionicons name="notifications" size={24} color="#333" />
+              )
+            }
           </TouchableOpacity>
 
             <TouchableOpacity

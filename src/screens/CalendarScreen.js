@@ -112,11 +112,7 @@ export default function CalendarScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#912338" />
-        </TouchableOpacity>
         <Text style={styles.headerTitle}>My Calendar</Text>
-        <View style={{ width: 24 }} />
       </View>
 
       <ScrollView

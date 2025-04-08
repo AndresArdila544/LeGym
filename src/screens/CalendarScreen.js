@@ -25,7 +25,7 @@ export default function CalendarScreen({ navigation }) {
   const onRefresh = async () => {
     setRefreshing(true);
     if (!activeUser) return;
-  
+
     try {
       const key = `classBookings_${activeUser.email}`;
       const storedEvents = await AsyncStorage.getItem(key);
@@ -38,7 +38,7 @@ export default function CalendarScreen({ navigation }) {
       setRefreshing(false);
     }
   };
-  
+
 
   const eventsData = [
     {
@@ -81,7 +81,7 @@ export default function CalendarScreen({ navigation }) {
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
           setActiveUser(parsedUser);
-  
+
           const key = `classBookings_${parsedUser.email}`;
           const storedEvents = await AsyncStorage.getItem(key);
           if (storedEvents) {
@@ -92,10 +92,10 @@ export default function CalendarScreen({ navigation }) {
         console.error("Failed to load user events:", error);
       }
     };
-  
+
     loadUserAndEvents();
   }, []);
-  
+
 
   // Filter events for selected date
   const todayEvents = events.filter((event) => {
@@ -114,6 +114,15 @@ export default function CalendarScreen({ navigation }) {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>My Calendar</Text>
       </View>
+
+      <Text style={{
+        textAlign: 'center',
+        marginTop: 10,
+        fontSize: 14,
+        color: '#667085'
+      }}>
+        Swipe down to refresh.
+      </Text>
 
       <ScrollView
         style={styles.eventsContainer}
@@ -230,7 +239,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   headerTitle: {
-    color:"#912338",
+    color: "#912338",
     fontSize: 20,
     fontWeight: "bold",
   },

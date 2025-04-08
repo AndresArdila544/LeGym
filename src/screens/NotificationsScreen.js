@@ -118,7 +118,7 @@ export default function NotificationsScreen({ navigation }) {
 
       {notifications.length === 0 || !notifications ? (
         <Text style={{ textAlign: 'center', marginTop: 20, fontSize: 16 }}>
-          No notifications available.
+          You have no notifications yet.
         </Text>
       ) : (
         <View >

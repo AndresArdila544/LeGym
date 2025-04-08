@@ -75,6 +75,26 @@ export default function ClassDetailScreen({ route, navigation }) {
       }, []);
     const getBookingKey = () => `classBookings_${activeUser?.email}`;
 
+    const addNotification = async (title, body) => {
+          try {
+            const notificationsJson = await AsyncStorage.getItem('notifications');
+            const notifications = notificationsJson ? JSON.parse(notificationsJson) : [];
+            
+            const newNotification = {
+              id: Date.now().toString(),
+              title,
+              body,
+              timestamp: new Date().toISOString(),
+            };
+
+            const updatedNotifications = [newNotification, ...notifications];
+            
+            await AsyncStorage.setItem('notifications', JSON.stringify(updatedNotifications));
+          } catch (error) {
+            console.error('Error adding notification:', error);
+          }
+        };
+
     const handleBookClass = async () => {
         if (!activeUser) return;
       
@@ -112,6 +132,11 @@ export default function ClassDetailScreen({ route, navigation }) {
         const updatedBookings = [...bookings, newBooking];
         await AsyncStorage.setItem(key, JSON.stringify(updatedBookings));
       
+        await addNotification(
+            'Booking Confirmed', 
+            `Your ${classInfo.title} class on ${weekday} at ${classInfo.time} has been confirmed!`
+        );
+
         setIsBooked(true);
         setConfirmationVisible(true);
       };
@@ -128,6 +153,11 @@ export default function ClassDetailScreen({ route, navigation }) {
         const updatedBookings = bookings.filter(booking => booking.id !== classInfo.id);
         await AsyncStorage.setItem(key, JSON.stringify(updatedBookings));
       
+        await addNotification(
+            'Class Cancelled', 
+            `Your booking for ${classInfo.title} class has been cancelled.`
+        );
+
         setIsBooked(false);
         setCancelConfirmVisible(false);
         navigation.goBack();

@@ -5,23 +5,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from 'moment';
 import { Swipeable } from 'react-native-gesture-handler';
 
-const mockNotifications = [
-  {
-    id: '1',
-    title: 'Booking Confirmed',
-    body: 'Your Hardcore class for Monday is confirmed!',
-    timestamp: '2025-04-07T10:30:00Z',
-    type: 'bookClass'
-  },
-  {
-    id: '2',
-    title: 'Class Cancelled',
-    body: 'Zumba Fitness on Wednesday has been cancelled.',
-    timestamp: '2025-04-06T15:00:00Z',
-    type: 'cancelClass'
-  },
-];
-
 export default function NotificationsScreen({ navigation }) {
   const [notifications, setNotifications] = useState([]);
 

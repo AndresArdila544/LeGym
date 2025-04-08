@@ -228,7 +228,12 @@ const styles = StyleSheet.create({
     overlay: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.6)',
-        justifyContent: 'flex-end'
+        justifyContent: 'flex-end',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
     },
     modalBox: {
         height: height * 0.85,
@@ -243,7 +248,8 @@ const styles = StyleSheet.create({
             height: -4
         },
         shadowRadius: 10,
-        elevation: 10
+        elevation: 10,
+        position: 'relative',
     },
     header: {
       backgroundColor: '#800000',

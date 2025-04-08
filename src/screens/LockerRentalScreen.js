@@ -1,5 +1,5 @@
 // src/screens/LockerRentalScreen.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,8 @@ import {
   SafeAreaView,
   Modal,
   Switch,
+  Alert,
+  FlatList
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -19,6 +21,8 @@ export default function LockerRentalScreen({ navigation }) {
   const [includesPadlock, setIncludesPadlock] = useState(false);
   const [confirmationVisible, setConfirmationVisible] = useState(false);
   const [summaryVisible, setSummaryVisible] = useState(false);
+  const [reservations, setReservations] = useState([]);
+  const [error, setError] = useState('');
   
   const locations = [
     'SGW – EV Building',
@@ -34,32 +38,38 @@ export default function LockerRentalScreen({ navigation }) {
     'Semester Pass'
   ];
   
-  const getPrice = () => {
-    let basePrice = 0;
-    switch (duration) {
-      case 'Day Pass':
-        basePrice = 5;
-        break;
-      case 'Week Pass':
-        basePrice = 15;
-        break;
-      case 'Month Pass':
-        basePrice = 40;
-        break;
-      case 'Semester Pass':
-        basePrice = 100;
-        break;
-      default:
-        basePrice = 5;
-    }
+  useEffect(() => {
+    const loadReservations = async () => {
+      try {
+        const storedReservations = await AsyncStorage.getItem('lockerReservations');
+        if (storedReservations) {
+          setReservations(JSON.parse(storedReservations));
+        }
+      } catch (error) {
+        console.error('Error loading reservations:', error);
+      }
+    };
     
-    return includesPadlock ? basePrice + 10 : basePrice;
+    loadReservations();
+  }, []);
+  
+  const getPrice = () => {
+    return includesPadlock ? 10 : 0;
+  };
+  
+  const isLockerAlreadyReserved = (loc) => {
+    return reservations.some(res => res.location === loc);
   };
   
   const handleRentLocker = async () => {
     try {
-      // Create locker rental object
-      const lockerRental = {
+      if (isLockerAlreadyReserved(location)) {
+        setError('This locker is already reserved. Please choose a different one.');
+        setSummaryVisible(false);
+        return;
+      }
+      
+      const newReservation = {
         id: Date.now().toString(),
         location,
         duration,
@@ -68,48 +78,113 @@ export default function LockerRentalScreen({ navigation }) {
         date: new Date().toISOString(),
       };
       
-      // Save to AsyncStorage
-      await AsyncStorage.setItem('currentLockerRental', JSON.stringify(lockerRental));
-      
-      // Show confirmation
+      const updatedReservations = [...reservations, newReservation];
+      await AsyncStorage.setItem('lockerReservations', JSON.stringify(updatedReservations));
+      setReservations(updatedReservations);
       setConfirmationVisible(true);
     } catch (error) {
       console.error('Error renting locker:', error);
+      Alert.alert('Error', 'Failed to reserve locker. Please try again.');
     }
   };
   
+  const handleCancelReservation = async (id) => {
+    try {
+      const updatedReservations = reservations.filter(res => res.id !== id);
+      await AsyncStorage.setItem('lockerReservations', JSON.stringify(updatedReservations));
+      setReservations(updatedReservations);
+    } catch (error) {
+      console.error('Error canceling reservation:', error);
+      Alert.alert('Error', 'Failed to cancel reservation. Please try again.');
+    }
+  };
+
+  const renderReservationItem = ({ item }) => (
+    <View style={styles.reservationCard}>
+      <View style={styles.reservationRow}>
+        <Text style={styles.reservationLabel}>Location:</Text>
+        <Text style={styles.reservationValue}>{item.location}</Text>
+      </View>
+      <View style={styles.reservationRow}>
+        <Text style={styles.reservationLabel}>Duration:</Text>
+        <Text style={styles.reservationValue}>{item.duration}</Text>
+      </View>
+      <View style={styles.reservationRow}>
+        <Text style={styles.reservationLabel}>Padlock:</Text>
+        <Text style={styles.reservationValue}>
+          {item.includesPadlock ? 'Yes (+$10)' : 'Not included'}
+        </Text>
+      </View>
+      <View style={styles.reservationRow}>
+        <Text style={styles.reservationLabel}>Total:</Text>
+        <Text style={styles.reservationValue}>
+          {item.price === 0 ? 'FREE' : `$${item.price}`}
+        </Text>
+      </View>
+      <View style={styles.divider} />
+      <TouchableOpacity 
+        style={styles.cancelReservationButton}
+        onPress={() => handleCancelReservation(item.id)}
+      >
+        <Text style={styles.cancelReservationButtonText}>Cancel Reservation</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Locker rental</Text>
+        <Text style={styles.headerTitle}>Locker Rental</Text>
         <View style={{ width: 24 }} />
       </View>
       
       <ScrollView style={styles.content}>
+        {reservations.length > 0 && (
+          <View style={styles.existingReservationContainer}>
+            <Text style={styles.sectionTitle}>Your Reservations</Text>
+            <FlatList
+              data={reservations}
+              renderItem={renderReservationItem}
+              keyExtractor={item => item.id}
+              scrollEnabled={false}
+              contentContainerStyle={styles.reservationsList}
+            />
+          </View>
+        )}
+        
         <View style={styles.formGroup}>
           <Text style={styles.label}>Location</Text>
           <View style={styles.optionsContainer}>
-            {locations.map((loc, index) => (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.optionButton,
-                  location === loc && styles.selectedOption
-                ]}
-                onPress={() => setLocation(loc)}
-              >
-                <Text style={[
-                  styles.optionText,
-                  location === loc && styles.selectedOptionText
-                ]}>
-                  {loc}
-                </Text>
-              </TouchableOpacity>
-            ))}
+            {locations.map((loc, index) => {
+              const isReserved = isLockerAlreadyReserved(loc);
+              return (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.optionButton,
+                    location === loc && styles.selectedOption,
+                    isReserved && styles.reservedOption
+                  ]}
+                  onPress={() => {
+                    if (!isReserved) setLocation(loc);
+                  }}
+                  disabled={isReserved}
+                >
+                  <Text style={[
+                    styles.optionText,
+                    location === loc && styles.selectedOptionText,
+                    isReserved && styles.reservedOptionText
+                  ]}>
+                    {loc} {isReserved && '(Reserved)'}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
         </View>
         
         <View style={styles.formGroup}>
@@ -152,14 +227,19 @@ export default function LockerRentalScreen({ navigation }) {
         
         <View style={styles.priceContainer}>
           <Text style={styles.priceLabel}>Total</Text>
-          <Text style={styles.price}>${getPrice()}</Text>
+          <Text style={styles.price}>
+            {getPrice() === 0 ? 'FREE' : `$${getPrice()}`}
+          </Text>
         </View>
         
         <TouchableOpacity 
           style={styles.rentButton}
-          onPress={() => setSummaryVisible(true)}
+          onPress={() => {
+            setError('');
+            setSummaryVisible(true);
+          }}
         >
-          <Text style={styles.rentButtonText}>Rent Locker</Text>
+          <Text style={styles.rentButtonText}>Reserve Locker</Text>
         </TouchableOpacity>
       </ScrollView>
       
@@ -171,22 +251,26 @@ export default function LockerRentalScreen({ navigation }) {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Summary</Text>
-            <View style={styles.summaryItem}>
+            <Text style={styles.modalTitle}>Reservation Summary</Text>
+            <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Location:</Text>
               <Text style={styles.summaryValue}>{location}</Text>
             </View>
-            <View style={styles.summaryItem}>
+            <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Duration:</Text>
               <Text style={styles.summaryValue}>{duration}</Text>
             </View>
-            <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>Includes Padlock:</Text>
-              <Text style={styles.summaryValue}>{includesPadlock ? 'Yes' : 'No'}</Text>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>Padlock:</Text>
+              <Text style={styles.summaryValue}>
+                {includesPadlock ? 'Yes (+$10)' : 'Not included'}
+              </Text>
             </View>
-            <View style={styles.summaryItem}>
+            <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Total:</Text>
-              <Text style={styles.summaryValue}>${getPrice()}</Text>
+              <Text style={styles.summaryValue}>
+                {getPrice() === 0 ? 'FREE' : `$${getPrice()}`}
+              </Text>
             </View>
             
             <View style={styles.modalButtons}>
@@ -217,13 +301,23 @@ export default function LockerRentalScreen({ navigation }) {
         animationType="fade"
       >
         <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Your Locker has been confirmed!</Text>
+          <View style={styles.confirmationContent}>
+            <Text style={styles.confirmationTitle}>Your booking has been confirmed!</Text>
+            <Text style={styles.confirmationText}>
+              Your {duration.toLowerCase()} locker at {location} is confirmed.
+            </Text>
+            {includesPadlock && (
+              <Text style={styles.confirmationText}>
+                Please pick up your padlock at the front desk.
+              </Text>
+            )}
             <TouchableOpacity 
               style={styles.closeButton}
               onPress={() => {
                 setConfirmationVisible(false);
-                navigation.goBack();
+                setLocation('SGW – EV Building');
+                setDuration('Day Pass');
+                setIncludesPadlock(false);
               }}
             >
               <Text style={styles.closeButtonText}>Close</Text>
@@ -247,14 +341,74 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
+    color: '#333',
   },
   content: {
     flex: 1,
     padding: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    color: '#333',
+  },
+  existingReservationContainer: {
+    marginBottom: 24,
+  },
+  reservationsList: {
+    paddingBottom: 16,
+  },
+  reservationCard: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  reservationRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  reservationLabel: {
+    fontSize: 16,
+    color: '#666',
+    fontWeight: '500',
+  },
+  reservationValue: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#333',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#e0e0e0',
+    marginVertical: 12,
+  },
+  cancelReservationButton: {
+    marginTop: 8,
+    padding: 12,
+    backgroundColor: '#800000',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  cancelReservationButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   formGroup: {
     marginBottom: 24,
@@ -263,40 +417,55 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 12,
+    color: '#333',
   },
   optionsContainer: {
     flexDirection: 'column',
   },
   optionButton: {
-    padding: 12,
+    padding: 16,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#e0e0e0',
     marginBottom: 8,
   },
   selectedOption: {
     backgroundColor: '#800000',
     borderColor: '#800000',
   },
+  reservedOption: {
+    backgroundColor: '#f9f9f9',
+    borderColor: '#e0e0e0',
+  },
   optionText: {
     fontSize: 16,
+    color: '#333',
   },
   selectedOptionText: {
     color: 'white',
     fontWeight: '500',
   },
+  reservedOptionText: {
+    color: '#999',
+  },
+  errorText: {
+    color: '#f44336',
+    marginTop: 8,
+    fontSize: 14,
+  },
   switchContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 12,
+    padding: 16,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#e0e0e0',
   },
   switchLabel: {
     fontSize: 16,
     fontWeight: '500',
+    color: '#333',
   },
   switchSubLabel: {
     fontSize: 14,
@@ -315,6 +484,7 @@ const styles = StyleSheet.create({
   priceLabel: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#333',
   },
   price: {
     fontSize: 24,
@@ -345,13 +515,38 @@ const styles = StyleSheet.create({
     padding: 24,
     width: '80%',
   },
+  confirmationContent: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 24,
+    width: '80%',
+    alignItems: 'center',
+  },
+  successIcon: {
+    marginBottom: 16,
+  },
+  confirmationTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 16,
+    color: '#333',
+  },
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 24,
+    color: '#333',
   },
-  summaryItem: {
+  confirmationText: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 12,
+    color: '#666',
+    lineHeight: 24,
+  },
+  summaryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 12,
@@ -363,6 +558,7 @@ const styles = StyleSheet.create({
   summaryValue: {
     fontSize: 16,
     fontWeight: '500',
+    color: '#333',
   },
   modalButtons: {
     flexDirection: 'row',
@@ -395,7 +591,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     borderRadius: 8,
     backgroundColor: '#800000',
-    alignSelf: 'center',
     marginTop: 16,
   },
   closeButtonText: {

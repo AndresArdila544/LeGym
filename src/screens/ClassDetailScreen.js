@@ -19,24 +19,6 @@ export default function ClassDetailScreen({ route, navigation }) {
     const { classInfo, openCancelModal = false } = route.params
     console.log(classInfo);
     
-    // || {
-    //     classInfo: {
-    //         id: '1',
-    //         title: 'Hardcore',
-    //         instructor: 'Coach Raymond',
-    //         time: '4:30 – 5:15 PM',
-    //         days: 'Monday and Wednesdays',
-    //         location: 'SGW – Le Gym – Gymnasium',
-    //         rating: '4.9',
-    //         reviews: '231',
-    //         description: 'A high intensity, cross-training session incorporating a blend of cardiovascular' +
-    //                 ', strength and core exercises for an intense total body workout. I strive to mak' +
-    //                 'e Hard Core as unique as possible, by coming up with creative and effective ways' +
-    //                 ' to challenge and strengthen my participants. Expect lots of variety to challeng' +
-    //                 'e all fitness levels, and be prepared to sweat!',
-    //         image: 'https://via.placeholder.com/400'
-    //     }
-    // };
 
     const [confirmationVisible,
         setConfirmationVisible] = useState(false);
@@ -76,25 +58,29 @@ export default function ClassDetailScreen({ route, navigation }) {
       }, []);
     const getBookingKey = () => `classBookings_${activeUser?.email}`;
 
-    const addNotification = async (title, body) => {
-          try {
-            const notificationsJson = await AsyncStorage.getItem('notifications');
-            const notifications = notificationsJson ? JSON.parse(notificationsJson) : [];
-            
-            const newNotification = {
-              id: Date.now().toString(),
-              title,
-              body,
-              timestamp: new Date().toISOString(),
-            };
-
-            const updatedNotifications = [newNotification, ...notifications];
-            
-            await AsyncStorage.setItem('notifications', JSON.stringify(updatedNotifications));
-          } catch (error) {
-            console.error('Error adding notification:', error);
-          }
-        };
+    const addNotification = async (title, body, type = 'general') => {
+        try {
+          if (!activeUser) return;
+      
+          const notifKey = `notifications_${activeUser.email.toLowerCase()}`;
+          const notificationsJson = await AsyncStorage.getItem(notifKey);
+          const notifications = notificationsJson ? JSON.parse(notificationsJson) : [];
+      
+          const newNotification = {
+            id: uuid.v4(),
+            title,
+            body,
+            type,
+            timestamp: new Date().toISOString(),
+          };
+      
+          const updatedNotifications = [newNotification, ...notifications];
+          await AsyncStorage.setItem(notifKey, JSON.stringify(updatedNotifications));
+        } catch (error) {
+          console.error('Error adding notification:', error);
+        }
+      };
+      
 
     const handleBookClass = async () => {
         if (!activeUser) return;
@@ -136,16 +122,12 @@ export default function ClassDetailScreen({ route, navigation }) {
         setIsBooked(true);
         setConfirmationVisible(true);
 
-        const notification = {
-            id: uuid.v4(),
-            title: 'Class Booking Confirmed',
-            body: `Your ${classInfo.title} class for ${classInfo.days} is confirmed!`,
-            timestamp: new Date().toISOString(),
-            type: 'bookClass'
-        }
-        const notifications = JSON.parse(await AsyncStorage.getItem('notifications')) || [];
-        notifications.push(notification);
-        await AsyncStorage.setItem('notifications', JSON.stringify(notifications));
+        await addNotification(
+            'Class Booking Confirmed',
+            `Your ${classInfo.title} class for ${classInfo.days} is confirmed!`,
+            'bookClass'
+          );
+          
 
       };
       
@@ -169,18 +151,11 @@ export default function ClassDetailScreen({ route, navigation }) {
         setIsBooked(false);
         setCancelConfirmVisible(false);
 
-        const notification = {
-            id: uuid.v4(),
-            title: 'Class Booking Cancelled',
-            body: `You cancelled your ${classInfo.title} class happening on ${classInfo.days}.`,
-            timestamp: new Date().toISOString(),
-            type: 'cancelClass'
-        }
-        const notifications = JSON.parse(await AsyncStorage.getItem('notifications')) || [];
-        notifications.push(notification);
-        await AsyncStorage.setItem('notifications', JSON.stringify(notifications));
-
-        navigation.goBack();
+        await addNotification(
+            'Class Booking Cancelled',
+            `You cancelled your ${classInfo.title} class happening on ${classInfo.days}.`,
+            'cancelClass'
+          );
       };
       
 

@@ -80,11 +80,17 @@ export default function HomeScreen({ navigation }) {
           setBookedClasses(parsedBookings);
         }
 
-        const notifications = await AsyncStorage.getItem("notifications");
-        if (notifications) {
-          const parsedNotifications = JSON.parse(notifications);
-          setIsNotificationListEmpty(parsedNotifications.length === 0);
+        if (parsedUser?.email) {
+          const notifKey = `notifications_${parsedUser.email.toLowerCase()}`;
+          const notifications = await AsyncStorage.getItem(notifKey);
+          if (notifications) {
+            const parsedNotifications = JSON.parse(notifications);
+            setIsNotificationListEmpty(parsedNotifications.length === 0);
+          } else {
+            setIsNotificationListEmpty(true);
+          }
         }
+        
   
       } catch (e) {
         console.error('Failed to load home screen data', e);

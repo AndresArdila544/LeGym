@@ -11,7 +11,13 @@ export default function NotificationsScreen({ navigation }) {
   useEffect(() => {
     const loadNotifications = async () => {
       try {
-        const storedNotifications = await AsyncStorage.getItem("notifications");
+        const storedUser = await AsyncStorage.getItem('activeUser');
+        if (!storedUser) return;
+  
+        const user = JSON.parse(storedUser);
+        const notifKey = `notifications_${user.email.toLowerCase()}`;
+  
+        const storedNotifications = await AsyncStorage.getItem(notifKey);
         if (storedNotifications) {
           setNotifications(JSON.parse(storedNotifications).reverse());
         }
@@ -19,9 +25,10 @@ export default function NotificationsScreen({ navigation }) {
         console.error("Failed to load notifications:", error);
       }
     };
-
+  
     loadNotifications();
   }, []);
+  
 
   const getIconName = (type) => {
     switch (type) {
@@ -50,21 +57,24 @@ export default function NotificationsScreen({ navigation }) {
 
   const handleDelete = async (id) => {
     try {
-      const notifications = await AsyncStorage.getItem("notifications");
-      console.log(notifications);
-
-      if (notifications) {
-        const parsedNotifications = JSON.parse(notifications);
-        const updatedNotifications = parsedNotifications.filter((item) => item.id !== id);
-        setNotifications(updatedNotifications);
-        await AsyncStorage.setItem("notifications", JSON.stringify(updatedNotifications));
+      const storedUser = await AsyncStorage.getItem('activeUser');
+      if (!storedUser) return;
+  
+      const user = JSON.parse(storedUser);
+      const notifKey = `notifications_${user.email.toLowerCase()}`;
+  
+      const stored = await AsyncStorage.getItem(notifKey);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        const updated = parsed.filter((item) => item.id !== id);
+        setNotifications(updated);
+        await AsyncStorage.setItem(notifKey, JSON.stringify(updated));
       }
-
     } catch (error) {
       console.error("Failed to delete notification:", error);
     }
-
-  }
+  };
+  
 
   const renderItem = ({ item }) => (
     <Swipeable

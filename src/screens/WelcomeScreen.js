@@ -335,6 +335,7 @@ export default function WelcomeScreen({navigation}) {
           console.error('❌ Failed to log users:', error);
         }
       };
+      
     useEffect(() => {
         logAllUsers();
         injectDefaultUser();

@@ -5,11 +5,15 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useIsFocused } from '@react-navigation/native';
+
 
 export default function PaymentMethodScreen({ navigation }) {
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [defaultMethod, setDefaultMethod] = useState(null);
   const [activeUser, setActiveUser] = useState(null);
+  const isFocused = useIsFocused();
+
 
   useEffect(() => {
     const loadUser = async () => {
@@ -39,9 +43,10 @@ export default function PaymentMethodScreen({ navigation }) {
         console.error('Failed to load payment methods:', error);
       }
     };
-
-    loadPaymentMethods();
-  }, [activeUser]);
+    if (isFocused && activeUser) {
+      loadPaymentMethods();
+    }
+  }, [isFocused, activeUser]);
 
   const getStorageKey = () => `paymentMethods_${activeUser?.email}`;
 

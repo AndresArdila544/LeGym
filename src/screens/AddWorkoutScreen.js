@@ -12,7 +12,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import CustomInlineDatePicker from '../components/InlineDatePicker'; 
+import { KeyboardAvoidingView, Platform, Keyboard, TouchableWithoutFeedback } from 'react-native';
+
 import uuid from 'react-native-uuid';
 
 export default function AddWorkoutScreen({ navigation, route }) {
@@ -135,6 +137,11 @@ export default function AddWorkoutScreen({ navigation, route }) {
 
   return (
     <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    style={{ flex: 1 }}
+    keyboardVerticalOffset={0} // adjust if needed for your header height
+  >
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="#912338" />
@@ -180,19 +187,10 @@ export default function AddWorkoutScreen({ navigation, route }) {
 
         <View style={styles.formGroup}>
           <Text style={styles.label}>Date</Text>
-          <TouchableOpacity style={styles.dateSelector} onPress={() => setShowDatePicker(true)}>
-            <Text>{date.toLocaleDateString()}</Text>
-            <Ionicons name="calendar" size={20} color="#912338" />
-          </TouchableOpacity>
-          {showDatePicker && (
-            <DateTimePicker
-              value={date}
-              mode="date"
-              display="default"
-              onChange={onDateChange}
-              maximumDate={new Date()}
-            />
-          )}
+          <CustomInlineDatePicker
+            value={date.toISOString().split('T')[0]}
+            onDateChange={(formatted) => setDate(new Date(formatted))}
+          />
         </View>
 
         <View style={styles.formGroup}>
@@ -218,6 +216,7 @@ export default function AddWorkoutScreen({ navigation, route }) {
           </TouchableOpacity>
         )}
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

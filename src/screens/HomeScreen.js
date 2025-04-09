@@ -30,23 +30,24 @@ export default function HomeScreen({ navigation }) {
 
 
   const calculateStreak = (workouts) => {
+    const toISODate = (date) => {
+      const d = new Date(date);
+      return d.toISOString().split('T')[0]; // yyyy-mm-dd
+    };
+  
     const uniqueWorkoutDays = new Set(
-      workouts.map(w => {
-        const d = new Date(w.date);
-        d.setHours(0, 0, 0, 0); // normalize time
-        return d.getTime();
-      })
+      workouts.map(w => toISODate(w.date))
     );
   
     let streak = 0;
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // normalize today
   
     for (let i = 0; ; i++) {
       const checkDate = new Date(today);
       checkDate.setDate(today.getDate() - i);
+      const key = toISODate(checkDate);
   
-      if (uniqueWorkoutDays.has(checkDate.getTime())) {
+      if (uniqueWorkoutDays.has(key)) {
         streak++;
       } else {
         break;
@@ -55,6 +56,7 @@ export default function HomeScreen({ navigation }) {
   
     return streak;
   };
+  
   
 
   useEffect(() => {

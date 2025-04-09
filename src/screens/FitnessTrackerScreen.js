@@ -43,7 +43,7 @@ const isFocused = useIsFocused();
           const parsedWorkouts = storedWorkouts ? JSON.parse(storedWorkouts) : [];
           setWorkouts(parsedWorkouts);
 
-          console.log(`📥 Loaded ${workouts.length} workouts for ${parsedUser?.email}`);
+          console.log(`📥 Loaded ${parsedWorkouts.length} workouts for ${parsedUser?.email}`);
 
           // Calculate calories and time
           let calories = 0;
@@ -57,26 +57,27 @@ const isFocused = useIsFocused();
           setTotalTime(minutes);
   
           // Calculate streak
-          const uniqueWorkoutDays = new Set(parsedWorkouts.map(w => {
-            const d = new Date(w.date);
-            d.setHours(0, 0, 0, 0);
-            return d.getTime();
-          }));
+          const toISODate = (d) => {
+            const date = new Date(d);
+            return date.toISOString().split('T')[0]; // "2025-04-08"
+          };
+          
+          const uniqueWorkoutDays = new Set(parsedWorkouts.map(w => toISODate(w.date)));
   
           let streak = 0;
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-  
-          for (let i = 0; ; i++) {
-            const checkDate = new Date(today);
-            checkDate.setDate(today.getDate() - i);
-  
-            if (uniqueWorkoutDays.has(checkDate.getTime())) {
-              streak++;
-            } else {
-              break;
-            }
-          }
+        const today = new Date();
+
+        for (let i = 0; ; i++) {
+        const checkDate = new Date(today);
+        checkDate.setDate(today.getDate() - i);
+        const key = toISODate(checkDate);
+
+        if (uniqueWorkoutDays.has(key)) {
+            streak++;
+        } else {
+            break;
+        }
+        }
   
           setStreakDays(streak);
         }

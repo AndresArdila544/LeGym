@@ -11,6 +11,7 @@ import {
 import LoginModal from "../components/LoginModal";
 import CreateAccountModal from "../components/CreateAccountModal";
 import CreatePasswordModal from "../components/CreatePasswordModal";
+import OnboardingMembershipScreen from "./OnboardingMembershipScreen";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function WelcomeScreen({navigation}) {
@@ -335,6 +336,14 @@ export default function WelcomeScreen({navigation}) {
           console.error('❌ Failed to log users:', error);
         }
       };
+
+    useEffect(() => {
+            const clearActiveUser = async () => {
+              await AsyncStorage.removeItem('activeUser');
+              console.log('🧹 Cleared active user from storage');
+            };
+            clearActiveUser();
+          }, []);
       
     useEffect(() => {
         logAllUsers();
@@ -440,34 +449,41 @@ export default function WelcomeScreen({navigation}) {
                 <Modal visible={showCreatePassword} transparent animationType="slide">
                     <CreatePasswordModal
                         onClose={() => setShowCreatePassword(false)}
-                        onContinue={async(password) => {
-                        const newUser = {
-                            ...userInfo,
-                            password,
-                            memberSince: new Date().toISOString(),
-                            membership: 'Monthly'
-                        };
-                        try {
-                            const existing = await AsyncStorage.getItem('users');
-                            let users = existing ? JSON.parse(existing) : [];
+                        onContinue={(password) => {
+                          const fullUser = { ...userInfo, password };
+                          setShowCreatePassword(false);
+                          navigation.navigate('OnboardingMembershipScreen', { userInfo: fullUser });
+                        }}
 
-                            const isDuplicate = users.some(u => u.email.toLowerCase() === newUser.email.toLowerCase());
-                            if (isDuplicate) {
-                            alert('An account with this email already exists.');
-                            return;
-                            }
+                    //       async(password) => {
+                    //     const newUser = {
+                    //         ...userInfo,
+                    //         password,
+                    //         memberSince: new Date().toISOString(),
+                    //         membership: 'Monthly'
+                    //     };
+                    //     try {
+                    //         const existing = await AsyncStorage.getItem('users');
+                    //         let users = existing ? JSON.parse(existing) : [];
 
-                            users.push(newUser);
-                            await AsyncStorage.setItem('users', JSON.stringify(users));
-                            await AsyncStorage.setItem('activeUser', JSON.stringify(newUser));
+                    //         const isDuplicate = users.some(u => u.email.toLowerCase() === newUser.email.toLowerCase());
+                    //         if (isDuplicate) {
+                    //         alert('An account with this email already exists.');
+                    //         return;
+                    //         }
 
-                            console.log(`✅ User created and saved! with email: ${newUser.email}`);
-                            setShowCreatePassword(false);
-                            navigation.navigate("Home");
-                        } catch (err) {
-                            console.error('❌ Failed to save user:', err);
-                        }
-                    }}/>
+                    //         users.push(newUser);
+                    //         await AsyncStorage.setItem('users', JSON.stringify(users));
+                    //         await AsyncStorage.setItem('activeUser', JSON.stringify(newUser));
+
+                    //         console.log(`✅ User created and saved! with email: ${newUser.email}`);
+                    //         setShowCreatePassword(false);
+                    //         navigation.navigate("Home");
+                    //     } catch (err) {
+                    //         console.error('❌ Failed to save user:', err);
+                    //     }
+                    // }
+                    />
                 </Modal>
             </View>
         </ImageBackground>

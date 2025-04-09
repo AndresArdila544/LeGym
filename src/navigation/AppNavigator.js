@@ -19,6 +19,7 @@ import SettingsScreen from '../screens/SettingsScreen';
 import ForgotPassword from '../screens/ResetPassword';
 import ClassesScreen from '../screens/ClassesScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
+import OnboardingMembershipScreen from '../screens/OnboardingMembershipScreen';
 
 const Stack = createStackNavigator();
 
@@ -91,6 +92,14 @@ export default function AppNavigator({onLayout}) {
                 <Stack.Screen name="ProfileSetting" component={SettingsScreen}/>
                 <Stack.Screen name="ForgotPassword" component={ForgotPassword}/>
                 <Stack.Screen name="NotificationsScreen" component={NotificationsScreen}/>
+                <Stack.Screen
+                    name="OnboardingMembershipScreen"
+                    component={OnboardingMembershipScreen}
+                    options={{
+                    gestureEnabled: false,
+                    headerShown: false,
+                    animationEnabled: false
+                }}/>
 
             </Stack.Navigator>
         </NavigationContainer>

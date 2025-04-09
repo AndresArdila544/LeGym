@@ -6,13 +6,18 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function AddCardScreen({ navigation }) {
+export default function AddCardScreen({  route, navigation  }) {
+  const { userInfo, selectedMembership } = route.params || {};
   const [cardHolder, setCardHolder] = useState('');
   const [cardNumber, setCardNumber] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCvv] = useState('');
   const [setAsDefault, setSetAsDefault] = useState(true);
-  const [activeUser, setActiveUser] = useState(null);
+  const [activeUser, setActiveUser] = useState(userInfo || null);
+
+  useEffect(() => {
+    console.log("🛠️ AddCard route params:", route?.params);
+  }, []);
 
   useEffect(() => {
     const loadActiveUser = async () => {
@@ -45,7 +50,7 @@ export default function AddCardScreen({ navigation }) {
     }
 
     try {
-      const key = `paymentMethods_${activeUser.email}`;
+      const key = getStorageKey();
       const newPaymentMethod = {
         id: Date.now().toString(),
         cardHolder,
@@ -70,9 +75,18 @@ export default function AddCardScreen({ navigation }) {
       const finalMethods = [...updatedMethods, newPaymentMethod];
 
       await AsyncStorage.setItem(key, JSON.stringify(finalMethods));
-
+      console.log(`Saving card with key:`, key)
       Alert.alert('Success', 'Payment method added successfully', [
-        { text: 'OK', onPress: () => navigation.navigate('PaymentMethod') }
+        {
+          text: 'OK',
+          onPress: () => {
+            if (userInfo && selectedMembership) {
+              navigation.navigate('PaymentMethod', { userInfo, selectedMembership });
+            } else {
+              navigation.navigate('PaymentMethod');
+            }
+          },
+        },
       ]);
     } catch (error) {
       console.error('Error saving payment method:', error);
@@ -104,7 +118,12 @@ export default function AddCardScreen({ navigation }) {
     if (['34', '37'].includes(firstTwo)) return 'American Express';
     return 'Card';
   };
-
+  const getStorageKey = () => {
+    if (userInfo && !activeUser) {
+      return `paymentMethods_pending_${userInfo.email}`;
+    }
+    return `paymentMethods_${activeUser.email}`;
+  };
   
   return (
     <SafeAreaView style={styles.container}>

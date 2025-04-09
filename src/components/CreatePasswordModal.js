@@ -171,7 +171,7 @@ export default function CreatePasswordModal({onClose, onContinue}) {
                                 onContinue(password);
                               }}
                             >
-                                <Text style={styles.buttonText}>CREATE ACCOUNT</Text>
+                                <Text style={styles.buttonText}>CONTINUE</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity>

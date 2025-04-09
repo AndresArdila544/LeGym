@@ -1,5 +1,5 @@
 // src/screens/ClassDetailScreen.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useCallback  } from 'react';
 import {
     View,
     Text,
@@ -14,11 +14,12 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BottomNavigationBar from '../components/BottomNavigationBar';
 import uuid from 'react-native-uuid';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function ClassDetailScreen({ route, navigation }) {
-    const { classInfo, openCancelModal = false } = route.params
+    const { classInfo, openCancelModal = false, bookedDay = null } = route.params
     console.log(classInfo);
-    
+    const [bookedDays, setBookedDays] = useState([]);
 
     const [confirmationVisible,
         setConfirmationVisible] = useState(false);
@@ -27,35 +28,76 @@ export default function ClassDetailScreen({ route, navigation }) {
     const [cancelConfirmVisible,
         setCancelConfirmVisible] = useState(openCancelModal);
         const [activeUser, setActiveUser] = useState(null);
+        const [pendingCancelDay, setPendingCancelDay] = useState(null);
 
 
-    function getDateOfCurrentWeekday(weekday) {
-        const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const today = new Date();
-        const currentDay = today.getDay(); // 0 (Sun) - 6 (Sat)
-        const targetDay = weekdays.indexOf(weekday);
+        const getBaseClassId = (id) => {
+            return id.includes('_') ? id.split('_')[0] : id;
+          };
 
-        if (targetDay === -1) {
-            throw new Error('Invalid weekday name');
-        }
-
-        const diff = targetDay - currentDay;
-        const targetDate = new Date(today);
-        targetDate.setDate(today.getDate() + diff);
-
-        return targetDate.toISOString(); // Returns "YYYY-MM-DD"
-    }
-
-    useEffect(() => {
-        const loadUser = async () => {
-          const stored = await AsyncStorage.getItem('activeUser');
-          if (stored) {
-            const parsed = JSON.parse(stored);
-            setActiveUser(parsed);
+        function getDateOfCurrentWeekday(weekday) {
+            const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            if (!weekday || !weekdays.includes(weekday)) {
+              console.warn('Invalid weekday:', weekday);
+              return null;
+            }
+          
+            const today = new Date();
+            const currentDay = today.getDay();
+            const targetDay = weekdays.indexOf(weekday);
+            const diff = targetDay - currentDay;
+          
+            const targetDate = new Date(today);
+            targetDate.setDate(today.getDate() + diff);
+          
+            return targetDate.toISOString();
           }
-        };
-        loadUser();
-      }, []);
+          
+          function getNextDateOfWeekday(weekday) {
+            const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+          
+            if (typeof weekday !== 'string' || !weekdays.includes(weekday)) {
+              console.warn('Invalid weekday:', weekday);
+              return null;
+            }
+          
+            const today = new Date();
+            const todayIndex = today.getDay();
+            const targetIndex = weekdays.indexOf(weekday);
+          
+            const diff = (targetIndex - todayIndex + 7) % 7 || 7; // ensures next occurrence, even if today
+            const targetDate = new Date();
+            targetDate.setDate(today.getDate() + diff);
+            return targetDate.toISOString();
+          }
+          
+
+          useFocusEffect(
+            useCallback(() => {
+              const loadAndCheck = async () => {
+                const stored = await AsyncStorage.getItem('activeUser');
+                if (!stored) return;
+          
+                const parsed = JSON.parse(stored);
+                setActiveUser(parsed);
+          
+                if (classInfo.title !== 'Personal Trainer') return;
+          
+                const key = `classBookings_${parsed.email}`;
+                const bookingsJson = await AsyncStorage.getItem(key);
+                const bookings = bookingsJson ? JSON.parse(bookingsJson) : [];
+          
+                const booked = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].filter(day =>
+                  bookings.some(b => b.id === `${classInfo.id}_${day}`)
+                );
+          
+                setBookedDays(booked);
+              };
+          
+              loadAndCheck();
+            }, [classInfo.id, confirmationVisible, cancelConfirmVisible])
+          );
+          
     const getBookingKey = () => `classBookings_${activeUser?.email}`;
 
     const addNotification = async (title, body, type = 'general') => {
@@ -82,99 +124,195 @@ export default function ClassDetailScreen({ route, navigation }) {
       };
       
 
-    const handleBookClass = async () => {
+      const handleBookClass = async (dayOverride = null) => {
+        console.log(activeUser)
         if (!activeUser) return;
       
         const key = getBookingKey();
+        const isPersonalTrainer = classInfo.title === 'Personal Trainer';
       
-        // Parse the first weekday from classInfo.days (e.g., "Monday and Wednesday" -> "Monday")
-        const weekday = classInfo.days.split(' ')[0];
-      
+        let weekday = typeof dayOverride === 'string' ? dayOverride : null;
+        console.log('Booking weekday:', weekday);
+        if (!weekday && typeof classInfo.days === 'string') {
+        const possibleDay = classInfo.days.split(' ')[0];
+        const validWeekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        if (validWeekdays.includes(possibleDay)) {
+            weekday = possibleDay;
+        }
+        }
+
+
+
+        let classDate;
+
+        if (isPersonalTrainer) {
+            const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const today = new Date();
+            const todayIndex = today.getDay(); // 0 = Sunday
+            const targetIndex = weekdays.indexOf(weekday);
+          
+            if (targetIndex === -1) {
+              alert(`Invalid weekday: ${weekday}`);
+              return;
+            }
+          
+            const isPastDay = targetIndex < todayIndex;
+            if (isPastDay) {
+              alert(`You can only book Personal Trainer sessions for today or later. ${weekday} has already passed.`);
+              return;
+            }
+          
+            classDate = getDateOfCurrentWeekday(weekday); 
+        } else {
+        // Check that the day is today or later in the same week
         const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const today = new Date();
         const todayIndex = today.getDay(); // 0 = Sunday
-      
         const targetIndex = weekdays.indexOf(weekday);
-      
-        // Check if the class is today or later in the current week
-        const isFutureOrToday =
-          targetIndex === todayIndex || (targetIndex > todayIndex) ||
-          todayIndex === 0; // if today is Sunday, always allow
-      
-        if (!isFutureOrToday) {
-          alert(`You can only book classes from today onward. This class runs on ${weekday}.`);
-          return;
+
+        if (targetIndex === -1) {
+            alert(`Invalid weekday: ${weekday}`);
+            return;
         }
+
+        const isPastDay = targetIndex < todayIndex;
+        if (isPastDay) {
+            alert(`You can only book classes from today onward. This class runs on ${weekday}.`);
+            return;
+        }
+
+        classDate = getDateOfCurrentWeekday(weekday); // same-week booking
+        }
+
+
+
       
         const bookingsJson = await AsyncStorage.getItem(key);
         const bookings = bookingsJson ? JSON.parse(bookingsJson) : [];
       
-        const newBooking = {
-          ...classInfo,
-          booked: true,
-          date: new Date().toISOString(),
-          classDate: getDateOfCurrentWeekday(weekday)
-        };
-      
+        const newBooking = isPersonalTrainer
+          ? {
+              ...classInfo,
+              booked: true,
+              time: '6:00 AM',
+              date: new Date().toISOString(),
+              classDate,
+              days: weekday,
+              id: `${classInfo.id}_${weekday}`, // Unique ID per day
+            }
+          : {
+              ...classInfo,
+              booked: true,
+              date: new Date().toISOString(),
+              classDate,
+              id: classInfo.id,
+            };
+    
+        const alreadyBooked = bookings.some(b => b.id === newBooking.id);
+        if (alreadyBooked) {
+            console.log('Class already booked:', newBooking.id);
+            return;
+          }
+            
         const updatedBookings = [...bookings, newBooking];
         await AsyncStorage.setItem(key, JSON.stringify(updatedBookings));
-
-        setIsBooked(true);
+      
+        if (isPersonalTrainer) {
+          setBookedDays(prev => [...prev, weekday]);
+        } else {
+          setIsBooked(true);
+        }
+      
         setConfirmationVisible(true);
-
+      
         await addNotification(
-            'Class Booking Confirmed',
-            `Your ${classInfo.title} class for ${classInfo.days} is confirmed!`,
-            'bookClass'
-          );
-          
-
+          'Class Booking Confirmed',
+          isPersonalTrainer
+            ? `Your ${classInfo.title} session for ${weekday} at 6:00 AM is confirmed!`
+            : `Your ${classInfo.title} class for ${classInfo.days} is confirmed!`,
+          'bookClass'
+        );
       };
       
       
+      
+      
 
-      const handleCancelBooking = async () => {
+      const handleCancelBooking = async (dayOverride = null) => {
         if (!activeUser) return;
         const key = getBookingKey();
       
         const bookingsJson = await AsyncStorage.getItem(key);
         const bookings = bookingsJson ? JSON.parse(bookingsJson) : [];
       
-        const updatedBookings = bookings.filter(booking => booking.id !== classInfo.id);
+        const isPersonalTrainer = classInfo.title === 'Personal Trainer';
+        const idToCancel = isPersonalTrainer && (dayOverride || pendingCancelDay)
+          ? `${classInfo.id}_${dayOverride || pendingCancelDay}`
+          : classInfo.id;
+      
+        const updatedBookings = bookings.filter(booking => booking.id !== idToCancel);
         await AsyncStorage.setItem(key, JSON.stringify(updatedBookings));
       
         await addNotification(
-            'Class Cancelled', 
-            `Your booking for ${classInfo.title} class has been cancelled.`
+          'Class Cancelled',
+          isPersonalTrainer
+            ? `Your Personal Trainer session on ${dayOverride || pendingCancelDay} at 6:00 AM has been cancelled.`
+            : `Your booking for ${classInfo.title} class has been cancelled.`,
+          'cancelClass'
         );
-
-        setIsBooked(false);
+      
         setCancelConfirmVisible(false);
-
-        await addNotification(
-            'Class Booking Cancelled',
-            `You cancelled your ${classInfo.title} class happening on ${classInfo.days}.`,
-            'cancelClass'
-          );
+        if (isPersonalTrainer && (dayOverride || pendingCancelDay)) {
+          setBookedDays(prev => prev.filter(d => d !== (dayOverride || pendingCancelDay)));
+          setPendingCancelDay(null);
+        } else {
+          setIsBooked(false);
+        }
       };
       
+      
+
 
     // Check if class is already booked when component mounts
-    React.useEffect(() => {
+    useEffect(() => {
         const checkBookingStatus = async () => {
-            if (!activeUser) return;
-            const key = getBookingKey();
-            const bookingsJson = await AsyncStorage.getItem(key);
-            if (bookingsJson) {
-              const bookings = JSON.parse(bookingsJson);
-              const isAlreadyBooked = bookings.some(booking => booking.id === classInfo.id);
-              setIsBooked(isAlreadyBooked);
-            }
-          };
-          
-
+          if (!activeUser) return;
+          const key = getBookingKey();
+          const bookingsJson = await AsyncStorage.getItem(key);
+          if (!bookingsJson) return;
+      
+          const bookings = JSON.parse(bookingsJson);
+          const isPersonalTrainer = classInfo.title === 'Personal Trainer';
+      
+          if (!isPersonalTrainer) {
+            const booked = bookings.some(b => b.id === classInfo.id);
+            setIsBooked(booked);
+          }
+        };
+      
         checkBookingStatus();
-    }, [classInfo.id,, activeUser]);
+      }, [classInfo.id, activeUser]);
+      
+
+      useEffect(() => {
+        const checkBookedDays = async () => {
+          if (!activeUser || classInfo.title !== 'Personal Trainer') return;
+          const key = getBookingKey();
+          const bookingsJson = await AsyncStorage.getItem(key);
+          const bookings = bookingsJson ? JSON.parse(bookingsJson) : [];
+      
+          const booked = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].filter(day =>
+            bookings.some(b => b.id === `${getBaseClassId(classInfo.id)}_${day}`)
+          );
+          setBookedDays(booked);
+        };
+      
+        checkBookedDays();
+      }, [activeUser, classInfo.id, confirmationVisible, cancelConfirmVisible]);
+      
+      
+
+
 
     return (
         <SafeAreaView style={styles.container}>
@@ -229,19 +367,65 @@ export default function ClassDetailScreen({ route, navigation }) {
                     <Text style={styles.description}>{classInfo.description}</Text>
                 </View>
 
-                {isBooked
-                    ? (
-                        <TouchableOpacity
-                            style={[styles.actionButton, styles.cancelButton]}
-                            onPress={() => setCancelConfirmVisible(true)}>
-                            <Text style={styles.actionButtonText}>Cancel Booking</Text>
-                        </TouchableOpacity>
-                    )
-                    : (
-                        <TouchableOpacity style={styles.actionButton} onPress={handleBookClass}>
-                            <Text style={styles.actionButtonText}>Book Class</Text>
-                        </TouchableOpacity>
-                    )}
+                {classInfo.title === 'Personal Trainer' ? (
+  <View style={{ padding: 16 }}>
+    {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day) => (
+      <View key={day} style={styles.trainerCard}>
+        <View style={styles.cardRow}>
+          <Ionicons name="location-outline" size={16} color="#555" />
+          <Text style={styles.cardText}>{classInfo.location}</Text>
+        </View>
+        <View style={styles.cardRow}>
+          <Ionicons name="star" size={16} color="#f5a623" />
+          <Text style={styles.cardText}>{classInfo.rating} ({classInfo.reviews} reviews)</Text>
+        </View>
+        <View style={styles.cardRow}>
+          <Ionicons name="calendar-outline" size={16} color="#555" />
+          <Text style={styles.cardText}>{day}</Text>
+        </View>
+        <View style={styles.cardRow}>
+          <Ionicons name="time-outline" size={16} color="#555" />
+          <Text style={styles.cardText}>6:00 AM</Text>
+        </View>
+        {activeUser && (
+        <TouchableOpacity
+        style={styles.bookButton}
+        onPress={() => {
+          if (bookedDays.includes(day)) {
+            setPendingCancelDay(day);
+            setCancelConfirmVisible(true);
+          } else {
+            handleBookClass(day);
+          }
+        }}
+      >
+        <Text style={styles.bookButtonText}>
+          {bookedDays.includes(day) ? `Cancel ${day} Booking` : `Book for ${day}`}
+        </Text>
+      </TouchableOpacity>
+      
+        )}
+
+      </View>
+    ))}
+  </View>
+) : (
+  isBooked ? (
+    <TouchableOpacity
+      style={[styles.actionButton, styles.cancelButton]}
+      onPress={() => setCancelConfirmVisible(true)}>
+      <Text style={styles.actionButtonText}>Cancel Booking</Text>
+    </TouchableOpacity>
+  ) : (
+    
+    <TouchableOpacity style={styles.actionButton} onPress={handleBookClass}>
+      <Text style={styles.actionButtonText}>Book Class</Text>
+    </TouchableOpacity>
+
+    
+  )
+)}
+
             </ScrollView>
 
             {/* Confirmation Modal */}
@@ -278,9 +462,15 @@ export default function ClassDetailScreen({ route, navigation }) {
                                 <Text style={styles.cancelModalButtonText}>No, Go back</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                                style={[styles.modalButton, styles.confirmModalButton]}
-                                onPress={handleCancelBooking}>
-                                <Text style={styles.confirmModalButtonText}>Yes, Cancel</Text>
+                            style={[styles.modalButton, styles.confirmModalButton]}
+                            onPress={() => {
+                                if (classInfo.title === 'Personal Trainer') {
+                                handleCancelBooking(pendingCancelDay);
+                                } else {
+                                handleCancelBooking(); // no argument
+                                }
+                            }}>
+                            <Text style={styles.confirmModalButtonText}>Yes, Cancel</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -481,5 +671,36 @@ const styles = StyleSheet.create({
     confirmModalButtonText: {
         color: 'white',
         fontWeight: 'bold'
-    }
+    },
+    trainerCard: {
+        backgroundColor: '#f9f9f9',
+        borderRadius: 12,
+        padding: 16,
+        marginBottom: 16,
+        borderWidth: 1,
+        borderColor: '#ddd',
+      },
+      cardRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 6,
+      },
+      cardText: {
+        marginLeft: 8,
+        fontSize: 14,
+        color: '#333',
+      },
+      bookButton: {
+        marginTop: 12,
+        backgroundColor: '#912338',
+        paddingVertical: 10,
+        borderRadius: 20,
+        alignItems: 'center',
+      },
+      bookButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 14,
+      }
+      
 });

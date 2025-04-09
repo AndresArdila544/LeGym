@@ -98,16 +98,36 @@ export default function CalendarScreen({ navigation }) {
 
 
   // Filter events for selected date
-  const todayEvents = events.filter((event) => {
-    console.log(event.classDate);
-
+  const todayEvents = events
+  .filter((event) => {
     const eventDate = new Date(event.classDate);
     return (
       eventDate.getDate() === selectedDate.getDate() &&
       eventDate.getMonth() === selectedDate.getMonth() &&
       eventDate.getFullYear() === selectedDate.getFullYear()
     );
+  })
+  .sort((a, b) => {
+    const parseTime = (timeStr) => {
+      if (!timeStr) return 0;
+      // Handles formats like "6:00 AM" or "7:30PM"
+      const match = timeStr.trim().match(/(\d+):(\d+)\s*(AM|PM)/i);
+      if (!match) return 0;
+
+      let [_, hour, minute, ampm] = match;
+      hour = parseInt(hour, 10);
+      minute = parseInt(minute, 10);
+
+      if (ampm.toLowerCase() === 'pm' && hour !== 12) hour += 12;
+      if (ampm.toLowerCase() === 'am' && hour === 12) hour = 0;
+
+      return hour * 60 + minute;
+    };
+
+    return parseTime(a.time) - parseTime(b.time);
   });
+
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -162,7 +182,11 @@ export default function CalendarScreen({ navigation }) {
                 <View style={styles.eventDetailsCard}>
                   <TouchableOpacity
                     onPress={() =>
-                      navigation.navigate("ClassDetail", { classInfo: event })
+                      navigation.navigate("ClassDetail", {
+                        classInfo: event,
+                        openCancelModal: false,
+                        bookedDay: event.days, 
+                      })
                     }
                   >
                     <Text style={styles.eventTitle}>{event.title}</Text>

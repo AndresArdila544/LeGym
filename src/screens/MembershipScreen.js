@@ -21,6 +21,8 @@ export default function MembershipScreen({ navigation }) {
         setSelectedMembership] = useState(null);
     const [confirmModalVisible,
         setConfirmModalVisible] = useState(false);
+    const [pendingMembership, setPendingMembership] = useState(null);
+
 
     useEffect(() => {
         const loadMembershipData = async () => {
@@ -30,6 +32,8 @@ export default function MembershipScreen({ navigation }) {
                     const parsedData = JSON.parse(storedUser);
                     const membership = parsedData.membership || 'Monthly';
                     const startDate = parsedData.memberSince ? new Date(parsedData.memberSince) : new Date();
+                    const pending = parsedData.pendingMembership || null;
+                    setPendingMembership(pending);
 
                     const newRenewalDate = new Date(startDate);
                     switch (membership) {
@@ -46,6 +50,10 @@ export default function MembershipScreen({ navigation }) {
 
                     setCurrentMembership(membership);
                     setRenewalDate(newRenewalDate);
+                    if (pending) {
+                        console.log(`🔁 Pending membership switch to ${pending} on ${newRenewalDate.toLocaleDateString()}`);
+                      }
+                      
                 }
             } catch (error) {
                 console.error('Failed to load membership data:', error);
@@ -57,47 +65,60 @@ export default function MembershipScreen({ navigation }) {
 
 
     const openConfirmationModal = (membership) => {
-        setSelectedMembership(membership);
-        setConfirmModalVisible(true);
+        // If selecting the same as current and there's a pending change → cancel it
+
+            setSelectedMembership(membership);
+            setConfirmModalVisible(true);
+
     };
+    
 
     const confirmMembershipChange = async () => {
-        if (!selectedMembership || selectedMembership === currentMembership) {
-            setConfirmModalVisible(false);
-            return;
-        }
-
         try {
             const storedUser = await AsyncStorage.getItem('activeUser');
-            if (storedUser) {
-                const parsedData = JSON.parse(storedUser);
-                const startDate = new Date();
-
-                parsedData.membership = selectedMembership;
-                parsedData.memberSince = startDate.toISOString();
-
+            if (!storedUser) return;
+    
+            const parsedData = JSON.parse(storedUser);
+    
+            let updated = false;
+    
+            if (selectedMembership === currentMembership && pendingMembership) {
+                // Cancel pending
+                delete parsedData.pendingMembership;
+                setPendingMembership(null);
+                updated = true;
+    
+                const notification = {
+                    id: uuid.v4(),
+                    title: 'Membership Change Cancelled',
+                    body: `Your pending switch to ${pendingMembership} was cancelled.`,
+                    timestamp: new Date().toISOString(),
+                    type: 'membershipUpdate'
+                };
+                const notifications = JSON.parse(await AsyncStorage.getItem('notifications')) || [];
+                notifications.push(notification);
+                await AsyncStorage.setItem('notifications', JSON.stringify(notifications));
+            } else if (selectedMembership !== currentMembership) {
+                parsedData.pendingMembership = selectedMembership;
+                setPendingMembership(selectedMembership);
+                updated = true;
+    
+                const notification = {
+                    id: uuid.v4(),
+                    title: 'Membership Change Scheduled',
+                    body: `You will switch to ${selectedMembership} after ${renewalDate.toLocaleDateString()}.`,
+                    timestamp: new Date().toISOString(),
+                    type: 'membershipUpdate'
+                };
+                const notifications = JSON.parse(await AsyncStorage.getItem('notifications')) || [];
+                notifications.push(notification);
+                await AsyncStorage.setItem('notifications', JSON.stringify(notifications));
+            }
+    
+            if (updated) {
                 await AsyncStorage.setItem('activeUser', JSON.stringify(parsedData));
-
-                setCurrentMembership(selectedMembership);
-                setSelectedMembership(null);
-                setConfirmModalVisible(false);
-
-                const newRenewalDate = new Date(startDate);
-                switch (selectedMembership) {
-                    case 'Monthly':
-                        newRenewalDate.setMonth(newRenewalDate.getMonth() + 1);
-                        break;
-                    case 'Annual':
-                        newRenewalDate.setFullYear(newRenewalDate.getFullYear() + 1);
-                        break;
-                    case 'Weekly':
-                        newRenewalDate.setDate(newRenewalDate.getDate() + 7);
-                        break;
-                }
-
-                setRenewalDate(newRenewalDate);
-
-                // Also update the user in the users array:
+    
+                // Update users array
                 const allUsersRaw = await AsyncStorage.getItem('users');
                 if (allUsersRaw) {
                     const users = JSON.parse(allUsersRaw);
@@ -106,22 +127,16 @@ export default function MembershipScreen({ navigation }) {
                     );
                     await AsyncStorage.setItem('users', JSON.stringify(updatedUsers));
                 }
-
-                const notification = {
-                    id: uuid.v4(),
-                    title: 'Membership Updated',
-                    body: `Your membership has been updated to ${selectedMembership}.`,
-                    timestamp: new Date().toISOString(),
-                    type: 'membershipUpdate'
-                }
-                const notifications = JSON.parse(await AsyncStorage.getItem('notifications')) || [];
-                notifications.push(notification);
-                await AsyncStorage.setItem('notifications', JSON.stringify(notifications));
             }
+    
+            setConfirmModalVisible(false);
+            setSelectedMembership(null);
+    
         } catch (error) {
-            console.error('Failed to update membership:', error);
+            console.error('❌ Failed to update membership:', error);
         }
     };
+    
 
 
     const getMembershipPrice = (type) => {
@@ -196,9 +211,13 @@ export default function MembershipScreen({ navigation }) {
                         <Text style={styles.membershipDescription}>
                             {getMembershipDescription(currentMembership)}
                         </Text>
-                        <Text style={styles.renewalDate}>
+                        {!pendingMembership? (<Text style={styles.renewalDate}>
                             Renews on: {renewalDate.toLocaleDateString()}
+                        </Text>) : (
+                        <Text style={[styles.renewalDate, { color: '#912338', fontWeight: 'bold' }]}>
+                            Change to "{pendingMembership}" will take effect on {renewalDate.toLocaleDateString()}
                         </Text>
+                        )}
                     </View>
                 </View>
 
@@ -214,10 +233,11 @@ export default function MembershipScreen({ navigation }) {
             <Modal visible={confirmModalVisible} transparent animationType="fade">
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalBox}>
-                        <Text style={styles.modalTitle}>
-                            Confirm switch to {selectedMembership}
-                            membership?
-                        </Text>
+                    <Text style={styles.modalTitle}>
+                    {selectedMembership === currentMembership && pendingMembership
+                        ? `Cancel switch to ${pendingMembership}?`
+                        : `Confirm switch to ${selectedMembership} membership?`}
+                    </Text>
                         <View style={styles.modalButtons}>
                             <TouchableOpacity
                                 style={[styles.modalButton, styles.cancelButton]}
@@ -333,12 +353,13 @@ const styles = StyleSheet.create({
     },
     currentBadge: {
         position: 'absolute',
-        top: 8,
+        bottom: 8,
         right: 8,
         backgroundColor: '#912338',
+        
         paddingHorizontal: 8,
         paddingVertical: 4,
-        borderRadius: 4
+        borderRadius: 20,
     },
     currentBadgeText: {
         color: 'white',
@@ -377,10 +398,12 @@ const styles = StyleSheet.create({
         marginHorizontal: 6
     },
     cancelButton: {
-        backgroundColor: '#f1f1f1'
+        backgroundColor: '#f1f1f1',
+        borderRadius: 20,
     },
     confirmButton: {
-        backgroundColor: '#912338'
+        backgroundColor: '#912338',
+        borderRadius: 20,
     },
     cancelText: {
         color: '#333',
